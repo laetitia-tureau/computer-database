@@ -10,20 +10,23 @@ import java.text.ParseException;
 import com.excilys.formation.java.cdb.mappers.DateMapper;
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.models.Computer;
-import com.excilys.formation.java.cdb.models.Page;
 import com.excilys.formation.java.cdb.services.CompanyService;
 import com.excilys.formation.java.cdb.services.ComputerService;
+import com.excilys.formation.java.cdb.services.Page;
 
+/** Represents Command-line interface.
+ * @author Laetitia Tureau
+ */
 public class UserInterface {
 	
 	private static void menuUpdate() {
 		System.out.println(" -> What do you want to update ? ");
 		System.out.println("Select operation:");
-		System.out.println(MenuUpdate.COMPUTER_NAME);
-		System.out.println(MenuUpdate.INTRODUCED_DATE);
-		System.out.println(MenuUpdate.DISCONTINUED_DATE);
-		System.out.println(MenuUpdate.MANUFACTURER);
-		System.out.println(MenuUpdate.QUIT);
+		System.out.println(MenuChoice.COMPUTER_NAME);
+		System.out.println(MenuChoice.INTRODUCED_DATE);
+		System.out.println(MenuChoice.DISCONTINUED_DATE);
+		System.out.println(MenuChoice.MANUFACTURER);
+		System.out.println(MenuChoice.QUIT);
 	}
 	
 	private static void menu() {
@@ -107,9 +110,9 @@ public class UserInterface {
 						} else {
 							menuUpdate();
 							int selector = scanner.nextInt();
-							MenuUpdate choice_2 = MenuUpdate.fromEntry(selector);
+							choice = MenuChoice.fromEntryUpdate(selector);
 							
-							switch(choice_2) {
+							switch(choice) {
 								case COMPUTER_NAME:
 									computerService.updateName(retrieveName(scanner, ""), id_update);
 									break;

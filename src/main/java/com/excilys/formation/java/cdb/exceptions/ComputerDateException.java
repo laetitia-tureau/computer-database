@@ -1,5 +1,9 @@
 package com.excilys.formation.java.cdb.exceptions;
 
+/** 
+ * Exception for computer's date.
+ * @author Laetitia Tureau
+ */
 @SuppressWarnings("serial")
 public class ComputerDateException extends Exception {
 	

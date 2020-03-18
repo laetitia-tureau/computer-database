@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 
@@ -19,6 +22,9 @@ public class CompanyService {
 	 * saving and updating table company data into the database.
 	 */
 	private CompanyDAO companyDAO;
+	
+	/** class logger */
+	private static final Logger logger = LoggerFactory.getLogger(CompanyService.class);
 	
 	/** 
 	 * Creates a service to company operations.
@@ -39,14 +45,15 @@ public class CompanyService {
 				companies.add(new Company(result.getLong(1), result.getString(2)));
 			}
 		} catch(SQLException sqle) {
-			sqle.printStackTrace();
+			logger.error("Erreur lors de l'exécution de la requête", sqle);
 		}
 		return companies;
 	}
 	
 	/** 
-	 * Retrieve a company with a specific id
-	 * @param A empty Optional if nothing found else a Optional containing a company
+	 * Retrieve a company with a specific id.
+	 * @param the company's id
+	 * @return An empty Optional if nothing found else a Optional containing a company
 	 */
 	public Optional<Company> findById(Long id) {
 		try {
@@ -54,8 +61,8 @@ public class CompanyService {
 			if (result.next()) {
 				return Optional.of(new Company(result.getLong(1)));
 			}
-		} catch(SQLException se) {
-			se.printStackTrace();
+		} catch(SQLException sqle) {
+			logger.error("Erreur lors de l'exécution de la requête", sqle);
 		}
 		return Optional.empty();
 	}
