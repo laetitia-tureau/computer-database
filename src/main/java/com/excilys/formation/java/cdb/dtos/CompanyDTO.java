@@ -1,25 +1,25 @@
-package com.excilys.formation.java.cdb.models;
+package com.excilys.formation.java.cdb.dtos;
 
 /** Represents a company.
  * @author Laetitia Tureau
  */
-public class Company {
+public class CompanyDTO {
 
 	private Long id;
 	private String name;
-	
+
 	/** Creates a company with the specified id.
 	 * @param companyID The employee’s id.
 	 */
-	public Company(Long companyID) {
+	public CompanyDTO(Long companyID) {
 		this.id = companyID;
 	}
-	
+
 	/** Creates an employee with the specified name.
 	 * @param companyID The employee’s id.
 	 * @param companyName The employee’s name.
 	 */
-	public Company(Long companyID, String companyName) {
+	public CompanyDTO(Long companyID, String companyName) {
 		this.id = companyID;
 		this.name = companyName;
 	}

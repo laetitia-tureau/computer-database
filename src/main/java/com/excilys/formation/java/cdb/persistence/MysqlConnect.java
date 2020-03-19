@@ -48,7 +48,8 @@ public final class MysqlConnect {
 	}
 	
    /**
-    * @return MysqlConnect Database connection object
+    * Retrieve the connexion to database
+	* @return MysqlConnect Database connection object
     */
    public static synchronized MysqlConnect getDbConnection() {
        if (database == null) {

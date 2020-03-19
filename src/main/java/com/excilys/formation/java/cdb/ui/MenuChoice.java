@@ -14,7 +14,7 @@ public enum MenuChoice {
 	INTRODUCED_DATE (2, "Computer's introduced date"),
 	DISCONTINUED_DATE (3, "Computer's discontinued date"),
 	MANUFACTURER (4, "Computer's company"),
-	QUIT(8, "Exit"),
+	QUIT(0, "Exit"),
 	ERROR(9, "Error");
 	
 	private final int choice;
@@ -69,7 +69,7 @@ public enum MenuChoice {
 				return UPDATE_COMPUTER;
 			case 6:
 				return DELETE_COMPUTER;
-			case 8:
+			case 0:
 				return QUIT;
 			default:
 				return ERROR;
@@ -91,7 +91,7 @@ public enum MenuChoice {
 				return DISCONTINUED_DATE;
 			case 4:
 				return MANUFACTURER;
-			case 8:
+			case 0:
 				return QUIT;
 			default:
 				return ERROR;

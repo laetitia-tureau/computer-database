@@ -69,7 +69,7 @@ public class ComputerService {
 	
 	/** 
 	 * Retrieve a computer with a specific id.
-	 * @param the computer's id
+	 * @param id the computer's id
 	 * @return An empty Optional if nothing found else a Optional containing a computer
 	 */
 	public Optional<Computer> findById(Long id) {

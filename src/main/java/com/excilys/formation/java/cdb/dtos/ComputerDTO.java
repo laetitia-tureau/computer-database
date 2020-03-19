@@ -1,25 +1,25 @@
-package com.excilys.formation.java.cdb.models;
+package com.excilys.formation.java.cdb.dtos;
 
 import java.time.LocalDate;
 
 /** Represents a computer.
  * @author Laetitia Tureau
 */
-public class Computer {
+public class ComputerDTO {
 
 	private Long id;
 	private String name;
 	private LocalDate introduced;
 	private LocalDate discontinued;
-	
+
 	/** Represents the computer's company.
 	 */
-	private Company manufacturer;
-	
+	private CompanyDTO manufacturer;
+
 	/** Creates a computer using a ComputerBuilder.
-	 * @param builder A ComputerBuilder
+	 * @param builder
 	 */
-	public Computer(ComputerBuilder builder) {
+	public ComputerDTO(ComputerBuilder builder) {
 		this.id = builder.id;
 		this.name = builder.name;
 		this.introduced = builder.introduced;
@@ -59,7 +59,7 @@ public class Computer {
 	 * Gets the computer's company..
 	 * @return this.manufacturer
 	 */
-	public Company getManufacturer() {
+	public CompanyDTO getManufacturer() {
 		return this.manufacturer;
 	}
 	
@@ -85,7 +85,7 @@ public class Computer {
 		
 		/** Represents the computer's company.
 		 */
-		private Company manufacturer;
+		private CompanyDTO manufacturer;
 		
 		/** Creates a ComputerBuilder with the specified id.
 		 * @param builderName The computer's name.
@@ -106,31 +106,31 @@ public class Computer {
 		
 		/**
 		 * Initialize attribute introduced of the ComputerBuilder
-		 * @param builderIntroduced A LocalDate
+		 * @param introducedBuilder A LocalDate
 		 * @return this
 		 */
-		public ComputerBuilder introduced(LocalDate builderIntroduced) {
-			this.introduced = builderIntroduced;
+		public ComputerBuilder introduced(LocalDate introducedBuilder) {
+			this.introduced = introducedBuilder;
 			return this;
 		}
 		
 		/**
 		 * Initialize attribute discontinued of the ComputerBuilder
-		 * @param builderDiscontinued A LocalDate
+		 * @param discontinuedBuilder A LocalDate
 		 * @return this
 		 */
-		public ComputerBuilder discontinued(LocalDate builderDiscontinued) {
-			this.discontinued = builderDiscontinued;
+		public ComputerBuilder discontinued(LocalDate discontinuedBuilder) {
+			this.discontinued = discontinuedBuilder;
 			return this;	
 		}
 		
 		/**
 		 * Initialize attribute manufacturer of the ComputerBuilder
-		 * @param builderManufacturer A Company
+		 * @param manufacturerBuilder A Company
 		 * @return this
 		 */
-		public ComputerBuilder manufacturer(Company builderManufacturer) {
-			this.manufacturer = builderManufacturer;
+		public ComputerBuilder manufacturer(CompanyDTO manufacturerBuilder) {
+			this.manufacturer = manufacturerBuilder;
 			return this;
 		}
 		
@@ -138,8 +138,8 @@ public class Computer {
 		 * Create a Computer from the ComputerBuilder
 		 * @return computer resulting
 		 */
-		public Computer build() {
-			Computer computer = new Computer(this);
+		public ComputerDTO build() {
+			ComputerDTO computer = new ComputerDTO(this);
 			return computer;
 		}	
 	}

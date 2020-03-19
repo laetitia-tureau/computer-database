@@ -52,7 +52,7 @@ public class CompanyService {
 	
 	/** 
 	 * Retrieve a company with a specific id.
-	 * @param the company's id
+	 * @param id the company's id
 	 * @return An empty Optional if nothing found else a Optional containing a company
 	 */
 	public Optional<Company> findById(Long id) {
