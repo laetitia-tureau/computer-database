@@ -1,30 +1,35 @@
 package com.excilys.formation.java.cdb.exceptions;
 
-/** 
+/**
  * Exception for computer's date.
  * @author Laetitia Tureau
  */
 @SuppressWarnings("serial")
 public class ComputerDateException extends Exception {
-	
-	public ComputerDateException() {
-	}
 
-	public ComputerDateException(String message) {
-		super(message);
-	}
+    /** Constructor. */
+    public ComputerDateException() { }
 
-	public ComputerDateException(Throwable cause) {
-		super(cause);
-	}
+    /** Constructor with specific message.
+     * @param message A String to provides information about exception
+     */
+    public ComputerDateException(String message) {
+        super(message);
+    }
 
-	public ComputerDateException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /** Constructor with specific cause.
+     * @param cause A Throwable that describe the cause of the exception
+     */
+    public ComputerDateException(Throwable cause) {
+        super(cause);
+    }
 
-	public ComputerDateException(String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
+    /** Constructor with message and cause.
+     * @param message A String to provides information about exception
+     * @param cause A Throwable that describe the cause of the exception
+     */
+    public ComputerDateException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
 }
