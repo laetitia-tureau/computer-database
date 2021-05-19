@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,19 +173,17 @@ public class ComputerService {
      * @param computer to validate
      */
     private void validateComputerObject(Computer computer, Timestamp date, boolean isIntroDate) throws ComputerDateException {
-    	if(computer.getIntroduced() == null && !isIntroDate) {
-            throw new ComputerDateException("computer must have an introduced date");
-    	}	
+    	LocalDate dateToInsert = date.toLocalDateTime().toLocalDate();
     	if(!isIntroDate) {
-    		if (computer.getIntroduced().compareTo(date.toLocalDateTime().toLocalDate()) > 0) {
-                throw new ComputerDateException("discontinued date must be greater than introduced date");
-            }
-    	} else {
-    		if(computer.getDiscontinued() != null) {
-    			if (computer.getDiscontinued().compareTo(date.toLocalDateTime().toLocalDate()) < 0) {
-                    throw new ComputerDateException("discontinued date must be greater than introduced date");
-                }
-    		} 
+    		if(computer.getIntroduced() == null) {
+    			throw new ComputerDateException("computer must have an introduced date");
+    		} else if(computer.getIntroduced().compareTo(dateToInsert) > 0) {
+    			throw new ComputerDateException("discontinued date must be greater than introduced date");
+    		}
+    	} else if(computer.getDiscontinued() != null) {
+    		if(computer.getDiscontinued().compareTo(dateToInsert) < 0) {
+    			throw new ComputerDateException("discontinued date must be greater than introduced date");
+    		}
     	}
     }
 }
