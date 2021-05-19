@@ -123,7 +123,7 @@ public class ComputerService {
         Optional<Computer> computer = findById(id);
         if (computer.isPresent()) {
             try {
-                validateComputerObject(computer.get(), false);
+                validateComputerObject(computer.get(), date, true);
                 computerDAO.updateIntroduced(date, id);
             } catch (ComputerDateException | SQLException exe) {
                 LOGGER.error("Erreur lors de l'exécution de la requête", exe);
@@ -142,8 +142,7 @@ public class ComputerService {
         Optional<Computer> computer = findById(id);
         if (computer.isPresent()) {
             try {
-                boolean firstInit = computer.get().getDiscontinued() ==  null ? true : false;
-                validateComputerObject(computer.get(), firstInit);
+                validateComputerObject(computer.get(), date, false);
                 computerDAO.updateDiscontinued(date, id);
             } catch (ComputerDateException | SQLException exe) {
                 LOGGER.error("Erreur lors de l'exécution de la requête", exe);
@@ -169,19 +168,23 @@ public class ComputerService {
 
     /**
      * Verify if a computer object does not break any assumption of system.
-     * @throws ComputerDateException
+     * @throws ComputerDateException if user enter a discontinued date when no introduced date or if introduced date > discontinued date
      * @param computer to validate
-     * @param discontinued1stInit
      */
-    private void validateComputerObject(Computer computer, boolean discontinued1stInit) throws ComputerDateException {
-        if (computer.getIntroduced() == null && computer.getDiscontinued() != null || discontinued1stInit) {
+    private void validateComputerObject(Computer computer, Timestamp date, boolean isIntroDate) throws ComputerDateException {
+    	if(computer.getIntroduced() == null && !isIntroDate) {
             throw new ComputerDateException("computer must have an introduced date");
-        }
-
-        if (computer.getIntroduced() != null && computer.getDiscontinued() != null) {
-            if (computer.getIntroduced().compareTo(computer.getDiscontinued()) < 0) {
+    	}	
+    	if(!isIntroDate) {
+    		if (computer.getIntroduced().compareTo(date.toLocalDateTime().toLocalDate()) > 0) {
                 throw new ComputerDateException("discontinued date must be greater than introduced date");
             }
-        }
+    	} else {
+    		if(computer.getDiscontinued() != null) {
+    			if (computer.getDiscontinued().compareTo(date.toLocalDateTime().toLocalDate()) < 0) {
+                    throw new ComputerDateException("discontinued date must be greater than introduced date");
+                }
+    		} 
+    	}
     }
 }

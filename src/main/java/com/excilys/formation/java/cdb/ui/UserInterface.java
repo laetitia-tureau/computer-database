@@ -22,6 +22,8 @@ public class UserInterface {
 
     private static ComputerService computerService = new ComputerService();
     private static CompanyService companyService = new CompanyService();
+    private static Optional<Computer> optionalComputer;
+    private static Optional<Company> optionalCompany;
 
     /**
      * Display a paginated list.
@@ -65,7 +67,7 @@ public class UserInterface {
 
     /**
      * Retrieve the date entered in the cli.
-     * @throws ParseException
+     * @throws ParseException when date format entered not valid
      * @param scanner A scanner to read the date
      * @return the entered date as a Timestamp
      */
@@ -86,18 +88,50 @@ public class UserInterface {
     }
 
     /**
-     * Represents Command-line interface.
-     * @throws SQLException
-     * @throws ParseException
+     * Print general menu or menu to update attributes and select an option.
+     * @param scanner A scanner to read the choice
+     * @param update if user choice's is to update an attribute or other
+     * @return the user choice as a MenuChoice
      */
-    //TODO implement ERROR
+    private MenuChoice choiceFromMenu(Scanner scanner, boolean update) {
+        if (update) {
+            menuUpdate();
+            int selector = scanner.nextInt();
+            return MenuChoice.fromEntryUpdate(selector);
+        } else {
+            menu();
+            int selector = scanner.nextInt();
+            return MenuChoice.fromEntry(selector);
+        }
+    }
+
+    /**
+     * Find Company or Computer given an id and assign the object retrieved to the corresponding static optional object.
+     * @param scanner A scanner to read the id
+     * @param action A message to display the use of the id
+     * @param update if the action is an update or not
+     * @param isCompany if the object is a company or not
+     * @return the id entered
+     */
+    private Long find(Scanner scanner, String action, boolean update, boolean isCompany) {
+        Long id = retrieveID(scanner, action, update);
+        if (isCompany) {
+            optionalCompany = companyService.findById(id);
+        } else {
+            optionalComputer = computerService.findById(id);
+        }
+        return id;
+    }
+
+    /**
+     * Represents Command-line interface.
+     * @throws SQLException for crud operations
+     * @throws ParseException when parsing a date
+     */
     public void start() throws SQLException, ParseException {
         Scanner scanner = new Scanner(System.in);
         do {
-            menu();
-            int featureSelector = scanner.nextInt();
-            MenuChoice choice = MenuChoice.fromEntry(featureSelector);
-            switch (choice) {
+            switch (choiceFromMenu(scanner, false)) {
                 case COMPUTER_LIST:
                     printList(scanner, computerService.listAll());
                     break;
@@ -105,9 +139,8 @@ public class UserInterface {
                     printList(scanner, companyService.listAll());
                     break;
                 case COMPUTER_DETAIL:
-                    Long computerID = retrieveID(scanner, "computer to display", false);
-                    Optional<Computer> computer = computerService.findById(computerID);
-                    System.out.println(computer.isPresent() ? computer.get() : "No computer with id : " + computerID);
+                    Long computerID = find(scanner, "computer to show", true, false);
+                    System.out.println(optionalComputer.isPresent() ? optionalComputer.get() : "No computer with id : " + computerID);
                     break;
                 case CREATE_COMPUTER:
                     computerService.createComputer(retrieveName(scanner, "of computer to create"));
@@ -117,16 +150,11 @@ public class UserInterface {
                     break;
                 case UPDATE_COMPUTER:
                     do {
-                        Long updateID = retrieveID(scanner, "computer to update", false);
-                        Optional<Computer> optionalComputer = computerService.findById(updateID);
+                        Long updateID = find(scanner, "computer to update", true, false);
                         if (!optionalComputer.isPresent()) {
                             System.out.println("No computer with id : " + updateID);
                         } else {
-                            menuUpdate();
-                            int selector = scanner.nextInt();
-                            choice = MenuChoice.fromEntryUpdate(selector);
-
-                            switch (choice) {
+                            switch (choiceFromMenu(scanner, true)) {
                                 case COMPUTER_NAME:
                                     computerService.updateName(retrieveName(scanner, ""), updateID);
                                     break;
@@ -137,8 +165,7 @@ public class UserInterface {
                                     computerService.updateDiscontinued(retrieveTimestamp(scanner), updateID);
                                     break;
                                 case MANUFACTURER:
-                                    Long companyID = retrieveID(scanner, "company", true);
-                                    Optional<Company> optionalCompany = companyService.findById(companyID);
+                                    Long companyID = find(scanner, "company to update", true, true);
                                     if (!optionalCompany.isPresent()) {
                                         System.out.println("No company with id : " + companyID);
                                     } else {
