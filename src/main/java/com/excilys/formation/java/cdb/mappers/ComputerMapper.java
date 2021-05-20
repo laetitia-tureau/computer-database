@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
+import com.excilys.formation.java.cdb.models.Company.CompanyBuilder;
 
 /**
  * Mapper class for computers.
@@ -36,7 +37,8 @@ public class ComputerMapper {
             builder.discontinued(discontinued);
         }
         if (result.getLong(5) != 0) {
-            manufacturer = new Company(result.getLong(5), result.getString(6));
+            //manufacturer = new Company(result.getLong(5), result.getString(6));
+            manufacturer = new CompanyBuilder(result.getLong(5), result.getString(6)).build();
             builder.manufacturer(manufacturer);
         }
         return new Computer(builder);

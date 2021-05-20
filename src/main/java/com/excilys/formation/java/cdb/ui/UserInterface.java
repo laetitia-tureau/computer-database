@@ -124,6 +124,41 @@ public class UserInterface {
     }
 
     /**
+     * Update a Computer.
+     * @param scanner A scanner to read the id and the user's choice
+     * @throws SQLException for crud operations
+     * @throws ParseException when parsing a date
+     */
+    private void update(Scanner scanner) throws SQLException, ParseException {
+        Long updateID = find(scanner, "computer to update", true, false);
+        if (!optionalComputer.isPresent()) {
+            System.out.println("No computer with id : " + updateID);
+        } else {
+            switch (choiceFromMenu(scanner, true)) {
+                case COMPUTER_NAME:
+                    computerService.updateName(retrieveName(scanner, ""), updateID);
+                    break;
+                case INTRODUCED_DATE:
+                    computerService.updateIntroduced(retrieveTimestamp(scanner), updateID);
+                    break;
+                case DISCONTINUED_DATE:
+                    computerService.updateDiscontinued(retrieveTimestamp(scanner), updateID);
+                    break;
+                case MANUFACTURER:
+                    Long companyID = find(scanner, "company to update", true, true);
+                    if (!optionalCompany.isPresent()) {
+                        System.out.println("No company with id : " + companyID);
+                    } else {
+                        computerService.updateManufacturer(companyID, updateID);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /**
      * Represents Command-line interface.
      * @throws SQLException for crud operations
      * @throws ParseException when parsing a date
@@ -150,32 +185,7 @@ public class UserInterface {
                     break;
                 case UPDATE_COMPUTER:
                     do {
-                        Long updateID = find(scanner, "computer to update", true, false);
-                        if (!optionalComputer.isPresent()) {
-                            System.out.println("No computer with id : " + updateID);
-                        } else {
-                            switch (choiceFromMenu(scanner, true)) {
-                                case COMPUTER_NAME:
-                                    computerService.updateName(retrieveName(scanner, ""), updateID);
-                                    break;
-                                case INTRODUCED_DATE:
-                                    computerService.updateIntroduced(retrieveTimestamp(scanner), updateID);
-                                    break;
-                                case DISCONTINUED_DATE:
-                                    computerService.updateDiscontinued(retrieveTimestamp(scanner), updateID);
-                                    break;
-                                case MANUFACTURER:
-                                    Long companyID = find(scanner, "company to update", true, true);
-                                    if (!optionalCompany.isPresent()) {
-                                        System.out.println("No company with id : " + companyID);
-                                    } else {
-                                        computerService.updateManufacturer(companyID, updateID);
-                                    }
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
+                        update(scanner);
                     } while (decide(scanner) != 0);
                     break;
                 default:

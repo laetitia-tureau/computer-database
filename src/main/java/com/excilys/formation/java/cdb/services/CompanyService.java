@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.excilys.formation.java.cdb.models.Company;
+import com.excilys.formation.java.cdb.models.Company.CompanyBuilder;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 
 /**
@@ -42,7 +43,8 @@ public class CompanyService {
         try {
             ResultSet result = companyDAO.getAllCompanies();
             while (result.next()) {
-                companies.add(new Company(result.getLong(1), result.getString(2)));
+                //companies.add(new Company(result.getLong(1), result.getString(2)));
+                companies.add(new CompanyBuilder(result.getLong(1), result.getString(2)).build());
             }
         } catch (SQLException sqle) {
             LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
@@ -59,7 +61,8 @@ public class CompanyService {
         try {
             ResultSet result = companyDAO.findById(id);
             if (result.next()) {
-                return Optional.of(new Company(result.getLong(1)));
+                //return Optional.of(new Company(result.getLong(1)));
+            	return Optional.of(new CompanyBuilder(result.getLong(1), result.getString(2)).build());
             }
         } catch (SQLException sqle) {
             LOGGER.error("Erreur lors de l'exécution de la requête", sqle);

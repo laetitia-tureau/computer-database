@@ -171,19 +171,21 @@ public class ComputerService {
      * Verify if a computer object does not break any assumption of system.
      * @throws ComputerDateException if user enter a discontinued date when no introduced date or if introduced date > discontinued date
      * @param computer to validate
+     * @param date to insert
+     * @param isIntroDate is true if user wants to update introduced date else false if discontinued date is updated
      */
     private void validateComputerObject(Computer computer, Timestamp date, boolean isIntroDate) throws ComputerDateException {
-    	LocalDate dateToInsert = date.toLocalDateTime().toLocalDate();
-    	if(!isIntroDate) {
-    		if(computer.getIntroduced() == null) {
-    			throw new ComputerDateException("computer must have an introduced date");
-    		} else if(computer.getIntroduced().compareTo(dateToInsert) > 0) {
-    			throw new ComputerDateException("discontinued date must be greater than introduced date");
-    		}
-    	} else if(computer.getDiscontinued() != null) {
-    		if(computer.getDiscontinued().compareTo(dateToInsert) < 0) {
-    			throw new ComputerDateException("discontinued date must be greater than introduced date");
-    		}
-    	}
+        LocalDate dateToInsert = date.toLocalDateTime().toLocalDate();
+        if (!isIntroDate) {
+            if (computer.getIntroduced() == null) {
+                throw new ComputerDateException("computer must have an introduced date");
+            } else if (computer.getIntroduced().compareTo(dateToInsert) > 0) {
+                throw new ComputerDateException("discontinued date must be greater than introduced date");
+            }
+        } else if (computer.getDiscontinued() != null) {
+            if (computer.getDiscontinued().compareTo(dateToInsert) < 0) {
+                throw new ComputerDateException("discontinued date must be greater than introduced date");
+            }
+        }
     }
 }
