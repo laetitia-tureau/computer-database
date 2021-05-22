@@ -86,7 +86,7 @@ public class Computer {
         /** Represents the computer's company. */
         private Company manufacturer;
 
-        /** Creates a ComputerBuilder with the specified id.
+        /** Creates a ComputerBuilder with the specified name.
          * @param builderName The computer's name.
          */
         public ComputerBuilder(String builderName) {

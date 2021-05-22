@@ -3,10 +3,10 @@ package com.excilys.formation.java.cdb.services;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.time.LocalDate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ public class ComputerService {
         try {
             ResultSet res = computerDAO.getAllComputers();
             while (res.next()) {
-                computers.add(ComputerMapper.convert(res));
+                computers.add(ComputerMapper.mapFromResultSet(res));
             }
         } catch (SQLException sqle) {
             LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
@@ -77,7 +77,7 @@ public class ComputerService {
         try {
             ResultSet result = computerDAO.findById(id);
             if (result.next()) {
-                return Optional.of(ComputerMapper.convert(result));
+                return Optional.of(ComputerMapper.mapFromResultSet(result));
             }
         } catch (SQLException sqle) {
             LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
@@ -174,7 +174,8 @@ public class ComputerService {
      * @param date to insert
      * @param isIntroDate is true if user wants to update introduced date else false if discontinued date is updated
      */
-    private void validateComputerObject(Computer computer, Timestamp date, boolean isIntroDate) throws ComputerDateException {
+    private void validateComputerObject(Computer computer, Timestamp date, boolean isIntroDate)
+            throws ComputerDateException {
         LocalDate dateToInsert = date.toLocalDateTime().toLocalDate();
         if (!isIntroDate) {
             if (computer.getIntroduced() == null) {
