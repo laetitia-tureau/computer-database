@@ -3,7 +3,6 @@ package com.excilys.formation.java.cdb.services;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +14,7 @@ import com.excilys.formation.java.cdb.exceptions.ComputerDateException;
 import com.excilys.formation.java.cdb.mappers.ComputerMapper;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
+import com.excilys.formation.java.cdb.validator.ComputerValidator;
 
 /**
  * Represents a computer service.
@@ -30,11 +30,14 @@ public class ComputerService {
     /** Class logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ComputerService.class);
 
+    private ComputerValidator computerValidator;
+
     /**
      * Creates a service to computer operations.
      */
     public ComputerService() {
         this.computerDAO = new ComputerDAO();
+        this.computerValidator = ComputerValidator.getInstance();
     }
 
     /**
@@ -124,7 +127,8 @@ public class ComputerService {
         Optional<Computer> computer = findById(id);
         if (computer.isPresent()) {
             try {
-                validateComputerObject(computer.get(), date, true);
+                // TODO: only pass computer built with date and fail to update it if forbidden
+                computerValidator.validateComputerDate(computer.get(), date, true);
                 computerDAO.updateIntroduced(date, id);
             } catch (ComputerDateException | SQLException exe) {
                 LOGGER.error("Erreur lors de l'exécution de la requête", exe);
@@ -143,7 +147,8 @@ public class ComputerService {
         Optional<Computer> computer = findById(id);
         if (computer.isPresent()) {
             try {
-                validateComputerObject(computer.get(), date, false);
+                // TODO: only pass computer built with date and fail to update it if forbidden
+                computerValidator.validateComputerDate(computer.get(), date, false);
                 computerDAO.updateDiscontinued(date, id);
             } catch (ComputerDateException | SQLException exe) {
                 LOGGER.error("Erreur lors de l'exécution de la requête", exe);
@@ -165,28 +170,5 @@ public class ComputerService {
             LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
         }
         return 0;
-    }
-
-    /**
-     * Verify if a computer object does not break any assumption of system.
-     * @throws ComputerDateException if user enter a discontinued date when no introduced date or if introduced date > discontinued date
-     * @param computer to validate
-     * @param date to insert
-     * @param isIntroDate is true if user wants to update introduced date else false if discontinued date is updated
-     */
-    private void validateComputerObject(Computer computer, Timestamp date, boolean isIntroDate)
-            throws ComputerDateException {
-        LocalDate dateToInsert = date.toLocalDateTime().toLocalDate();
-        if (!isIntroDate) {
-            if (computer.getIntroduced() == null) {
-                throw new ComputerDateException("computer must have an introduced date");
-            } else if (computer.getIntroduced().compareTo(dateToInsert) > 0) {
-                throw new ComputerDateException("discontinued date must be greater than introduced date");
-            }
-        } else if (computer.getDiscontinued() != null) {
-            if (computer.getDiscontinued().compareTo(dateToInsert) < 0) {
-                throw new ComputerDateException("discontinued date must be greater than introduced date");
-            }
-        }
     }
 }
