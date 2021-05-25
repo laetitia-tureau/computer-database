@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+import com.excilys.formation.java.cdb.dtos.ComputerDTO;
+import com.excilys.formation.java.cdb.dtos.ComputerDTO.ComputerBuilderDTO;
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.models.Company.CompanyBuilder;
 import com.excilys.formation.java.cdb.models.Computer;
@@ -42,6 +44,50 @@ public class ComputerMapper {
             builder.manufacturer(manufacturer);
         }
         return new Computer(builder);
+    }
+
+    /**
+     * Convert a ComputerDTO into a Computer.
+     * @param computerDTO A ComputerDTO to convert
+     * @return the computer resulting
+     */
+    public static Computer mapFromDTOtoModel(ComputerDTO computerDTO) {
+        Company company = new Company.CompanyBuilder("").build();
+        Long id = Long.parseLong(computerDTO.getId());
+        ComputerBuilder builder = new Computer.ComputerBuilder(id, computerDTO.getName());
+
+        if (computerDTO.getIntroduced() != null && computerDTO.getIntroduced().compareTo("") != 0) {
+            builder.introduced(LocalDate.parse(computerDTO.getIntroduced()));
+        }
+        if (computerDTO.getDiscontinued() != null && computerDTO.getDiscontinued().compareTo("") != 0) {
+            builder.discontinued(LocalDate.parse(computerDTO.getDiscontinued()));
+        }
+        if (computerDTO.getManufacturer() != null && computerDTO.getManufacturer().compareTo("") != 0) {
+            company = new Company.CompanyBuilder(Long.parseLong(computerDTO.getManufacturer())).build();
+            builder.manufacturer(company);
+        }
+        return new Computer(builder);
+    }
+
+    /**
+     * Convert a Computer into a ComputerDTO.
+     * @param computer A Computer to convert
+     * @return the computerDTO resulting
+     */
+    public static ComputerDTO mapFromModelToDTO(Computer computer) {
+        String id = String.valueOf(computer.getId());
+        ComputerBuilderDTO builder = new ComputerDTO.ComputerBuilderDTO(id, computer.getName());
+
+        if (computer.getDiscontinued() != null) {
+            builder.discontinued(String.valueOf(computer.getDiscontinued()));
+        }
+        if (computer.getIntroduced() != null) {
+            builder.introduced(String.valueOf(computer.getIntroduced()));
+        }
+        if (computer.getManufacturer() != null) {
+            builder.manufacturer(String.valueOf(computer.getManufacturer().getId()));
+        }
+        return new ComputerDTO(builder);
     }
 
 }

@@ -6,7 +6,7 @@ package com.excilys.formation.java.cdb.dtos;
  */
 public class CompanyDTO {
 
-    private Long id;
+    private String id;
     private String name;
 
     /**
@@ -22,7 +22,7 @@ public class CompanyDTO {
      * Gets the company's id.
      * @return this.id
      */
-    public Long getId() {
+    public String getId() {
         return this.id;
     }
 
@@ -47,7 +47,7 @@ public class CompanyDTO {
      */
     public static class CompanyBuilderDTO {
 
-        private Long id;
+        private String id;
         private String name;
 
         /**
@@ -64,7 +64,7 @@ public class CompanyDTO {
          * @param builderID   The company's id.
          * @param builderName The company's name.
          */
-        public CompanyBuilderDTO(Long builderID, String builderName) {
+        public CompanyBuilderDTO(String builderID, String builderName) {
             this.id = builderID;
             this.name = builderName;
         }
