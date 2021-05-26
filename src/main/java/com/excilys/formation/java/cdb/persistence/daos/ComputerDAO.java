@@ -1,12 +1,13 @@
 package com.excilys.formation.java.cdb.persistence.daos;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 
-import com.excilys.formation.java.cdb.persistence.MysqlConnect;
+import com.excilys.formation.java.cdb.persistence.DBConnexion;
 
 /** Represents a computer DAO.
  * @author Laetitia Tureau
@@ -14,7 +15,7 @@ import com.excilys.formation.java.cdb.persistence.MysqlConnect;
 public class ComputerDAO {
 
     /** The connexion to mySQL database. */
-    private MysqlConnect mysqlConnect = MysqlConnect.getDbConnection();
+    private DBConnexion dbConnexion;
 
     /** Represents query to create a computer. */
     private static final String INSERT_COMPUTER = "INSERT INTO computer (name) VALUES (?)";
@@ -42,7 +43,9 @@ public class ComputerDAO {
     private static final String UPDATE_MANUFACTURER = "UPDATE computer SET company_id = ? WHERE id = ?";
 
     /** Creates a DAO to computer operations into database. */
-    public ComputerDAO() { }
+    public ComputerDAO() {
+        this.dbConnexion = DBConnexion.getInstance();
+    }
 
     /**
      * Retrieve all the computers in the database.
@@ -50,7 +53,8 @@ public class ComputerDAO {
      * @return A ResultSet as a result of the executed query
      */
     public ResultSet getAllComputers() throws SQLException {
-        Statement stmt = mysqlConnect.connexion.createStatement();
+        Connection connexion = dbConnexion.getConnection();
+        Statement stmt = connexion.createStatement();
         return stmt.executeQuery(ALL_COMPUTERS);
     }
 
@@ -61,7 +65,8 @@ public class ComputerDAO {
      * @return the number of rows inserted
      */
     public int createComputer(String computerName) throws SQLException {
-        PreparedStatement stmt = mysqlConnect.connexion.prepareStatement(INSERT_COMPUTER);
+        Connection connexion = dbConnexion.getConnection();
+        PreparedStatement stmt = connexion.prepareStatement(INSERT_COMPUTER);
         stmt.setString(1, computerName);
         return stmt.executeUpdate();
     }
@@ -73,7 +78,8 @@ public class ComputerDAO {
      * @return A ResultSet as a result of the executed query
      */
     public ResultSet findById(Long id) throws SQLException {
-        PreparedStatement stmt = mysqlConnect.connexion.prepareStatement(FIND_COMPUTER);
+        Connection connexion = dbConnexion.getConnection();
+        PreparedStatement stmt = connexion.prepareStatement(FIND_COMPUTER);
         stmt.setLong(1, id);
         return stmt.executeQuery();
     }
@@ -85,7 +91,8 @@ public class ComputerDAO {
      * @return the number of rows deleted
      */
     public int deleteComputer(Long id) throws SQLException {
-        PreparedStatement stmt = mysqlConnect.connexion.prepareStatement(DELETE_COMPUTER);
+        Connection connexion = dbConnexion.getConnection();
+        PreparedStatement stmt = connexion.prepareStatement(DELETE_COMPUTER);
         stmt.setLong(1, id);
         return stmt.executeUpdate();
     }
@@ -98,7 +105,8 @@ public class ComputerDAO {
      * @return the number of rows updated
      */
     public int updateName(String name, Long id) throws SQLException {
-        PreparedStatement stmt = mysqlConnect.connexion.prepareStatement(UPDATE_NAME);
+        Connection connexion = dbConnexion.getConnection();
+        PreparedStatement stmt = connexion.prepareStatement(UPDATE_NAME);
         stmt.setString(1, name);
         stmt.setLong(2, id);
         return stmt.executeUpdate();
@@ -112,7 +120,8 @@ public class ComputerDAO {
      * @return the number of rows updated
      */
     public int updateIntroduced(Timestamp date, Long id) throws SQLException {
-        PreparedStatement stmt = mysqlConnect.connexion.prepareStatement(UPDATE_INTRODUCED);
+        Connection connexion = dbConnexion.getConnection();
+        PreparedStatement stmt = connexion.prepareStatement(UPDATE_INTRODUCED);
         stmt.setTimestamp(1, date);
         stmt.setLong(2, id);
         return stmt.executeUpdate();
@@ -126,7 +135,8 @@ public class ComputerDAO {
      * @return the number of rows updated
      */
     public int updateDiscontinued(Timestamp date, Long id) throws SQLException {
-        PreparedStatement stmt = mysqlConnect.connexion.prepareStatement(UPDATE_DISCONTINUED);
+        Connection connexion = dbConnexion.getConnection();
+        PreparedStatement stmt = connexion.prepareStatement(UPDATE_DISCONTINUED);
         stmt.setTimestamp(1, date);
         stmt.setLong(2, id);
         return stmt.executeUpdate();
@@ -140,7 +150,8 @@ public class ComputerDAO {
      * @return the number of rows updated
      */
     public int updateManufacturer(Long companyID, Long id) throws SQLException {
-        PreparedStatement stmt = mysqlConnect.connexion.prepareStatement(UPDATE_MANUFACTURER);
+        Connection connexion = dbConnexion.getConnection();
+        PreparedStatement stmt = connexion.prepareStatement(UPDATE_MANUFACTURER);
         stmt.setLong(1, companyID);
         stmt.setLong(2, id);
         return stmt.executeUpdate();

@@ -51,11 +51,10 @@
       <version>1.4.200</version>
     </dependency>
     <dependency>
-        <groupId>commons-dbcp</groupId>
-        <artifactId>commons-dbcp</artifactId>
-        <version>1.4</version>
-        <type>jar</type>
-    </dependency>
+		<groupId>com.zaxxer</groupId>
+		<artifactId>HikariCP</artifactId>
+		<version>4.0.3</version>
+	</dependency>
   </dependencies>
   
   <build>
