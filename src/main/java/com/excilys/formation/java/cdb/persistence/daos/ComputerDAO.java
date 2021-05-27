@@ -6,8 +6,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.excilys.formation.java.cdb.mappers.ComputerMapper;
+import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.persistence.DBConnexion;
+import com.excilys.formation.java.cdb.services.ComputerService;
 
 /** Represents a computer DAO.
  * @author Laetitia Tureau
@@ -16,6 +25,9 @@ public class ComputerDAO {
 
     /** The connexion to mySQL database. */
     private DBConnexion dbConnexion;
+
+    /** Class logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ComputerService.class);
 
     /** Represents query to create a computer. */
     private static final String INSERT_COMPUTER = "INSERT INTO computer (name) VALUES (?)";
@@ -43,19 +55,34 @@ public class ComputerDAO {
     private static final String UPDATE_MANUFACTURER = "UPDATE computer SET company_id = ? WHERE id = ?";
 
     /** Creates a DAO to computer operations into database. */
-    public ComputerDAO() {
+    private ComputerDAO() {
         this.dbConnexion = DBConnexion.getInstance();
+    }
+
+    public static ComputerDAO getInstance() {
+        return SingletonHolder.INSTANCE;
+    }
+
+    private static class SingletonHolder {
+        private static final ComputerDAO INSTANCE = new ComputerDAO();
     }
 
     /**
      * Retrieve all the computers in the database.
-     * @throws SQLException for database access error, or closed Connection, or resulting ResultSet
-     * @return A ResultSet as a result of the executed query
+     * @return a list of computers
      */
-    public ResultSet getAllComputers() throws SQLException {
-        Connection connexion = dbConnexion.getConnection();
-        Statement stmt = connexion.createStatement();
-        return stmt.executeQuery(ALL_COMPUTERS);
+    public List<Computer> getAllComputers() {
+        List<Computer> computers = new ArrayList<>();
+        try (Connection connexion = dbConnexion.getConnection();
+                Statement stmt = connexion.createStatement();
+                ResultSet resultSet = stmt.executeQuery(ALL_COMPUTERS)) {
+            while (resultSet.next()) {
+                computers.add(ComputerMapper.mapFromResultSet(resultSet));
+            }
+        } catch (SQLException sqle) {
+            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+        }
+        return computers;
     }
 
     /**
@@ -64,24 +91,34 @@ public class ComputerDAO {
      * @param computerName the computer's name
      * @return the number of rows inserted
      */
-    public int createComputer(String computerName) throws SQLException {
-        Connection connexion = dbConnexion.getConnection();
-        PreparedStatement stmt = connexion.prepareStatement(INSERT_COMPUTER);
-        stmt.setString(1, computerName);
-        return stmt.executeUpdate();
+    public int createComputer(String computerName) {
+        try (Connection connexion = dbConnexion.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(INSERT_COMPUTER)) {
+            stmt.setString(1, computerName);
+            return stmt.executeUpdate();
+        } catch (SQLException sqle) {
+            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+        }
+        return 0;
     }
 
     /**
      * Retrieve a computer.
-     * @throws SQLException for database access error, or closed Connection or PreparedStatement, or wrong match with setter
      * @param id the computer's id
-     * @return A ResultSet as a result of the executed query
+     * @return An empty Optional if nothing found else a Optional containing a computer
      */
-    public ResultSet findById(Long id) throws SQLException {
-        Connection connexion = dbConnexion.getConnection();
-        PreparedStatement stmt = connexion.prepareStatement(FIND_COMPUTER);
-        stmt.setLong(1, id);
-        return stmt.executeQuery();
+    public Optional<Computer> findById(Long id) {
+        try (Connection connexion = dbConnexion.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(FIND_COMPUTER)) {
+            stmt.setLong(1, id);
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                return Optional.of(ComputerMapper.mapFromResultSet(resultSet));
+            }
+        } catch (SQLException sqle) {
+            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+        }
+        return Optional.empty();
     }
 
     /**
@@ -90,11 +127,15 @@ public class ComputerDAO {
      * @param id the computer's id
      * @return the number of rows deleted
      */
-    public int deleteComputer(Long id) throws SQLException {
-        Connection connexion = dbConnexion.getConnection();
-        PreparedStatement stmt = connexion.prepareStatement(DELETE_COMPUTER);
-        stmt.setLong(1, id);
-        return stmt.executeUpdate();
+    public int deleteComputer(Long id) {
+        try (Connection connexion = dbConnexion.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(DELETE_COMPUTER)) {
+            stmt.setLong(1, id);
+            return stmt.executeUpdate();
+        } catch (SQLException sqle) {
+            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+        }
+        return 0;
     }
 
     /**
@@ -104,12 +145,17 @@ public class ComputerDAO {
      * @param id the computer's id
      * @return the number of rows updated
      */
-    public int updateName(String name, Long id) throws SQLException {
-        Connection connexion = dbConnexion.getConnection();
-        PreparedStatement stmt = connexion.prepareStatement(UPDATE_NAME);
-        stmt.setString(1, name);
-        stmt.setLong(2, id);
-        return stmt.executeUpdate();
+    public int updateName(String name, Long id) {
+        try (Connection connexion = dbConnexion.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(UPDATE_NAME)) {
+            stmt.setString(1, name);
+            stmt.setLong(2, id);
+            return stmt.executeUpdate();
+        } catch (SQLException sqle) {
+            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+        }
+        return 0;
+
     }
 
     /**
@@ -120,11 +166,15 @@ public class ComputerDAO {
      * @return the number of rows updated
      */
     public int updateIntroduced(Timestamp date, Long id) throws SQLException {
-        Connection connexion = dbConnexion.getConnection();
-        PreparedStatement stmt = connexion.prepareStatement(UPDATE_INTRODUCED);
-        stmt.setTimestamp(1, date);
-        stmt.setLong(2, id);
-        return stmt.executeUpdate();
+        try (Connection connexion = dbConnexion.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(UPDATE_INTRODUCED)) {
+            stmt.setTimestamp(1, date);
+            stmt.setLong(2, id);
+            return stmt.executeUpdate();
+        } catch (SQLException sqle) {
+            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+        }
+        return 0;
     }
 
     /**
@@ -135,11 +185,15 @@ public class ComputerDAO {
      * @return the number of rows updated
      */
     public int updateDiscontinued(Timestamp date, Long id) throws SQLException {
-        Connection connexion = dbConnexion.getConnection();
-        PreparedStatement stmt = connexion.prepareStatement(UPDATE_DISCONTINUED);
-        stmt.setTimestamp(1, date);
-        stmt.setLong(2, id);
-        return stmt.executeUpdate();
+        try (Connection connexion = dbConnexion.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(UPDATE_DISCONTINUED)) {
+            stmt.setTimestamp(1, date);
+            stmt.setLong(2, id);
+            return stmt.executeUpdate();
+        } catch (SQLException sqle) {
+            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+        }
+        return 0;
     }
 
     /**
@@ -149,12 +203,16 @@ public class ComputerDAO {
      * @param companyID the computer's manufacturer id
      * @return the number of rows updated
      */
-    public int updateManufacturer(Long companyID, Long id) throws SQLException {
-        Connection connexion = dbConnexion.getConnection();
-        PreparedStatement stmt = connexion.prepareStatement(UPDATE_MANUFACTURER);
-        stmt.setLong(1, companyID);
-        stmt.setLong(2, id);
-        return stmt.executeUpdate();
+    public int updateManufacturer(Long companyID, Long id) {
+        try (Connection connexion = dbConnexion.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(UPDATE_MANUFACTURER)) {
+            stmt.setLong(1, companyID);
+            stmt.setLong(2, id);
+            return stmt.executeUpdate();
+        } catch (SQLException sqle) {
+            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+        }
+        return 0;
     }
 
 }

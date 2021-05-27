@@ -13,15 +13,18 @@ import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 public class CompanyService {
 
     /**
-     * A DAO used to encapsulate the logic for retrieving, saving and updating table company data into the database.
+     * A DAO instance used to encapsulate the logic for retrieving, saving and updating table company data into the database.
      */
-    private CompanyDAO companyDAO;
+    private static CompanyDAO companyInstance = CompanyDAO.getInstance();
 
     /**
      * Creates a service to company operations.
      */
     public CompanyService() {
-        this.companyDAO = new CompanyDAO();
+    }
+
+    public void setCompanyInstance(CompanyDAO companyInstance) {
+        CompanyService.companyInstance = companyInstance;
     }
 
     /**
@@ -29,16 +32,18 @@ public class CompanyService {
      * @return a list of companies
      */
     public List<Company> listAll() {
-        return companyDAO.getAllCompanies();
+        return companyInstance.getAllCompanies();
     }
 
     /**
      * Retrieve a company with a specific id.
      * @param id the company's id
-     * @return An empty Optional if nothing found else a Optional containing a company
+     * @return a company or throw exception
      */
-    public Optional<Company> findById(Long id) {
-        return companyDAO.findById(id);
+    public Company findById(Long id) {
+        Optional<Company> opt = companyInstance.findById(id);
+        // TODO : create proper exception
+        return opt.orElseThrow(RuntimeException::new);
     }
 
 }

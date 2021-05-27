@@ -35,8 +35,16 @@ public class CompanyDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(CompanyService.class);
 
     /** Creates a DAO to company operations into database. */
-    public CompanyDAO() {
+    private CompanyDAO() {
         this.dbConnexion = DBConnexion.getInstance();
+    }
+
+    public static CompanyDAO getInstance() {
+        return SingletonHolder.INSTANCE;
+    }
+
+    private static class SingletonHolder {
+        private static final CompanyDAO INSTANCE = new CompanyDAO();
     }
 
     /**
@@ -63,9 +71,8 @@ public class CompanyDAO {
      * @return An empty Optional if nothing found else a Optional containing a company
      */
     public Optional<Company> findById(Long id) {
-        try {
-            Connection connexion = dbConnexion.getConnection();
-            PreparedStatement stmt = connexion.prepareStatement(FIND_COMPANY);
+        try (Connection connexion = dbConnexion.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(FIND_COMPANY)) {
             stmt.setLong(1, id);
             ResultSet resultSet = stmt.executeQuery();
             if (resultSet.next()) {
@@ -74,7 +81,6 @@ public class CompanyDAO {
         } catch (SQLException sqle) {
             LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
         }
-        // TODO manually close resources
         return Optional.empty();
     }
 

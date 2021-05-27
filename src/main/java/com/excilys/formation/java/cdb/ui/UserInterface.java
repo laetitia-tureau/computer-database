@@ -2,10 +2,12 @@ package com.excilys.formation.java.cdb.ui;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
 import java.text.ParseException;
+import java.util.List;
+import java.util.Scanner;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.excilys.formation.java.cdb.mappers.DateMapper;
 import com.excilys.formation.java.cdb.models.Company;
@@ -22,8 +24,9 @@ public class UserInterface {
 
     private static ComputerService computerService = new ComputerService();
     private static CompanyService companyService = new CompanyService();
-    private static Optional<Computer> optionalComputer;
-    private static Optional<Company> optionalCompany;
+    private static Computer computer;
+    private static Company company;
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserInterface.class);
 
     /**
      * Display a paginated list.
@@ -116,9 +119,17 @@ public class UserInterface {
     private Long find(Scanner scanner, String action, boolean update, boolean isCompany) {
         Long id = retrieveID(scanner, action, update);
         if (isCompany) {
-            optionalCompany = companyService.findById(id);
+            try {
+                company = companyService.findById(id);
+            } catch (Exception e) {
+                LOGGER.warn("No company with id : " + id);
+            }
         } else {
-            optionalComputer = computerService.findById(id);
+            try {
+                computer = computerService.findById(id);
+            } catch (Exception e) {
+                LOGGER.warn("No computer with id : " + id);
+            }
         }
         return id;
     }
@@ -131,30 +142,22 @@ public class UserInterface {
      */
     private void update(Scanner scanner) throws SQLException, ParseException {
         Long updateID = find(scanner, "computer to update", true, false);
-        if (!optionalComputer.isPresent()) {
-            System.out.println("No computer with id : " + updateID);
-        } else {
-            switch (choiceFromMenu(scanner, true)) {
-                case COMPUTER_NAME:
-                    computerService.updateName(retrieveName(scanner, ""), updateID);
-                    break;
-                case INTRODUCED_DATE:
-                    computerService.updateIntroduced(retrieveTimestamp(scanner), updateID);
-                    break;
-                case DISCONTINUED_DATE:
-                    computerService.updateDiscontinued(retrieveTimestamp(scanner), updateID);
-                    break;
-                case MANUFACTURER:
-                    Long companyID = find(scanner, "company to update", true, true);
-                    if (!optionalCompany.isPresent()) {
-                        System.out.println("No company with id : " + companyID);
-                    } else {
-                        computerService.updateManufacturer(companyID, updateID);
-                    }
-                    break;
-                default:
-                    break;
-            }
+        switch (choiceFromMenu(scanner, true)) {
+        case COMPUTER_NAME:
+            computerService.updateName(retrieveName(scanner, ""), updateID);
+            break;
+        case INTRODUCED_DATE:
+            computerService.updateIntroduced(retrieveTimestamp(scanner), updateID);
+            break;
+        case DISCONTINUED_DATE:
+            computerService.updateDiscontinued(retrieveTimestamp(scanner), updateID);
+            break;
+        case MANUFACTURER:
+            Long companyID = find(scanner, "company to update", true, true);
+            computerService.updateManufacturer(companyID, updateID);
+            break;
+        default:
+            break;
         }
     }
 
@@ -167,29 +170,29 @@ public class UserInterface {
         Scanner scanner = new Scanner(System.in);
         do {
             switch (choiceFromMenu(scanner, false)) {
-                case COMPUTER_LIST:
-                    printList(scanner, computerService.listAll());
-                    break;
-                case COMPANY_LIST:
-                    printList(scanner, companyService.listAll());
-                    break;
-                case COMPUTER_DETAIL:
-                    Long computerID = find(scanner, "computer to show", true, false);
-                    System.out.println(optionalComputer.isPresent() ? optionalComputer.get() : "No computer with id : " + computerID);
-                    break;
-                case CREATE_COMPUTER:
-                    computerService.createComputer(retrieveName(scanner, "of computer to create"));
-                    break;
-                case DELETE_COMPUTER:
-                    computerService.deleteComputer(retrieveID(scanner, "computer to delete", false));
-                    break;
-                case UPDATE_COMPUTER:
-                    do {
-                        update(scanner);
-                    } while (decide(scanner) != 0);
-                    break;
-                default:
-                    break;
+            case COMPUTER_LIST:
+                printList(scanner, computerService.listAll());
+                break;
+            case COMPANY_LIST:
+                printList(scanner, companyService.listAll());
+                break;
+            case COMPUTER_DETAIL:
+                find(scanner, "computer to show", true, false);
+                System.out.println(computer);
+                break;
+            case CREATE_COMPUTER:
+                computerService.createComputer(retrieveName(scanner, "of computer to create"));
+                break;
+            case DELETE_COMPUTER:
+                computerService.deleteComputer(retrieveID(scanner, "computer to delete", false));
+                break;
+            case UPDATE_COMPUTER:
+                do {
+                    update(scanner);
+                } while (decide(scanner) != 0);
+                break;
+            default:
+                break;
             }
         } while (decide(scanner) != 0);
         scanner.close();

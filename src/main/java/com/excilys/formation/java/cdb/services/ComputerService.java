@@ -1,17 +1,12 @@
 package com.excilys.formation.java.cdb.services;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.excilys.formation.java.cdb.exceptions.ComputerDateException;
-import com.excilys.formation.java.cdb.mappers.ComputerMapper;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
 import com.excilys.formation.java.cdb.validator.ComputerValidator;
@@ -23,9 +18,9 @@ import com.excilys.formation.java.cdb.validator.ComputerValidator;
 public class ComputerService {
 
     /**
-     * A DAO used to encapsulate the logic for retrieving, saving and updating table computer data into the database.
+     * A DAO instance used to encapsulate the logic for retrieving, saving and updating table computer data into the database.
      */
-    private ComputerDAO computerDAO;
+    private static ComputerDAO computerInstance = ComputerDAO.getInstance();
 
     /** Class logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ComputerService.class);
@@ -36,7 +31,6 @@ public class ComputerService {
      * Creates a service to computer operations.
      */
     public ComputerService() {
-        this.computerDAO = new ComputerDAO();
         this.computerValidator = ComputerValidator.getInstance();
     }
 
@@ -45,16 +39,7 @@ public class ComputerService {
      * @return a list of computers
      */
     public List<Computer> listAll() {
-        List<Computer> computers = new ArrayList<>();
-        try {
-            ResultSet res = computerDAO.getAllComputers();
-            while (res.next()) {
-                computers.add(ComputerMapper.mapFromResultSet(res));
-            }
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return computers;
+        return computerInstance.getAllComputers();
     }
 
     /**
@@ -63,29 +48,18 @@ public class ComputerService {
      * @return the number of rows inserted
      */
     public int createComputer(String name) {
-        try {
-            return computerDAO.createComputer(name);
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return 0;
+        return computerInstance.createComputer(name);
     }
 
     /**
      * Retrieve a computer with a specific id.
      * @param id the computer's id
-     * @return An empty Optional if nothing found else a Optional containing a computer
+     * @return a computer or throw exception
      */
-    public Optional<Computer> findById(Long id) {
-        try {
-            ResultSet result = computerDAO.findById(id);
-            if (result.next()) {
-                return Optional.of(ComputerMapper.mapFromResultSet(result));
-            }
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return Optional.empty();
+    public Computer findById(Long id) {
+        Optional<Computer> opt = computerInstance.findById(id);
+        // TODO : create proper exception
+        return opt.orElseThrow(RuntimeException::new);
     }
 
     /**
@@ -94,12 +68,7 @@ public class ComputerService {
      * @return the number of rows deleted
      */
     public int deleteComputer(Long id) {
-        try {
-            return computerDAO.deleteComputer(id);
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return 0;
+        return computerInstance.deleteComputer(id);
     }
 
     /**
@@ -109,30 +78,25 @@ public class ComputerService {
      * @return the number of rows updated
      */
     public int updateName(String name, Long id) {
-        try {
-            return computerDAO.updateName(name, id);
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return 0;
+        return computerInstance.updateName(name, id);
     }
 
     /**
      * Update a computer's introduced date.
      * @param date A Timestamp as the computer's introduced date
      * @param id A Long containing the computer's id
-     * @return An empty Optional if no computer found else a Optional containing the updated computer
+     * @return a computer
      */
-    public Optional<Computer> updateIntroduced(Timestamp date, Long id) {
-        Optional<Computer> computer = findById(id);
-        if (computer.isPresent()) {
-            try {
-                // TODO: only pass computer built with date and fail to update it if forbidden
-                computerValidator.validateComputerDate(computer.get(), date, true);
-                computerDAO.updateIntroduced(date, id);
-            } catch (ComputerDateException | SQLException exe) {
-                LOGGER.error("Erreur lors de l'exécution de la requête", exe);
-            }
+    public Computer updateIntroduced(Timestamp date, Long id) {
+        Computer computer = null;
+        try {
+            computer = findById(id);
+            // TODO: only pass computer built with date and fail to update it if forbidden
+            computerValidator.validateComputerDate(computer, date, true);
+            computerInstance.updateIntroduced(date, id);
+        } catch (Exception exe) {
+            // TODO: use proper exception
+            LOGGER.error("Erreur lors de l'exécution de la requête", exe);
         }
         return computer;
     }
@@ -141,18 +105,18 @@ public class ComputerService {
      * Update a computer's discontinued date.
      * @param date A Timestamp as the computer's discontinued date
      * @param id A Long containing the computer's id
-     * @return An empty Optional if no computer found else a Optional containing the updated computer
+     * @return a computer
      */
-    public Optional<Computer> updateDiscontinued(Timestamp date, Long id) {
-        Optional<Computer> computer = findById(id);
-        if (computer.isPresent()) {
-            try {
-                // TODO: only pass computer built with date and fail to update it if forbidden
-                computerValidator.validateComputerDate(computer.get(), date, false);
-                computerDAO.updateDiscontinued(date, id);
-            } catch (ComputerDateException | SQLException exe) {
-                LOGGER.error("Erreur lors de l'exécution de la requête", exe);
-            }
+    public Computer updateDiscontinued(Timestamp date, Long id) {
+        Computer computer = null;
+        try {
+            computer = findById(id);
+            // TODO: only pass computer built with date and fail to update it if forbidden
+            computerValidator.validateComputerDate(computer, date, false);
+            computerInstance.updateDiscontinued(date, id);
+        } catch (Exception exe) {
+            // TODO: use proper exception
+            LOGGER.error("Erreur lors de l'exécution de la requête", exe);
         }
         return computer;
     }
@@ -164,11 +128,6 @@ public class ComputerService {
      * @return the number of rows updated
      */
     public int updateManufacturer(Long companyID, Long id) {
-        try {
-            return computerDAO.updateManufacturer(companyID, id);
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return 0;
+        return computerInstance.updateManufacturer(companyID, id);
     }
 }
