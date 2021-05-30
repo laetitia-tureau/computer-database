@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Hello World!</title>
 </head>
 <body>
  <p>Ceci est une page générée depuis une HTML.</p>
