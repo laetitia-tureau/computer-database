@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.excilys.formation.java.cdb.mappers.CompanyMapper;
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.persistence.DBConnexion;
 import com.excilys.formation.java.cdb.services.CompanyService;
+import com.excilys.formation.java.cdb.services.Pagination;
 
 /** Represents a company DAO.
  * @author Laetitia Tureau
@@ -32,7 +32,7 @@ public class CompanyDAO {
     private static final String FIND_COMPANY = "SELECT * FROM company WHERE id = ?";
 
     /** Class logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(CompanyService.class);
+    private static final Logger LOGGER = Logger.getLogger(CompanyService.class);
 
     /** Creates a DAO to company operations into database. */
     private CompanyDAO() {
@@ -56,6 +56,26 @@ public class CompanyDAO {
         try (Connection connexion = dbConnexion.getConnection();
                 Statement stmt = connexion.createStatement();
                 ResultSet resultSet = stmt.executeQuery(ALL_COMPANIES)) {
+            while (resultSet.next()) {
+                companies.add(CompanyMapper.mapFromResultSet(resultSet));
+            }
+        } catch (SQLException sqle) {
+            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+        }
+        return companies;
+    }
+
+    /**
+     * Retrieve all the companies in the database.
+     * @param page current page
+     * @return a list of companies
+     */
+    public List<Company> getPaginatedCompanies(Pagination page) {
+        List<Company> companies = new ArrayList<>();
+        String withLimit = " LIMIT " + page.getLimit() * (page.getPage() - 1) + "," + page.getLimit();
+        try (Connection connexion = dbConnexion.getConnection();
+                Statement stmt = connexion.createStatement();
+                ResultSet resultSet = stmt.executeQuery(ALL_COMPANIES + withLimit)) {
             while (resultSet.next()) {
                 companies.add(CompanyMapper.mapFromResultSet(resultSet));
             }

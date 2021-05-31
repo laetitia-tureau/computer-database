@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.excilys.formation.java.cdb.mappers.ComputerMapper;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.persistence.DBConnexion;
 import com.excilys.formation.java.cdb.services.ComputerService;
+import com.excilys.formation.java.cdb.services.Pagination;
 
 /** Represents a computer DAO.
  * @author Laetitia Tureau
@@ -27,7 +27,7 @@ public class ComputerDAO {
     private DBConnexion dbConnexion;
 
     /** Class logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(ComputerService.class);
+    private static final Logger LOGGER = Logger.getLogger(ComputerService.class);
 
     /** Represents query to create a computer. */
     private static final String INSERT_COMPUTER = "INSERT INTO computer (name) VALUES (?)";
@@ -76,6 +76,26 @@ public class ComputerDAO {
         try (Connection connexion = dbConnexion.getConnection();
                 Statement stmt = connexion.createStatement();
                 ResultSet resultSet = stmt.executeQuery(ALL_COMPUTERS)) {
+            while (resultSet.next()) {
+                computers.add(ComputerMapper.mapFromResultSet(resultSet));
+            }
+        } catch (SQLException sqle) {
+            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+        }
+        return computers;
+    }
+
+    /**
+     * Retrieve all the computers in the database.
+     * @param page current page
+     * @return a list of computers
+     */
+    public List<Computer> getPaginatedComputers(Pagination page) {
+        List<Computer> computers = new ArrayList<>();
+        String withLimit = " LIMIT " + page.getLimit() * (page.getPage() - 1) + "," + page.getLimit();
+        try (Connection connexion = dbConnexion.getConnection();
+                Statement stmt = connexion.createStatement();
+                ResultSet resultSet = stmt.executeQuery(ALL_COMPUTERS + withLimit)) {
             while (resultSet.next()) {
                 computers.add(ComputerMapper.mapFromResultSet(resultSet));
             }

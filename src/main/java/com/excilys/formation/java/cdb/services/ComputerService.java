@@ -4,10 +4,10 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.excilys.formation.java.cdb.models.Computer;
+import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
 import com.excilys.formation.java.cdb.validator.ComputerValidator;
 
@@ -23,23 +23,34 @@ public class ComputerService {
     private static ComputerDAO computerInstance = ComputerDAO.getInstance();
 
     /** Class logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(ComputerService.class);
+    private static final Logger LOGGER = Logger.getLogger(ComputerService.class);
 
-    private ComputerValidator computerValidator;
+    private ComputerValidator computerValidator = ComputerValidator.getInstance();
+    private static CompanyService companyService = new CompanyService();
 
-    /**
-     * Creates a service to computer operations.
-     */
-    public ComputerService() {
-        this.computerValidator = ComputerValidator.getInstance();
+    public void setComputerInstance(ComputerDAO computerInstance) {
+        ComputerService.computerInstance = computerInstance;
+    }
+
+    public void setCompanyInstance(CompanyDAO companyInstance) {
+        ComputerService.companyService.setCompanyInstance(companyInstance);
     }
 
     /**
      * Retrieve all the computers in the database.
      * @return a list of computers
      */
-    public List<Computer> listAll() {
+    public List<Computer> getComputers() {
         return computerInstance.getAllComputers();
+    }
+
+    /**
+     * Retrieve all the computers in the database.
+     * @param page current page
+     * @return a list of computers
+     */
+    public List<Computer> getPaginatedComputers(Pagination page) {
+        return computerInstance.getPaginatedComputers(page);
     }
 
     /**

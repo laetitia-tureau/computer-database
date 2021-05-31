@@ -17,12 +17,6 @@ public class CompanyService {
      */
     private static CompanyDAO companyInstance = CompanyDAO.getInstance();
 
-    /**
-     * Creates a service to company operations.
-     */
-    public CompanyService() {
-    }
-
     public void setCompanyInstance(CompanyDAO companyInstance) {
         CompanyService.companyInstance = companyInstance;
     }
@@ -31,8 +25,17 @@ public class CompanyService {
      * Retrieve all the companies in the database.
      * @return a list of companies
      */
-    public List<Company> listAll() {
+    public List<Company> getCompanies() {
         return companyInstance.getAllCompanies();
+    }
+
+    /**
+     * Retrieve all the companies in the database.
+     * @param page current page
+     * @return a list of companies
+     */
+    public List<Company> getPaginatedCompanies(Pagination page) {
+        return companyInstance.getPaginatedCompanies(page);
     }
 
     /**

@@ -22,7 +22,7 @@
     <section id="main">
         <div class="container">
             <h1 id="homeTitle">
-             <c:out value="${pagination.totalItem}" /> Computers found
+             <c:out value="${pagination.totalItems}" /> Computers found
             </h1>
             <div id="actions" class="form-horizontal">
                 <div class="pull-left">
@@ -88,7 +88,7 @@
                         </td>
                         <td>${computer.introduced}</td>
                         <td>${computer.discontinued}</td>
-                        <td>${computer.companyName}</td>
+                        <td>${computer.manufacturer}</td>
 
                     </tr>
                     </c:forEach>

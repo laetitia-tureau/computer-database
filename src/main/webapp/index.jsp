@@ -1,10 +1,12 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Hello World!</title>
+<title>Dashboard</title>
 </head>
 <body>
- <p>Ceci est une page générée depuis une HTML.</p>
+         <p>Ceci est une page gÃ©nÃ©rÃ©e depuis une JSP.</p>
 </body>
 </html>

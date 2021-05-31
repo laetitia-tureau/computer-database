@@ -34,11 +34,11 @@
       <artifactId>mysql-connector-java</artifactId>
       <version>8.0.25</version>
 	</dependency>
-	<dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.30</version>
-    </dependency>
+    <dependency>
+  		<groupId>org.slf4j</groupId>
+  		<artifactId>slf4j-log4j12</artifactId>
+  		<version>1.7.30</version>
+	</dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
 	  <artifactId>javax.servlet-api</artifactId>
@@ -52,6 +52,11 @@
         <scope>provided</scope>
     </dependency>
     <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>jstl</artifactId>
+        <version>1.2</version>
+    </dependency>
+    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <version>1.4.200</version>
@@ -60,6 +65,11 @@
 		<groupId>com.zaxxer</groupId>
 		<artifactId>HikariCP</artifactId>
 		<version>4.0.3</version>
+	</dependency>
+	<dependency>
+  		<groupId>org.apache.commons</groupId>
+  		<artifactId>commons-lang3</artifactId>
+  		<version>3.12.0</version>
 	</dependency>
   </dependencies>
   
