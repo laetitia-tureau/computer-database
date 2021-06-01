@@ -49,6 +49,14 @@ public class ComputerController {
         return page;
     }
 
+    /**
+     * Create a computer with his attributes.
+     * @param name computer's name
+     * @param introduced computer's introduced date
+     * @param discontinued computer's discontinued date
+     * @param companyId computer's manufacturer
+     * @throws MyPersistenceException if computer is not a valid computer
+     */
     public static void createComputer(String name, String introduced, String discontinued, String companyId)
             throws MyPersistenceException {
         ComputerDTO computerDTO = new ComputerDTO.ComputerBuilderDTO().name(name).introduced(introduced)

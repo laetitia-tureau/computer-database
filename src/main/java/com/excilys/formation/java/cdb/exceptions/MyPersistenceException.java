@@ -7,7 +7,7 @@ package com.excilys.formation.java.cdb.exceptions;
 @SuppressWarnings("serial")
 public class MyPersistenceException extends RuntimeException {
 
-    public static String ER_NOT_FIND = "This element does not exist in database";
+    public static final String ER_NOT_FIND = "This element does not exist in database";
 
     /** Constructor. */
     public MyPersistenceException() {

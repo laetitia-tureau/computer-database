@@ -36,17 +36,31 @@ public class ComputerValidator {
         return instance;
     }
 
+    /**
+     * Verify if a computerDTO object does not break any assumption of system.
+     * @param computerDTO the computerDTO to validate
+     * @throws MyPersistenceException if not a valid computerDTO
+     */
     public static void validateComputerDTO(ComputerDTO computerDTO) throws MyPersistenceException {
         validateName(computerDTO.getName());
         validateDate(computerDTO.getIntroduced(), computerDTO.getDiscontinued());
     }
 
+    /**
+     * Verify if the computer's name is not null or empty.
+     * @param name the computer's name
+     */
     private static void validateName(String name) {
         if (name == null || "".equals(name) || name.isEmpty()) {
             throw new MyPersistenceException("Name must not be empty !");
         }
     }
 
+    /**
+     * Verify if the computerDTO's dates do not break any assumption of system.
+     * @param introduced the computerDTO's introduced date
+     * @param discontinued the computerDTO's discontinued date
+     */
     private static void validateDate(String introduced, String discontinued) {
         LocalDate introducedDate = null;
         LocalDate discontinuedDate = null;

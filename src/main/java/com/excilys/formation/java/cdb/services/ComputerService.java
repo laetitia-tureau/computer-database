@@ -30,10 +30,18 @@ public class ComputerService {
     private static CompanyService companyService = new CompanyService();
     private static Computer computerToUpdate;
 
+    /**
+     * Initialize ComputerDAO instance.
+     * @param computerInstance the instance
+     */
     public void setComputerInstance(ComputerDAO computerInstance) {
         ComputerService.computerInstance = computerInstance;
     }
 
+    /**
+     * Initialize CompanyDAO instance.
+     * @param companyInstance the instance
+     */
     public void setCompanyInstance(CompanyDAO companyInstance) {
         ComputerService.companyService.setCompanyInstance(companyInstance);
     }
@@ -69,7 +77,6 @@ public class ComputerService {
                 throw new MyPersistenceException("company does not exist in database");
             }
         }
-
         return computerInstance.createComputer(computer);
     }
 
@@ -92,6 +99,11 @@ public class ComputerService {
         return computerInstance.deleteComputer(id);
     }
 
+    /**
+     * Update a computer.
+     * @param computer to update
+     * @return the updated computer
+     */
     public Computer update(Computer computer) {
         Long id = computer.getId();
         computerToUpdate = findById(id);

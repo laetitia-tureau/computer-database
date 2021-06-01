@@ -41,7 +41,7 @@ public class CompanyServiceTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
         companyService.setCompanyInstance(companyDao);
-        trueCompany = new Company.CompanyBuilder(FIND_COMPANY_BY_ID).name("Apple Inc.").build();
+        trueCompany = new Company.CompanyBuilder().id(FIND_COMPANY_BY_ID).name("Apple Inc.").build();
     }
 
     @Test
@@ -65,7 +65,7 @@ public class CompanyServiceTest {
     public void testGetListCompaniesShouldReturnNotEmptyCompanyList() {
         List<Company> companies = new ArrayList<>(Arrays.asList(trueCompany, trueCompany));
         when(companyDao.getAllCompanies()).thenReturn(companies);
-        List<Company> companyList = companyService.listAll();
+        List<Company> companyList = companyService.getCompanies();
         assertFalse(companyList.isEmpty());
         verify(companyDao).getAllCompanies();
     }
