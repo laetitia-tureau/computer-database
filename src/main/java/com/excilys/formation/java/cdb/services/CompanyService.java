@@ -3,6 +3,7 @@ package com.excilys.formation.java.cdb.services;
 import java.util.List;
 import java.util.Optional;
 
+import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 
@@ -45,8 +46,6 @@ public class CompanyService {
      */
     public Company findById(Long id) {
         Optional<Company> opt = companyInstance.findById(id);
-        // TODO : create proper exception
-        return opt.orElseThrow(RuntimeException::new);
+        return opt.orElseThrow(MyPersistenceException::new);
     }
-
 }

@@ -1,10 +1,11 @@
 package com.excilys.formation.java.cdb.validator;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 
-import com.excilys.formation.java.cdb.exceptions.ComputerDateException;
+import com.excilys.formation.java.cdb.dtos.ComputerDTO;
+import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
 import com.excilys.formation.java.cdb.models.Computer;
+import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
 
 /**
  * Validator for computers.
@@ -35,26 +36,45 @@ public class ComputerValidator {
         return instance;
     }
 
-    /**
-     * Verify if a computer object does not break any assumption of system.
-     * @throws ComputerDateException if user enter a discontinued date when no introduced date or if introduced date > discontinued date
-     * @param computer to validate
-     * @param date to insert
-     * @param isIntroDate is true if user wants to update introduced date else false if discontinued date is updated
-     */
-    public void validateComputerDate(Computer computer, Timestamp date, boolean isIntroDate)
-            throws ComputerDateException {
-        LocalDate dateToInsert = date.toLocalDateTime().toLocalDate();
-        if (!isIntroDate) {
-            if (computer.getIntroduced() == null) {
-                throw new ComputerDateException(NO_INTRO_DATE);
-            } else if (computer.getIntroduced().compareTo(dateToInsert) > 0) {
-                throw new ComputerDateException(FORBIDDEN_DATE);
-            }
-        } else if (computer.getDiscontinued() != null) {
-            if (computer.getDiscontinued().compareTo(dateToInsert) < 0) {
-                throw new ComputerDateException(FORBIDDEN_DATE);
-            }
+    public static void validateComputerDTO(ComputerDTO computerDTO) throws MyPersistenceException {
+        validateName(computerDTO.getName());
+        validateDate(computerDTO.getIntroduced(), computerDTO.getDiscontinued());
+    }
+
+    private static void validateName(String name) {
+        if (name == null || "".equals(name) || name.isEmpty()) {
+            throw new MyPersistenceException("Name must not be empty !");
         }
     }
+
+    private static void validateDate(String introduced, String discontinued) {
+        LocalDate introducedDate = null;
+        LocalDate discontinuedDate = null;
+        ComputerBuilder builder = new Computer.ComputerBuilder();
+        if (introduced != null && !introduced.isEmpty()) {
+            introducedDate = LocalDate.parse(introduced);
+            builder.introduced(introducedDate);
+        }
+        if (discontinued != null && !discontinued.isEmpty()) {
+            discontinuedDate = LocalDate.parse(discontinued);
+            builder.discontinued(discontinuedDate);
+        }
+        validateComputerDate(builder.build());
+    }
+
+    /**
+     * Verify if a computer object does not break any assumption of system.
+     * @throws MyPersistenceException if user enter a discontinued date when no introduced date or if introduced date > discontinued date
+     * @param computer to validate
+     */
+    public static void validateComputerDate(Computer computer) throws MyPersistenceException {
+        if (computer.getIntroduced() != null && computer.getDiscontinued() != null) {
+            if (computer.getDiscontinued().compareTo(computer.getIntroduced()) < 0) {
+                throw new MyPersistenceException(FORBIDDEN_DATE);
+            }
+        } else if (computer.getDiscontinued() != null && computer.getIntroduced() == null) {
+            throw new MyPersistenceException(NO_INTRO_DATE);
+        }
+    }
+
 }

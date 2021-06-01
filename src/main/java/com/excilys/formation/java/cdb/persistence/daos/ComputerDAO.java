@@ -108,18 +108,29 @@ public class ComputerDAO {
     /**
      * Insert a computer in the database.
      * @throws SQLException for database access error, or closed Connection or PreparedStatement, or wrong match with setter
-     * @param computerName the computer's name
-     * @return the number of rows inserted
+     * @param computer object to create
+     * @return the computer saved in database
      */
-    public int createComputer(String computerName) {
+    public Computer createComputer(Computer computer) {
         try (Connection connexion = dbConnexion.getConnection();
                 PreparedStatement stmt = connexion.prepareStatement(INSERT_COMPUTER)) {
-            stmt.setString(1, computerName);
-            return stmt.executeUpdate();
+            stmt.setString(1, computer.getName());
+            if (computer.getIntroduced() != null) {
+                stmt.setDate(2, java.sql.Date.valueOf(computer.getIntroduced()));
+            }
+            if (computer.getDiscontinued() != null) {
+                stmt.setDate(3, java.sql.Date.valueOf(computer.getDiscontinued()));
+            }
+            if (computer.getManufacturer() != null) {
+                if (computer.getManufacturer().getId() != null) {
+                    stmt.setLong(4, computer.getManufacturer().getId());
+                }
+            }
+            stmt.executeUpdate();
         } catch (SQLException sqle) {
             LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
         }
-        return 0;
+        return computer;
     }
 
     /**
@@ -185,7 +196,7 @@ public class ComputerDAO {
      * @param id the computer's id
      * @return the number of rows updated
      */
-    public int updateIntroduced(Timestamp date, Long id) throws SQLException {
+    public int updateIntroduced(Timestamp date, Long id) {
         try (Connection connexion = dbConnexion.getConnection();
                 PreparedStatement stmt = connexion.prepareStatement(UPDATE_INTRODUCED)) {
             stmt.setTimestamp(1, date);
@@ -204,7 +215,7 @@ public class ComputerDAO {
      * @param id the computer's id
      * @return the number of rows updated
      */
-    public int updateDiscontinued(Timestamp date, Long id) throws SQLException {
+    public int updateDiscontinued(Timestamp date, Long id) {
         try (Connection connexion = dbConnexion.getConnection();
                 PreparedStatement stmt = connexion.prepareStatement(UPDATE_DISCONTINUED)) {
             stmt.setTimestamp(1, date);

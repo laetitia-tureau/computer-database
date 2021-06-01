@@ -6,8 +6,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Scanner;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.excilys.formation.java.cdb.mappers.DateMapper;
 import com.excilys.formation.java.cdb.models.Company;
@@ -26,7 +25,7 @@ public class UserInterface {
     private static CompanyService companyService = new CompanyService();
     private static Computer computer;
     private static Company company;
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserInterface.class);
+    private static final Logger LOGGER = Logger.getLogger(UserInterface.class);
 
     /**
      * Display a paginated list.
@@ -171,17 +170,19 @@ public class UserInterface {
         do {
             switch (choiceFromMenu(scanner, false)) {
             case COMPUTER_LIST:
-                printList(scanner, computerService.listAll());
+                printList(scanner, computerService.getComputers());
                 break;
             case COMPANY_LIST:
-                printList(scanner, companyService.listAll());
+                printList(scanner, companyService.getCompanies());
                 break;
             case COMPUTER_DETAIL:
                 find(scanner, "computer to show", true, false);
                 System.out.println(computer);
                 break;
             case CREATE_COMPUTER:
-                computerService.createComputer(retrieveName(scanner, "of computer to create"));
+                String computerName = retrieveName(scanner, "of computer to create");
+                Computer computerToSave = new Computer.ComputerBuilder().name(computerName).build();
+                computerService.createComputer(computerToSave);
                 break;
             case DELETE_COMPUTER:
                 computerService.deleteComputer(retrieveID(scanner, "computer to delete", false));

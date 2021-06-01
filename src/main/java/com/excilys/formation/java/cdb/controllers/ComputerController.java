@@ -7,10 +7,12 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import com.excilys.formation.java.cdb.dtos.ComputerDTO;
+import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
 import com.excilys.formation.java.cdb.mappers.ComputerMapper;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.services.ComputerService;
 import com.excilys.formation.java.cdb.services.Pagination;
+import com.excilys.formation.java.cdb.validator.ComputerValidator;
 
 public class ComputerController {
     private static ComputerService computerService = new ComputerService();
@@ -47,14 +49,14 @@ public class ComputerController {
         return page;
     }
 
-    /*public static void createComputer(String name, String introduced, String discontinued, String companyId)
-            throws CustomException {
-        ComputerDTO computerDTO = new ComputerDTO.ComputerDTOBuilder().withName(name).withIntroduced(introduced)
-                .withDiscontinued(discontinued).withCompanyId(companyId).build();
+    public static void createComputer(String name, String introduced, String discontinued, String companyId)
+            throws MyPersistenceException {
+        ComputerDTO computerDTO = new ComputerDTO.ComputerBuilderDTO().name(name).introduced(introduced)
+                .discontinued(discontinued).manufacturer(companyId).build();
         ComputerValidator.validateComputerDTO(computerDTO);
-        Computer computer = ComputerMapper.setObject(computerDTO);
-        new ComputerService().create(computer);
-    }*/
+        Computer computer = ComputerMapper.mapFromDTOtoModel(computerDTO);
+        new ComputerService().createComputer(computer);
+    }
 
     /**
      * Retrieve index for pagination.

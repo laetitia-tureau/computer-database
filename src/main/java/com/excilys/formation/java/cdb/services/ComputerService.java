@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.apache.log4j.Logger;
 
+import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
@@ -27,6 +28,7 @@ public class ComputerService {
 
     private ComputerValidator computerValidator = ComputerValidator.getInstance();
     private static CompanyService companyService = new CompanyService();
+    private static Computer computerToUpdate;
 
     public void setComputerInstance(ComputerDAO computerInstance) {
         ComputerService.computerInstance = computerInstance;
@@ -55,11 +57,20 @@ public class ComputerService {
 
     /**
      * Create a computer.
-     * @param name A String containing the computer's name
-     * @return the number of rows inserted
+     * @param computer the computer to create
+     * @return the computer saved in database
      */
-    public int createComputer(String name) {
-        return computerInstance.createComputer(name);
+    public Computer createComputer(Computer computer) {
+        computerValidator.validateComputerDate(computer);
+        if (computer.getManufacturer() != null) {
+            if (computer.getManufacturer().getId() != 0) {
+                companyService.findById(computer.getManufacturer().getId());
+            } else {
+                throw new MyPersistenceException("company does not exist in database");
+            }
+        }
+
+        return computerInstance.createComputer(computer);
     }
 
     /**
@@ -69,8 +80,7 @@ public class ComputerService {
      */
     public Computer findById(Long id) {
         Optional<Computer> opt = computerInstance.findById(id);
-        // TODO : create proper exception
-        return opt.orElseThrow(RuntimeException::new);
+        return opt.orElseThrow(MyPersistenceException::new);
     }
 
     /**
@@ -80,6 +90,24 @@ public class ComputerService {
      */
     public int deleteComputer(Long id) {
         return computerInstance.deleteComputer(id);
+    }
+
+    public Computer update(Computer computer) {
+        Long id = computer.getId();
+        computerToUpdate = findById(id);
+        if (computer.getName() != null) {
+            updateName(computer.getName(), id);
+        }
+        if (computer.getIntroduced() != null) {
+            updateIntroduced(Timestamp.valueOf(computer.getIntroduced().atStartOfDay()), id);
+        }
+        if (computer.getDiscontinued() != null) {
+            updateDiscontinued(Timestamp.valueOf(computer.getDiscontinued().atStartOfDay()), id);
+        }
+        if (computer.getManufacturer() != null) {
+            updateManufacturer(computer.getManufacturer().getId(), id);
+        }
+        return computer;
     }
 
     /**
@@ -98,18 +126,9 @@ public class ComputerService {
      * @param id A Long containing the computer's id
      * @return a computer
      */
-    public Computer updateIntroduced(Timestamp date, Long id) {
-        Computer computer = null;
-        try {
-            computer = findById(id);
-            // TODO: only pass computer built with date and fail to update it if forbidden
-            computerValidator.validateComputerDate(computer, date, true);
-            computerInstance.updateIntroduced(date, id);
-        } catch (Exception exe) {
-            // TODO: use proper exception
-            LOGGER.error("Erreur lors de l'exécution de la requête", exe);
-        }
-        return computer;
+    public int updateIntroduced(Timestamp date, Long id) {
+        computerValidator.validateComputerDate(computerToUpdate);
+        return computerInstance.updateIntroduced(date, id);
     }
 
     /**
@@ -118,18 +137,9 @@ public class ComputerService {
      * @param id A Long containing the computer's id
      * @return a computer
      */
-    public Computer updateDiscontinued(Timestamp date, Long id) {
-        Computer computer = null;
-        try {
-            computer = findById(id);
-            // TODO: only pass computer built with date and fail to update it if forbidden
-            computerValidator.validateComputerDate(computer, date, false);
-            computerInstance.updateDiscontinued(date, id);
-        } catch (Exception exe) {
-            // TODO: use proper exception
-            LOGGER.error("Erreur lors de l'exécution de la requête", exe);
-        }
-        return computer;
+    public int updateDiscontinued(Timestamp date, Long id) {
+        computerValidator.validateComputerDate(computerToUpdate);
+        return computerInstance.updateDiscontinued(date, id);
     }
 
     /**
