@@ -48,19 +48,8 @@ public class Company {
         private Long id;
         private String name;
 
-        /** Creates a CompanyBuilder with the specified id.
-         * @param builderID The company's id.
-         */
-        public CompanyBuilder(Long builderID) {
-            this.id = builderID;
-        }
-
-        /** Creates a CompanyBuilder with the specified name.
-         * @param builderName The company's name.
-         */
-        public CompanyBuilder(String builderName) {
-            this.id = null;
-            this.name = builderName;
+        /** Creates a CompanyBuilder.*/
+        public CompanyBuilder() {
         }
 
         /** Creates a CompanyBuilder with specific id and name.
@@ -70,6 +59,16 @@ public class Company {
         public CompanyBuilder(Long builderID, String builderName) {
             this.id = builderID;
             this.name = builderName;
+        }
+
+        /**
+         * Initialize attribute id of the CompanyBuilder.
+         * @param builderId A Long
+         * @return this
+         */
+        public CompanyBuilder id(Long builderId) {
+            this.id = builderId;
+            return this;
         }
 
         /**

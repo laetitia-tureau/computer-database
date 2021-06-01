@@ -20,7 +20,7 @@ public class CompanyMapper {
      * @return the company resulting
      */
     public static Company mapFromResultSet(ResultSet result) throws SQLException {
-        CompanyBuilder builder = new Company.CompanyBuilder(result.getLong(1));
+        CompanyBuilder builder = new Company.CompanyBuilder().id(result.getLong(1));
         if (result.getString(2) != null) {
             builder.name(result.getString(2));
         }

@@ -76,21 +76,15 @@ public class ComputerDTO {
      */
     public static class ComputerBuilderDTO {
 
-        private final String id;
-        private final String name;
+        private String id;
+        private String name;
         private String introduced;
         private String discontinued;
-
-        /** Represents the computer's company.
-         */
+        /** Represents the computer's company.*/
         private String manufacturer;
 
-        /** Creates a ComputerBuilder with the specified id.
-         * @param builderName The computer's name.
-         */
-        public ComputerBuilderDTO(String builderName) {
-            this.id = null;
-            this.name = builderName;
+        /** Creates a ComputerBuilder.*/
+        public ComputerBuilderDTO() {
         }
 
         /** Creates a ComputerBuilder with specific id and name.
@@ -100,6 +94,26 @@ public class ComputerDTO {
         public ComputerBuilderDTO(String builderID, String builderName) {
             this.id = builderID;
             this.name = builderName;
+        }
+
+        /**
+         * Initialize attribute id of the ComputerBuilderDTO.
+         * @param builderId A String id
+         * @return this
+         */
+        public ComputerBuilderDTO id(String builderId) {
+            this.id = builderId;
+            return this;
+        }
+
+        /**
+         * Initialize attribute name of the ComputerBuilderDTO.
+         * @param builderName A String name
+         * @return this
+         */
+        public ComputerBuilderDTO name(String builderName) {
+            this.name = builderName;
+            return this;
         }
 
         /**

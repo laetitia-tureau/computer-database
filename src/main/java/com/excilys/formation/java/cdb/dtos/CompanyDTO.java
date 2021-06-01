@@ -51,12 +51,9 @@ public class CompanyDTO {
         private String name;
 
         /**
-         * Creates a CompanyBuilderDTO with the specified id.
-         * @param builderName The company's name.
+         * Creates a CompanyBuilderDTO.
          */
-        public CompanyBuilderDTO(String builderName) {
-            this.id = null;
-            this.name = builderName;
+        public CompanyBuilderDTO() {
         }
 
         /**
@@ -67,6 +64,26 @@ public class CompanyDTO {
         public CompanyBuilderDTO(String builderID, String builderName) {
             this.id = builderID;
             this.name = builderName;
+        }
+
+        /**
+         * Initialize attribute id of the CompanyBuilderDTO.
+         * @param builderId A String
+         * @return this
+         */
+        public CompanyBuilderDTO id(String builderId) {
+            this.id = builderId;
+            return this;
+        }
+
+        /**
+         * Initialize attribute name of the CompanyBuilderDTO.
+         * @param builderName A String
+         * @return this
+         */
+        public CompanyBuilderDTO name(String builderName) {
+            this.name = builderName;
+            return this;
         }
 
         /**

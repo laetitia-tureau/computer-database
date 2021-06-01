@@ -52,18 +52,23 @@ public class ComputerMapper {
      * @return the computer resulting
      */
     public static Computer mapFromDTOtoModel(ComputerDTO computerDTO) {
-        Company company = new Company.CompanyBuilder("").build();
-        Long id = Long.parseLong(computerDTO.getId());
-        ComputerBuilder builder = new Computer.ComputerBuilder(id, computerDTO.getName());
+        Company company = new Company.CompanyBuilder().build();
+        ComputerBuilder builder = new Computer.ComputerBuilder();
 
-        if (computerDTO.getIntroduced() != null && computerDTO.getIntroduced().compareTo("") != 0) {
+        if (computerDTO.getId() != null && !computerDTO.getId().isEmpty()) {
+            builder.id(Long.parseLong(computerDTO.getId()));
+        }
+        if (computerDTO.getName() != null && !computerDTO.getName().isEmpty()) {
+            builder.name(computerDTO.getName());
+        }
+        if (computerDTO.getIntroduced() != null && !computerDTO.getIntroduced().isEmpty()) {
             builder.introduced(LocalDate.parse(computerDTO.getIntroduced()));
         }
-        if (computerDTO.getDiscontinued() != null && computerDTO.getDiscontinued().compareTo("") != 0) {
+        if (computerDTO.getDiscontinued() != null && !computerDTO.getDiscontinued().isEmpty()) {
             builder.discontinued(LocalDate.parse(computerDTO.getDiscontinued()));
         }
-        if (computerDTO.getManufacturer() != null && computerDTO.getManufacturer().compareTo("") != 0) {
-            company = new Company.CompanyBuilder(Long.parseLong(computerDTO.getManufacturer())).build();
+        if (computerDTO.getManufacturer() != null && !computerDTO.getManufacturer().isEmpty()) {
+            company = new Company.CompanyBuilder().id(Long.parseLong(computerDTO.getManufacturer())).build();
             builder.manufacturer(company);
         }
         return new Computer(builder);
