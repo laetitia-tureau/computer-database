@@ -8,20 +8,12 @@ public class Company {
     private Long id;
     private String name;
 
-    /** Creates a company with the specified id.
-     * @param companyID The employee’s id.
+    /** Creates a company using a CompanyBuilder.
+     * @param builder A CompanyBuilder
      */
-    public Company(Long companyID) {
-        this.id = companyID;
-    }
-
-    /** Creates an employee with the specified name.
-     * @param companyID The employee’s id.
-     * @param companyName The employee’s name.
-     */
-    public Company(Long companyID, String companyName) {
-        this.id = companyID;
-        this.name = companyName;
+    public Company(CompanyBuilder builder) {
+        this.id = builder.id;
+        this.name = builder.name;
     }
 
     /**
@@ -33,14 +25,6 @@ public class Company {
     }
 
     /**
-     * Sets the company's id.
-     * @param companyID A long containing the company's id.
-     */
-    public void setId(Long companyID) {
-        this.id = companyID;
-    }
-
-    /**
      * Gets the company's name.
      * @return this.name
      */
@@ -48,18 +32,62 @@ public class Company {
         return this.name;
     }
 
-    /**
-     * Sets the company's name.
-     * @param companyName A String containing the company's name.
-     */
-    public void setName(String companyName) {
-        this.name = companyName;
-    }
-
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
         str.append(this.id).append("\t|\t").append(this.name);
         return str.toString();
+    }
+
+    /**
+     * Implementation of Builder pattern that allows to create a company.
+     * @author Laetitia Tureau
+     */
+    public static class CompanyBuilder {
+
+        private Long id;
+        private String name;
+
+        /** Creates a CompanyBuilder.*/
+        public CompanyBuilder() {
+        }
+
+        /** Creates a CompanyBuilder with specific id and name.
+         * @param builderID The company's id.
+         * @param builderName The company's name.
+         */
+        public CompanyBuilder(Long builderID, String builderName) {
+            this.id = builderID;
+            this.name = builderName;
+        }
+
+        /**
+         * Initialize attribute id of the CompanyBuilder.
+         * @param builderId A Long
+         * @return this
+         */
+        public CompanyBuilder id(Long builderId) {
+            this.id = builderId;
+            return this;
+        }
+
+        /**
+         * Initialize attribute name of the CompanyBuilder.
+         * @param builderName A String
+         * @return this
+         */
+        public CompanyBuilder name(String builderName) {
+            this.name = builderName;
+            return this;
+        }
+
+        /**
+         * Create a Company from the CompanyBuilder.
+         * @return computer resulting
+         */
+        public Company build() {
+            Company company = new Company(this);
+            return company;
+        }
     }
 }

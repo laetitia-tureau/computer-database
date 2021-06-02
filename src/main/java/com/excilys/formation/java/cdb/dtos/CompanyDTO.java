@@ -1,43 +1,29 @@
 package com.excilys.formation.java.cdb.dtos;
 
-/** Represents a company.
+/**
+ * Represents a company.
  * @author Laetitia Tureau
  */
 public class CompanyDTO {
 
-    private Long id;
+    private String id;
     private String name;
 
-    /** Creates a company with the specified id.
-     * @param companyID The employee’s id.
+    /**
+     * Creates a company using a CompanyBuilderDTO.
+     * @param builder A CompanyBuilderDTO
      */
-    public CompanyDTO(Long companyID) {
-        this.id = companyID;
-    }
-
-    /** Creates an employee with the specified name.
-     * @param companyID The employee’s id.
-     * @param companyName The employee’s name.
-     */
-    public CompanyDTO(Long companyID, String companyName) {
-        this.id = companyID;
-        this.name = companyName;
+    public CompanyDTO(CompanyBuilderDTO builder) {
+        this.id = builder.id;
+        this.name = builder.name;
     }
 
     /**
      * Gets the company's id.
      * @return this.id
      */
-    public Long getId() {
+    public String getId() {
         return this.id;
-    }
-
-    /**
-     * Sets the company's id.
-     * @param companyID A long containing the company's id.
-     */
-    public void setId(Long companyID) {
-        this.id = companyID;
     }
 
     /**
@@ -48,18 +34,65 @@ public class CompanyDTO {
         return this.name;
     }
 
-    /**
-     * Sets the company's name.
-     * @param companyName A String containing the company's name.
-     */
-    public void setName(String companyName) {
-        this.name = companyName;
-    }
-
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
         str.append(this.id).append("\t|\t").append(this.name);
         return str.toString();
+    }
+
+    /**
+     * Implementation of Builder pattern that allows to create a company.
+     * @author Laetitia Tureau
+     */
+    public static class CompanyBuilderDTO {
+
+        private String id;
+        private String name;
+
+        /**
+         * Creates a CompanyBuilderDTO.
+         */
+        public CompanyBuilderDTO() {
+        }
+
+        /**
+         * Creates a CompanyBuilderDTO with specific id and name.
+         * @param builderID   The company's id.
+         * @param builderName The company's name.
+         */
+        public CompanyBuilderDTO(String builderID, String builderName) {
+            this.id = builderID;
+            this.name = builderName;
+        }
+
+        /**
+         * Initialize attribute id of the CompanyBuilderDTO.
+         * @param builderId A String
+         * @return this
+         */
+        public CompanyBuilderDTO id(String builderId) {
+            this.id = builderId;
+            return this;
+        }
+
+        /**
+         * Initialize attribute name of the CompanyBuilderDTO.
+         * @param builderName A String
+         * @return this
+         */
+        public CompanyBuilderDTO name(String builderName) {
+            this.name = builderName;
+            return this;
+        }
+
+        /**
+         * Create a CompanyDTO from the CompanyBuilderDTO.
+         * @return computer resulting
+         */
+        public CompanyDTO build() {
+            CompanyDTO companyDTO = new CompanyDTO(this);
+            return companyDTO;
+        }
     }
 }

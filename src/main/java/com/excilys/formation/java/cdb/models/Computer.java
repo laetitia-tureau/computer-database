@@ -78,29 +78,46 @@ public class Computer {
      */
     public static class ComputerBuilder {
 
-        private final Long id;
-        private final String name;
+        private Long id;
+        private String name;
         private LocalDate introduced;
         private LocalDate discontinued;
 
         /** Represents the computer's company. */
         private Company manufacturer;
 
-        /** Creates a ComputerBuilder with the specified id.
-         * @param builderName The computer's name.
-         */
-        public ComputerBuilder(String builderName) {
-            this.id = null;
-            this.name = builderName;
+        /** Creates a ComputerBuilder.*/
+        public ComputerBuilder() {
         }
 
-        /** Creates a ComputerBuilder with specific id and name.
+        /**
+         * Creates a ComputerBuilder with specific id and name.
          * @param builderID The computer's id.
          * @param builderName The computer's name.
          */
         public ComputerBuilder(Long builderID, String builderName) {
             this.id = builderID;
             this.name = builderName;
+        }
+
+        /**
+         * Initialize attribute id of the ComputerBuilder.
+         * @param builderId A Long id
+         * @return this
+         */
+        public ComputerBuilder id(Long builderId) {
+            this.id = builderId;
+            return this;
+        }
+
+        /**
+         * Initialize attribute name of the ComputerBuilder.
+         * @param builderName A String name
+         * @return this
+         */
+        public ComputerBuilder name(String builderName) {
+            this.name = builderName;
+            return this;
         }
 
         /**

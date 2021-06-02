@@ -1,14 +1,9 @@
 package com.excilys.formation.java.cdb.services;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 
@@ -19,52 +14,38 @@ import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 public class CompanyService {
 
     /**
-     * A DAO used to encapsulate the logic for retrieving, saving and updating table company data into the database.
+     * A DAO instance used to encapsulate the logic for retrieving, saving and updating table company data into the database.
      */
-    private CompanyDAO companyDAO;
+    private static CompanyDAO companyInstance = CompanyDAO.getInstance();
 
-    /** Class logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(CompanyService.class);
-
-    /**
-     * Creates a service to company operations.
-     */
-    public CompanyService() {
-        this.companyDAO = new CompanyDAO();
+    public void setCompanyInstance(CompanyDAO companyInstance) {
+        CompanyService.companyInstance = companyInstance;
     }
 
     /**
      * Retrieve all the companies in the database.
      * @return a list of companies
      */
-    public List<Company> listAll() {
-        List<Company> companies = new ArrayList<>();
-        try {
-            ResultSet result = companyDAO.getAllCompanies();
-            while (result.next()) {
-                companies.add(new Company(result.getLong(1), result.getString(2)));
-            }
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return companies;
+    public List<Company> getCompanies() {
+        return companyInstance.getAllCompanies();
+    }
+
+    /**
+     * Retrieve all the companies in the database.
+     * @param page current page
+     * @return a list of companies
+     */
+    public List<Company> getPaginatedCompanies(Pagination page) {
+        return companyInstance.getPaginatedCompanies(page);
     }
 
     /**
      * Retrieve a company with a specific id.
      * @param id the company's id
-     * @return An empty Optional if nothing found else a Optional containing a company
+     * @return a company or throw exception
      */
-    public Optional<Company> findById(Long id) {
-        try {
-            ResultSet result = companyDAO.findById(id);
-            if (result.next()) {
-                return Optional.of(new Company(result.getLong(1)));
-            }
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return Optional.empty();
+    public Company findById(Long id) {
+        Optional<Company> opt = companyInstance.findById(id);
+        return opt.orElseThrow(MyPersistenceException::new);
     }
-
 }

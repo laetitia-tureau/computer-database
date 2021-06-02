@@ -1,25 +1,23 @@
 package com.excilys.formation.java.cdb.dtos;
 
-import java.time.LocalDate;
-
 /** Represents a computer.
  * @author Laetitia Tureau
  */
 public class ComputerDTO {
 
-    private Long id;
+    private String id;
     private String name;
-    private LocalDate introduced;
-    private LocalDate discontinued;
+    private String introduced;
+    private String discontinued;
 
     /** Represents the computer's company.
      */
-    private CompanyDTO manufacturer;
+    private String manufacturer;
 
     /** Creates a computer using a ComputerBuilder.
      * @param builder A ComputerBuilder
      */
-    public ComputerDTO(ComputerBuilder builder) {
+    public ComputerDTO(ComputerBuilderDTO builder) {
         this.id = builder.id;
         this.name = builder.name;
         this.introduced = builder.introduced;
@@ -30,7 +28,7 @@ public class ComputerDTO {
     /** Gets the computer's id.
      * @return this.id
      */
-    public long getId() {
+    public String getId() {
         return this.id;
     }
 
@@ -44,14 +42,14 @@ public class ComputerDTO {
     /** Gets the computer's introduced date.
      * @return this.introduced
      */
-    public LocalDate getIntroduced() {
+    public String getIntroduced() {
         return this.introduced;
     }
 
     /** Gets the computer's discontinued date.
      * @return this.discontinued
      */
-    public LocalDate getDiscontinued() {
+    public String getDiscontinued() {
         return this.discontinued;
     }
 
@@ -59,7 +57,7 @@ public class ComputerDTO {
      * Gets the computer's company..
      * @return this.manufacturer
      */
-    public CompanyDTO getManufacturer() {
+    public String getManufacturer() {
         return this.manufacturer;
     }
 
@@ -76,32 +74,46 @@ public class ComputerDTO {
      * Implementation of Builder pattern that allows to create a computer.
      * @author Laetitia Tureau
      */
-    public static class ComputerBuilder {
+    public static class ComputerBuilderDTO {
 
-        private final Long id;
-        private final String name;
-        private LocalDate introduced;
-        private LocalDate discontinued;
+        private String id;
+        private String name;
+        private String introduced;
+        private String discontinued;
+        /** Represents the computer's company.*/
+        private String manufacturer;
 
-        /** Represents the computer's company.
-         */
-        private CompanyDTO manufacturer;
-
-        /** Creates a ComputerBuilder with the specified id.
-         * @param builderName The computer's name.
-         */
-        public ComputerBuilder(String builderName) {
-            this.id = null;
-            this.name = builderName;
+        /** Creates a ComputerBuilder.*/
+        public ComputerBuilderDTO() {
         }
 
         /** Creates a ComputerBuilder with specific id and name.
          * @param builderID The computer's id.
          * @param builderName The computer's name.
          */
-        public ComputerBuilder(Long builderID, String builderName) {
+        public ComputerBuilderDTO(String builderID, String builderName) {
             this.id = builderID;
             this.name = builderName;
+        }
+
+        /**
+         * Initialize attribute id of the ComputerBuilderDTO.
+         * @param builderId A String id
+         * @return this
+         */
+        public ComputerBuilderDTO id(String builderId) {
+            this.id = builderId;
+            return this;
+        }
+
+        /**
+         * Initialize attribute name of the ComputerBuilderDTO.
+         * @param builderName A String name
+         * @return this
+         */
+        public ComputerBuilderDTO name(String builderName) {
+            this.name = builderName;
+            return this;
         }
 
         /**
@@ -109,7 +121,7 @@ public class ComputerDTO {
          * @param introducedBuilder A LocalDate
          * @return this
          */
-        public ComputerBuilder introduced(LocalDate introducedBuilder) {
+        public ComputerBuilderDTO introduced(String introducedBuilder) {
             this.introduced = introducedBuilder;
             return this;
         }
@@ -119,7 +131,7 @@ public class ComputerDTO {
          * @param discontinuedBuilder A LocalDate
          * @return this
          */
-        public ComputerBuilder discontinued(LocalDate discontinuedBuilder) {
+        public ComputerBuilderDTO discontinued(String discontinuedBuilder) {
             this.discontinued = discontinuedBuilder;
             return this;
         }
@@ -129,7 +141,7 @@ public class ComputerDTO {
          * @param manufacturerBuilder A Company
          * @return this
          */
-        public ComputerBuilder manufacturer(CompanyDTO manufacturerBuilder) {
+        public ComputerBuilderDTO manufacturer(String manufacturerBuilder) {
             this.manufacturer = manufacturerBuilder;
             return this;
         }

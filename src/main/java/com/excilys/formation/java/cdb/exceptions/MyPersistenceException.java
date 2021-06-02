@@ -5,22 +5,25 @@ package com.excilys.formation.java.cdb.exceptions;
  * @author Laetitia Tureau
  */
 @SuppressWarnings("serial")
-public class ComputerDateException extends Exception {
+public class MyPersistenceException extends RuntimeException {
+
+    public static final String ER_NOT_FIND = "This element does not exist in database";
 
     /** Constructor. */
-    public ComputerDateException() { }
+    public MyPersistenceException() {
+    }
 
     /** Constructor with specific message.
      * @param message A String to provides information about exception
      */
-    public ComputerDateException(String message) {
+    public MyPersistenceException(String message) {
         super(message);
     }
 
     /** Constructor with specific cause.
      * @param cause A Throwable that describe the cause of the exception
      */
-    public ComputerDateException(Throwable cause) {
+    public MyPersistenceException(Throwable cause) {
         super(cause);
     }
 
@@ -28,8 +31,7 @@ public class ComputerDateException extends Exception {
      * @param message A String to provides information about exception
      * @param cause A Throwable that describe the cause of the exception
      */
-    public ComputerDateException(String message, Throwable cause) {
+    public MyPersistenceException(String message, Throwable cause) {
         super(message, cause);
     }
-
 }
