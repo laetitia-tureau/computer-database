@@ -2,6 +2,7 @@ package com.excilys.formation.java.cdb.controllers;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -79,5 +80,29 @@ public class ComputerController {
         int pageLimitMid = new Pagination(limitMid, 0, totalItem).getTotalPage();
         int pageLimitMax = new Pagination(limitMax, 0, totalItem).getTotalPage();
         return Arrays.asList(pageLimitMin, pageLimitMid, pageLimitMax);
+    }
+
+    public static Optional<ComputerDTO> findComputer(String computerId) {
+        if (computerId != null && StringUtils.isNumeric(computerId)) {
+            Computer computer = computerService.findById(Long.parseLong(computerId));
+            return Optional.of(ComputerMapper.mapFromModelToDTO(computer));
+        }
+        return Optional.empty();
+    }
+
+    public static void updateComputer(String computerId, String computerName, String introduced, String discontinued,
+            String companyId) {
+        Optional<ComputerDTO> opt = findComputer(computerId);
+        ComputerDTO computerDTO = opt.orElseThrow(MyPersistenceException::new);
+        computerDTO = new ComputerDTO.ComputerBuilderDTO().id(computerId).name(computerName).introduced(introduced)
+                .discontinued(discontinued).manufacturer(companyId).build();
+        ComputerValidator.validateComputerDTO(computerDTO);
+        Computer computer = ComputerMapper.mapFromDTOtoModel(computerDTO);
+        new ComputerService().update(computer);
+
+    }
+
+    public static void deleteComputer(String computerId) {
+        Arrays.asList(computerId.split(",")).stream().forEach(id -> computerService.deleteComputer(Long.valueOf(id)));
     }
 }

@@ -73,6 +73,8 @@ public class ComputerService {
         if (computer.getManufacturer() != null) {
             if (computer.getManufacturer().getId() != 0) {
                 companyService.findById(computer.getManufacturer().getId());
+                // if (company == null) throw new MyPersistenceException("company does not exist
+                // in database");
             } else {
                 throw new MyPersistenceException("company does not exist in database");
             }
@@ -88,6 +90,7 @@ public class ComputerService {
     public Computer findById(Long id) {
         Optional<Computer> opt = computerInstance.findById(id);
         return opt.orElseThrow(MyPersistenceException::new);
+        // return opt.orElse(null);
     }
 
     /**

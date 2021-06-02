@@ -16,9 +16,11 @@ $(function() {
             $("#selectall").prop("checked", false);
         }
         if ($(".cb:checked").length != 0) {
-            $("#deleteSelected").enable();
+            //$("#deleteSelected").enable();
+            $("#deleteSelected").removeClass("btn disabled");
         } else {
-            $("#deleteSelected").disable();
+            //$("#deleteSelected").disable();
+            $("#deleteSelected").addClass("btn disabled");
         }
     });
 

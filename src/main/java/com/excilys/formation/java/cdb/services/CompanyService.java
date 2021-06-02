@@ -47,5 +47,6 @@ public class CompanyService {
     public Company findById(Long id) {
         Optional<Company> opt = companyInstance.findById(id);
         return opt.orElseThrow(MyPersistenceException::new);
+        // return opt.orElse(null);
     }
 }
