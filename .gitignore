@@ -86,6 +86,11 @@ local.properties
 # BlueJ files
 *.ctxt
 
+# Intellij
+.idea/
+*.iml
+*.iws
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
@@ -119,5 +124,9 @@ buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 .flattened-pom.xml
+
+### Files properties ###
+src/main/resources/
+src/test/resources/
 
 # End of https://www.gitignore.io/api/java,maven,eclipse,java-web

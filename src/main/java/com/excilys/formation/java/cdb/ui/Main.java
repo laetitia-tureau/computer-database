@@ -3,11 +3,20 @@ package com.excilys.formation.java.cdb.ui;
 import java.sql.SQLException;
 import java.text.ParseException;
 
+/** Main class.
+ * @author Laetitia Tureau
+ */
 public class Main {
 
-	public static void main(String[] args) throws SQLException, ParseException {
-		UserInterface cli = new UserInterface();
-		cli.start();
-	}
+    /**
+     * Main method that start the cli.
+     * @param args An array of strings
+     * @throws SQLException for crud operations
+     * @throws ParseException when parsing a date
+     */
+    public static void main(String[] args) throws SQLException, ParseException {
+        UserInterface cli = new UserInterface();
+        cli.start();
+    }
 
 }
