@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import com.excilys.formation.java.cdb.mappers.ComputerMapper;
 import com.excilys.formation.java.cdb.models.Computer;
+import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
 import com.excilys.formation.java.cdb.persistence.DBConnexion;
 import com.excilys.formation.java.cdb.services.ComputerService;
 import com.excilys.formation.java.cdb.services.Pagination;
@@ -30,7 +31,7 @@ public class ComputerDAO {
     private static final Logger LOGGER = Logger.getLogger(ComputerService.class);
 
     /** Represents query to create a computer. */
-    private static final String INSERT_COMPUTER = "INSERT INTO computer (name) VALUES (?)";
+    private static final String INSERT_COMPUTER = "INSERT INTO computer (name, introduced, discontinued, company_id) VALUES (?,?,?,?)";
 
     /** Represents query to retrieve all computers. */
     private static final String ALL_COMPUTERS = "SELECT computer.id, computer.name, introduced, discontinued, company_id, "
@@ -112,19 +113,30 @@ public class ComputerDAO {
      * @return the computer saved in database
      */
     public Computer createComputer(Computer computer) {
+        ComputerBuilder builder = new Computer.ComputerBuilder().name(computer.getName());
         try (Connection connexion = dbConnexion.getConnection();
                 PreparedStatement stmt = connexion.prepareStatement(INSERT_COMPUTER)) {
-            stmt.setString(1, computer.getName());
+            int i = 1;
+            stmt.setString(i++, computer.getName());
             if (computer.getIntroduced() != null) {
-                stmt.setDate(2, java.sql.Date.valueOf(computer.getIntroduced()));
+                stmt.setDate(i++, java.sql.Date.valueOf(computer.getIntroduced()));
+                builder.introduced(computer.getIntroduced());
+            } else {
+                stmt.setNull(i++, 0);
             }
             if (computer.getDiscontinued() != null) {
-                stmt.setDate(3, java.sql.Date.valueOf(computer.getDiscontinued()));
+                stmt.setDate(i++, java.sql.Date.valueOf(computer.getDiscontinued()));
+                builder.introduced(computer.getDiscontinued());
+            } else {
+                stmt.setNull(i++, 0);
             }
             if (computer.getManufacturer() != null) {
                 if (computer.getManufacturer().getId() != null) {
-                    stmt.setLong(4, computer.getManufacturer().getId());
+                    stmt.setLong(i++, computer.getManufacturer().getId());
+                    builder.manufacturer(computer.getManufacturer());
                 }
+            } else {
+                stmt.setNull(i++, 0);
             }
             stmt.executeUpdate();
         } catch (SQLException sqle) {
