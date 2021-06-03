@@ -187,6 +187,9 @@ public class UserInterface {
             case DELETE_COMPUTER:
                 computerService.deleteComputer(retrieveID(scanner, "computer to delete", false));
                 break;
+            case DELETE_COMPANY:
+                companyService.deleteCompany(retrieveID(scanner, "company to delete", false));
+                break;
             case UPDATE_COMPUTER:
                 do {
                     update(scanner);
@@ -209,6 +212,7 @@ public class UserInterface {
         System.out.println(MenuChoice.CREATE_COMPUTER);
         System.out.println(MenuChoice.UPDATE_COMPUTER);
         System.out.println(MenuChoice.DELETE_COMPUTER);
+        System.out.println(MenuChoice.DELETE_COMPANY);
         System.out.println(MenuChoice.QUIT);
     }
 

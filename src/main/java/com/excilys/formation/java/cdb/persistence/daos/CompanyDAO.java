@@ -31,6 +31,9 @@ public class CompanyDAO {
     /** Represents query to retrieve a specific company. */
     private static final String FIND_COMPANY = "SELECT * FROM company WHERE id = ?";
 
+    /** Represents query to delete a computer. */
+    private static final String DELETE_COMPANY = "DELETE FROM company WHERE id = ?";
+
     /** Class logger. */
     private static final Logger LOGGER = Logger.getLogger(CompanyService.class);
 
@@ -102,6 +105,23 @@ public class CompanyDAO {
             LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
         }
         return Optional.empty();
+    }
+
+    /**
+     * Delete a company in the database.
+     * @throws SQLException for database access error, or closed Connection or PreparedStatement, or wrong match with setter
+     * @param id the company's id
+     * @return the number of rows deleted
+     */
+    public int deleteCompany(Long id) {
+        try (Connection connexion = dbConnexion.getConnection();
+                PreparedStatement stmt = connexion.prepareStatement(DELETE_COMPANY)) {
+            stmt.setLong(1, id);
+            return stmt.executeUpdate();
+        } catch (SQLException sqle) {
+            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+        }
+        return 0;
     }
 
 }
