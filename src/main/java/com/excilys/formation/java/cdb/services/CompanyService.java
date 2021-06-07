@@ -1,16 +1,11 @@
 package com.excilys.formation.java.cdb.services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
 import com.excilys.formation.java.cdb.models.Company;
-import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
-import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
 
 /**
  * Represents a company service.
@@ -61,22 +56,6 @@ public class CompanyService {
      * @return the number of rows deleted
      */
     public int deleteCompany(Long id) {
-        findById(id);
-        List<Computer> computers = new ArrayList<>(computerInstance.getComputers());
-        computers.removeIf(c -> c.getManufacturer() == null);
-        Predicate<Computer> p = c -> c.getManufacturer().getId() == id;
-        List<Computer> cs = computers.stream().filter(p).collect(Collectors.toList());
-        cs.stream().forEach(c -> computerInstance.deleteComputer(c.getId()));
         return companyInstance.deleteCompany(id);
     }
-
-    /**
-     * Initialize ComputerDAO instance.
-     * @param computerInstance the instance
-     */
-    public void setComputerInstance(ComputerDAO computerInstance) {
-        CompanyService.computerInstance.setComputerInstance(computerInstance);
-    }
-
-    private static ComputerService computerInstance = new ComputerService();
 }
