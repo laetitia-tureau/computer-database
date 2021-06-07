@@ -13,6 +13,7 @@ import com.excilys.formation.java.cdb.mappers.ComputerMapper;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.services.ComputerService;
 import com.excilys.formation.java.cdb.services.Pagination;
+import com.excilys.formation.java.cdb.services.SearchCriteria;
 import com.excilys.formation.java.cdb.validator.ComputerValidator;
 
 public class ComputerController {
@@ -20,12 +21,16 @@ public class ComputerController {
 
     /**
      * Retrieve computers encapsulated in a dto.
-     * @param page current page
+     * @param criteria
+     * @param
      * @return list of computers dto
      */
-    public static List<ComputerDTO> getComputersPerPage(Pagination page) {
-        ComputerService computerService = new ComputerService();
-        List<Computer> computerList = computerService.getPaginatedComputers(page);
+    public static List<ComputerDTO> getComputersPerPage(Pagination page, SearchCriteria criteria) {
+        Pagination pagination = ComputerController.getPage(String.valueOf(page.getCurrentPage()),
+                String.valueOf(page.getItemsPerPage()), criteria.getItemName());
+        criteria.setLimit(
+                pagination.getItemsPerPage() * (pagination.getCurrentPage() - 1) + "," + pagination.getItemsPerPage());
+        List<Computer> computerList = computerService.findByCriteria(criteria);
 
         return computerList.stream().map(c -> {
             return ComputerMapper.mapFromModelToDTO(c);
@@ -34,20 +39,36 @@ public class ComputerController {
 
     /**
      * Retrieve a Pagination.
-     * @param pageNumber number of current page
-     * @param perPage number of items per page
+     * @param
+     * @param
+     * @param
      * @return a pagination service
      */
-    public static Pagination getPage(String pageNumber, String perPage) {
+    public static Pagination getPage(String indexCurrentPage, String itemsPerPage, String search) {
         Pagination page = new Pagination(0);
-        page.setTotalItems(computerService.getComputers().size());
-        if (pageNumber != null && StringUtils.isNumeric(pageNumber)) {
-            page.setPage(Integer.parseInt(pageNumber));
+        if (StringUtils.isBlank(search)) {
+            page.setTotalItems(computerService.getComputers().size());
+        } else {
+            SearchCriteria criteria = new SearchCriteria();
+            criteria.setItemName(search);
+            page.setTotalItems(computerService.findByCriteria(criteria).size());
         }
-        if (perPage != null && StringUtils.isNumeric(perPage)) {
-            page.setLimit(Integer.parseInt(perPage));
+
+        if (indexCurrentPage != null && StringUtils.isNumeric(indexCurrentPage)) {
+            page.setCurrentPage(Integer.parseInt(indexCurrentPage));
+        }
+        if (itemsPerPage != null && StringUtils.isNumeric(itemsPerPage)) {
+            page.setItemsPerPage(Integer.parseInt(itemsPerPage));
         }
         return page;
+    }
+
+    public static List<Integer> getMaxItemsPerPage(Pagination page) {
+        int totalItem = page.getTotalItems();
+        int pageLimitMin = new Pagination(Pagination.PageLimit.MIN.getLimit(), 0, totalItem).getTotalOfPages();
+        int pageLimitMid = new Pagination(Pagination.PageLimit.MID.getLimit(), 0, totalItem).getTotalOfPages();
+        int pageLimitMax = new Pagination(Pagination.PageLimit.MAX.getLimit(), 0, totalItem).getTotalOfPages();
+        return Arrays.asList(pageLimitMin, pageLimitMid, pageLimitMax);
     }
 
     /**
@@ -65,21 +86,6 @@ public class ComputerController {
         ComputerValidator.validateComputerDTO(computerDTO);
         Computer computer = ComputerMapper.mapFromDTOtoModel(computerDTO);
         new ComputerService().createComputer(computer);
-    }
-
-    /**
-     * Retrieve index for pagination.
-     * @param limitMin minimum numbers of items per page
-     * @param limitMid mid numbers of items per page
-     * @param limitMax maximum numbers of items per page
-     * @return indexes
-     */
-    public static List<Integer> getMaxPagePerLimit(int limitMin, int limitMid, int limitMax) {
-        int totalItem = computerService.getComputers().size();
-        int pageLimitMin = new Pagination(limitMin, 0, totalItem).getTotalPage();
-        int pageLimitMid = new Pagination(limitMid, 0, totalItem).getTotalPage();
-        int pageLimitMax = new Pagination(limitMax, 0, totalItem).getTotalPage();
-        return Arrays.asList(pageLimitMin, pageLimitMid, pageLimitMax);
     }
 
     public static Optional<ComputerDTO> findComputer(String computerId) {
@@ -104,5 +110,25 @@ public class ComputerController {
 
     public static void deleteComputer(String computerId) {
         Arrays.asList(computerId.split(",")).stream().forEach(id -> computerService.deleteComputer(Long.valueOf(id)));
+    }
+
+    public static String setUrl(String search, String order, String sort) {
+        String url = "?";
+        if (StringUtils.isNotBlank(search)) {
+            url += "search=" + search;
+        }
+        if (StringUtils.isNotBlank(sort)) {
+            if (url.length() > 1) {
+                url += "&";
+            }
+            url += "sort=" + sort;
+        }
+        if (StringUtils.isNotBlank(order)) {
+            if (url.length() > 1) {
+                url += "&";
+            }
+            url += "order=" + order;
+        }
+        return url;
     }
 }

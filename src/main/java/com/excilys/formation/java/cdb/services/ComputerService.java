@@ -63,6 +63,21 @@ public class ComputerService {
         return computerInstance.getPaginatedComputers(page);
     }
 
+    public List<Computer> findByCriteria(SearchCriteria criteria) {
+        return computerInstance.findByCriteria(criteria);
+    }
+
+    /**
+     * Retrieve a computer with a specific id.
+     * @param id the computer's id
+     * @return a computer or throw exception
+     */
+    public Computer findById(Long id) {
+        Optional<Computer> opt = computerInstance.findById(id);
+        return opt.orElseThrow(MyPersistenceException::new);
+        // return opt.orElse(null);
+    }
+
     /**
      * Create a computer.
      * @param computer the computer to create
@@ -80,17 +95,6 @@ public class ComputerService {
             }
         }
         return computerInstance.createComputer(computer);
-    }
-
-    /**
-     * Retrieve a computer with a specific id.
-     * @param id the computer's id
-     * @return a computer or throw exception
-     */
-    public Computer findById(Long id) {
-        Optional<Computer> opt = computerInstance.findById(id);
-        return opt.orElseThrow(MyPersistenceException::new);
-        // return opt.orElse(null);
     }
 
     /**

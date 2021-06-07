@@ -103,27 +103,27 @@
             <ul class="pagination">
                 <c:set var="firstPage" value="${1}"/>
                 <c:set var="lastPage" value="${5}"/>
-                <c:if test="${pagination.page > 1}">
-                <c:set var="firstPage" value="${pagination.page - 2}"/>
-                <c:set var="lastPage" value="${pagination.page + 2}"/>
-                <li class="${pagination.page == pageNumber ? 'active' : '' }" >
-                    <a href="${not empty url ? url : '?'}page=${pagination.page - 1}&perPage=${pagination.limit}" aria-label="Previous">
+                <c:if test="${pagination.currentPage > 1}">
+                <c:set var="firstPage" value="${pagination.currentPage - 2}"/>
+                <c:set var="lastPage" value="${pagination.currentPage + 2}"/>
+                <li class="${pagination.currentPage == indexPage ? 'active' : '' }" >
+                    <a href="${not empty url ? url : '?'}currentPage=${pagination.currentPage - 1}&itemsPerPage=${pagination.itemsPerPage}" aria-label="Previous">
                       <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
                 </c:if>
                 
-                <c:forEach var="pageNumber" begin="${firstPage}" end="${lastPage}">
-	                <c:if test="${pageNumber > 0 && pageNumber <= pagination.totalPage}">
-	                   <li class="${pagination.page == pageNumber ? 'active' : '' }">
-	                       <a href="${not empty url ? url : '?'}page=${pageNumber}&perPage=${pagination.limit}">${pageNumber}</a>
+                <c:forEach var="indexPage" begin="${firstPage}" end="${lastPage}">
+	                <c:if test="${indexPage > 0 && indexPage <= pagination.totalOfPages}">
+	                   <li class="${pagination.currentPage == indexPage ? 'active' : '' }">
+	                       <a href="${not empty url ? url : '?'}currentPage=${indexPage}&itemsPerPage=${pagination.itemsPerPage}">${indexPage}</a>
 	                   </li>
 	                </c:if>
 			    </c:forEach>
-                <c:if test="${pagination.page < pagination.totalPage}">
-                <li class="${pagination.page == pageNumber ? 'active' : '' }">
+                <c:if test="${pagination.currentPage < pagination.totalOfPages}">
+                <li class="${pagination.currentPage == indexPage ? 'active' : '' }">
                 
-                    <a href="${not empty url ? url : '?'}page=${pagination.page + 1}&perPage=${pagination.limit}" aria-label="Next">
+                    <a href="${not empty url ? url : '?'}currentPage=${pagination.currentPage + 1}&itemsPerPage=${pagination.itemsPerPage}" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
@@ -131,9 +131,9 @@
             </ul>
        
 	        <div class="btn-group btn-group-sm pull-right" role="group" >
-	            <a href="${not empty url ? url : '?'}page=${pagination.page > maxTotalPage[0] ? maxTotalPage[0] : pagination.page}&perPage=10" class="btn btn-default ${pagination.limit == 10 ? 'active' : '' }">10</a>
-	            <a href="${not empty url ? url : '?'}page=${pagination.page > maxTotalPage[1] ? maxTotalPage[1] : pagination.page}&perPage=50" class="btn btn-default ${pagination.limit == 50 ? 'active' : '' }">50</a>
-	            <a href="${not empty url ? url : '?'}page=${pagination.page > maxTotalPage[2] ? maxTotalPage[2] : pagination.page}&perPage=100" class="btn btn-default ${pagination.limit == 100 ? 'active' : '' }">100</a>
+	            <a href="${not empty url ? url : '?'}currentPage=${pagination.currentPage > maxTotalOfPages[0] ? maxTotalOfPages[0] : pagination.currentPage}&itemsPerPage=10" class="btn btn-default ${pagination.itemsPerPage == 10 ? 'active' : '' }">10</a>
+	            <a href="${not empty url ? url : '?'}currentPage=${pagination.currentPage > maxTotalOfPages[1] ? maxTotalOfPages[1] : pagination.currentPage}&itemsPerPage=50" class="btn btn-default ${pagination.itemsPerPage == 50 ? 'active' : '' }">50</a>
+	            <a href="${not empty url ? url : '?'}currentPage=${pagination.currentPage > maxTotalOfPages[2] ? maxTotalOfPages[2] : pagination.currentPage}&itemsPerPage=100" class="btn btn-default ${pagination.itemsPerPage == 100 ? 'active' : '' }">100</a>
 	        </div>
         </div>
 

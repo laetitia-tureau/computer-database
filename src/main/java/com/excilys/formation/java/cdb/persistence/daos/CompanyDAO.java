@@ -75,7 +75,8 @@ public class CompanyDAO {
      */
     public List<Company> getPaginatedCompanies(Pagination page) {
         List<Company> companies = new ArrayList<>();
-        String withLimit = " LIMIT " + page.getLimit() * (page.getPage() - 1) + "," + page.getLimit();
+        String withLimit = " LIMIT " + page.getItemsPerPage() * (page.getCurrentPage() - 1) + ","
+                + page.getItemsPerPage();
         try (Connection connexion = dbConnexion.getConnection();
                 Statement stmt = connexion.createStatement();
                 ResultSet resultSet = stmt.executeQuery(ALL_COMPANIES + withLimit)) {
