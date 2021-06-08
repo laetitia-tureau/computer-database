@@ -3,6 +3,8 @@ package com.excilys.formation.java.cdb.mappers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.springframework.stereotype.Component;
+
 import com.excilys.formation.java.cdb.dtos.CompanyDTO;
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.models.Company.CompanyBuilder;
@@ -11,6 +13,7 @@ import com.excilys.formation.java.cdb.models.Company.CompanyBuilder;
  * Mapper class for companies.
  * @author Laetitia Tureau
  */
+@Component
 public class CompanyMapper {
 
     /**
@@ -19,7 +22,7 @@ public class CompanyMapper {
      * @param result A ResultSet to convert
      * @return the company resulting
      */
-    public static Company mapFromResultSet(ResultSet result) throws SQLException {
+    public Company mapFromResultSet(ResultSet result) throws SQLException {
         CompanyBuilder builder = new Company.CompanyBuilder().id(result.getLong(1));
         if (result.getString(2) != null) {
             builder.name(result.getString(2));
@@ -32,7 +35,7 @@ public class CompanyMapper {
      * @param company A Company to convert
      * @return the companyDTO resulting
      */
-    public static CompanyDTO mapFromModelToDTO(Company company) {
+    public CompanyDTO mapFromModelToDTO(Company company) {
         String id = String.valueOf(company.getId());
         return new CompanyDTO.CompanyBuilderDTO(id, company.getName()).build();
     }
@@ -42,7 +45,7 @@ public class CompanyMapper {
      * @param companyDTO A CompanyDTO to convert
      * @return the company resulting
      */
-    public static Company mapFromDTOtoModel(CompanyDTO companyDTO) {
+    public Company mapFromDTOtoModel(CompanyDTO companyDTO) {
         Long id = Long.parseLong(companyDTO.getId());
         return new Company.CompanyBuilder(id, companyDTO.getName()).build();
     }

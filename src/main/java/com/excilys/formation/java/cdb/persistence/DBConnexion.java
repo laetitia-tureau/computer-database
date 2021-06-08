@@ -12,7 +12,7 @@ import com.zaxxer.hikari.HikariDataSource;
  */
 public final class DBConnexion {
 
-    private HikariDataSource ds;
+    private HikariDataSource dataSource;
     public static DBConnexion instance;
     private static final String URL_PROPERTIES = "/db.properties";
 
@@ -21,7 +21,7 @@ public final class DBConnexion {
      * @param hikarids the datasource
      */
     private DBConnexion(HikariDataSource hikarids) {
-        this.ds = hikarids;
+        this.dataSource = hikarids;
     }
 
     /**
@@ -29,8 +29,6 @@ public final class DBConnexion {
      * @return database connection object
      */
     public static synchronized DBConnexion getInstance() {
-        // TODO renvoyer une exception qui encapsule les exceptions liées a sql ou jdbc
-        // afin de masquer les exceptions specifique propres au DAO
         if (instance == null) {
             instance = new DBConnexion(new HikariDataSource(new HikariConfig(URL_PROPERTIES)));
         }
@@ -43,6 +41,10 @@ public final class DBConnexion {
      * @throws SQLException exception
      */
     public Connection getConnection() throws SQLException {
-        return ds.getConnection();
+        return dataSource.getConnection();
+    }
+
+    public HikariDataSource getDataSource() {
+        return dataSource;
     }
 }

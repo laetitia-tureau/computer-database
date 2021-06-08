@@ -3,26 +3,33 @@ package com.excilys.formation.java.cdb.controllers;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.services.CompanyService;
 
+@Component
 public class CompanyController {
+
+    @Autowired
+    private CompanyService companyService;
+
     /**
      * Retrieve all companies.
      * @return list of companies
      */
-    public static List<Company> getCompanies() {
-        return new CompanyService().getCompanies();
+    public List<Company> getCompanies() {
+        return companyService.getCompanies();
     }
 
     /**
      * Delete a company.
      * @param idCompany company's id to remove
      */
-    public static void deleteCompany(String idCompany) {
+    public void deleteCompany(String idCompany) {
         if (idCompany != null && StringUtils.isNumeric(idCompany)) {
-            new CompanyService().deleteCompany(Long.parseLong(idCompany));
+            companyService.deleteCompany(Long.parseLong(idCompany));
         }
     }
 }

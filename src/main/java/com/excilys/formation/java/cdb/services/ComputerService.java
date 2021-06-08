@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
 import com.excilys.formation.java.cdb.models.Computer;
@@ -16,18 +18,23 @@ import com.excilys.formation.java.cdb.validator.ComputerValidator;
  * Represents a computer service.
  * @author Laetitia Tureau
  */
+@Service
 public class ComputerService {
 
     /**
      * A DAO instance used to encapsulate the logic for retrieving, saving and updating table computer data into the database.
      */
-    private static ComputerDAO computerInstance = ComputerDAO.getInstance();
+    @Autowired
+    private ComputerDAO computerInstance;
+
+    @Autowired
+    private CompanyService companyService;
+
+    private ComputerValidator computerValidator;
 
     /** Class logger. */
     private static final Logger LOGGER = Logger.getLogger(ComputerService.class);
 
-    private ComputerValidator computerValidator = ComputerValidator.getInstance();
-    private static CompanyService companyService = new CompanyService();
     private static Computer computerToUpdate;
 
     /**
@@ -35,7 +42,7 @@ public class ComputerService {
      * @param computerInstance the instance
      */
     public void setComputerInstance(ComputerDAO computerInstance) {
-        ComputerService.computerInstance = computerInstance;
+        this.computerInstance = computerInstance;
     }
 
     /**
@@ -43,7 +50,7 @@ public class ComputerService {
      * @param companyInstance the instance
      */
     public void setCompanyInstance(CompanyDAO companyInstance) {
-        ComputerService.companyService.setCompanyInstance(companyInstance);
+        this.companyService.setCompanyInstance(companyInstance);
     }
 
     /**

@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+import org.springframework.stereotype.Component;
+
 import com.excilys.formation.java.cdb.dtos.ComputerDTO;
 import com.excilys.formation.java.cdb.dtos.ComputerDTO.ComputerBuilderDTO;
 import com.excilys.formation.java.cdb.models.Company;
@@ -15,6 +17,7 @@ import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
  * Mapper class for computers.
  * @author Laetitia Tureau
  */
+@Component
 public class ComputerMapper {
 
     private static LocalDate introduced;
@@ -27,7 +30,7 @@ public class ComputerMapper {
      * @param result A ResultSet to convert
      * @return the computer resulting
      */
-    public static Computer mapFromResultSet(ResultSet result) throws SQLException {
+    public Computer mapFromResultSet(ResultSet result) throws SQLException {
         ComputerBuilder builder = new Computer.ComputerBuilder(result.getLong(1), result.getString(2));
 
         if (result.getDate(3) != null) {
@@ -51,7 +54,7 @@ public class ComputerMapper {
      * @param computerDTO A ComputerDTO to convert
      * @return the computer resulting
      */
-    public static Computer mapFromDTOtoModel(ComputerDTO computerDTO) {
+    public Computer mapFromDTOtoModel(ComputerDTO computerDTO) {
         Company company = new Company.CompanyBuilder().build();
         ComputerBuilder builder = new Computer.ComputerBuilder();
 
@@ -79,7 +82,7 @@ public class ComputerMapper {
      * @param computer A Computer to convert
      * @return the computerDTO resulting
      */
-    public static ComputerDTO mapFromModelToDTO(Computer computer) {
+    public ComputerDTO mapFromModelToDTO(Computer computer) {
         String id = String.valueOf(computer.getId());
         ComputerBuilderDTO builder = new ComputerDTO.ComputerBuilderDTO(id, computer.getName());
 

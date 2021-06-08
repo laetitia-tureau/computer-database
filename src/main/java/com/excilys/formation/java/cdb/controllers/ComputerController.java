@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.excilys.formation.java.cdb.dtos.ComputerDTO;
 import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
@@ -16,8 +18,16 @@ import com.excilys.formation.java.cdb.services.Pagination;
 import com.excilys.formation.java.cdb.services.SearchCriteria;
 import com.excilys.formation.java.cdb.validator.ComputerValidator;
 
+@Component
 public class ComputerController {
-    private static ComputerService computerService = new ComputerService();
+
+    @Autowired
+    private ComputerService computerService;
+
+    @Autowired
+    private ComputerMapper computerMapper;
+
+    private ComputerValidator computerValidator;
 
     /**
      * Retrieve computers encapsulated in a dto.
@@ -25,15 +35,15 @@ public class ComputerController {
      * @param page a pagination service
      * @return list of computers dto
      */
-    public static List<ComputerDTO> getComputersPerPage(Pagination page, SearchCriteria criteria) {
-        Pagination pagination = ComputerController.getPage(String.valueOf(page.getCurrentPage()),
+    public List<ComputerDTO> getComputersPerPage(Pagination page, SearchCriteria criteria) {
+        Pagination pagination = this.getPage(String.valueOf(page.getCurrentPage()),
                 String.valueOf(page.getItemsPerPage()), criteria.getItemName());
         criteria.setLimit(
                 pagination.getItemsPerPage() * (pagination.getCurrentPage() - 1) + "," + pagination.getItemsPerPage());
         List<Computer> computerList = computerService.findByCriteria(criteria);
 
         return computerList.stream().map(c -> {
-            return ComputerMapper.mapFromModelToDTO(c);
+            return computerMapper.mapFromModelToDTO(c);
         }).collect(Collectors.toList());
     }
 
@@ -44,7 +54,7 @@ public class ComputerController {
      * @param search search criteria
      * @return a pagination service
      */
-    public static Pagination getPage(String indexCurrentPage, String itemsPerPage, String search) {
+    public Pagination getPage(String indexCurrentPage, String itemsPerPage, String search) {
         Pagination page = new Pagination(0);
         if (StringUtils.isBlank(search)) {
             page.setTotalItems(computerService.getComputers().size());
@@ -84,13 +94,13 @@ public class ComputerController {
      * @param companyId computer's manufacturer
      * @throws MyPersistenceException if computer is not a valid computer
      */
-    public static void createComputer(String name, String introduced, String discontinued, String companyId)
+    public void createComputer(String name, String introduced, String discontinued, String companyId)
             throws MyPersistenceException {
         ComputerDTO computerDTO = new ComputerDTO.ComputerBuilderDTO().name(name).introduced(introduced)
                 .discontinued(discontinued).manufacturer(companyId).build();
-        ComputerValidator.validateComputerDTO(computerDTO);
-        Computer computer = ComputerMapper.mapFromDTOtoModel(computerDTO);
-        new ComputerService().createComputer(computer);
+        computerValidator.validateComputerDTO(computerDTO);
+        Computer computer = computerMapper.mapFromDTOtoModel(computerDTO);
+        computerService.createComputer(computer);
     }
 
     /**
@@ -98,10 +108,10 @@ public class ComputerController {
      * @param computerId computer's id to find
      * @return An empty Optional if nothing found else a Optional containing a computer
      */
-    public static Optional<ComputerDTO> findComputer(String computerId) {
+    public Optional<ComputerDTO> findComputer(String computerId) {
         if (computerId != null && StringUtils.isNumeric(computerId)) {
             Computer computer = computerService.findById(Long.parseLong(computerId));
-            return Optional.of(ComputerMapper.mapFromModelToDTO(computer));
+            return Optional.of(computerMapper.mapFromModelToDTO(computer));
         }
         return Optional.empty();
     }
@@ -114,14 +124,14 @@ public class ComputerController {
      * @param discontinued computer's discontinued date
      * @param companyId computer's manufacturer
      */
-    public static void updateComputer(String computerId, String computerName, String introduced, String discontinued,
+    public void updateComputer(String computerId, String computerName, String introduced, String discontinued,
             String companyId) {
-        Optional<ComputerDTO> opt = findComputer(computerId);
+        Optional<ComputerDTO> opt = this.findComputer(computerId);
         ComputerDTO computerDTO = opt.orElseThrow(MyPersistenceException::new);
         computerDTO = new ComputerDTO.ComputerBuilderDTO().id(computerId).name(computerName).introduced(introduced)
                 .discontinued(discontinued).manufacturer(companyId).build();
-        ComputerValidator.validateComputerDTO(computerDTO);
-        Computer computer = ComputerMapper.mapFromDTOtoModel(computerDTO);
+        computerValidator.validateComputerDTO(computerDTO);
+        Computer computer = computerMapper.mapFromDTOtoModel(computerDTO);
         new ComputerService().update(computer);
 
     }
@@ -130,7 +140,7 @@ public class ComputerController {
      * Delete a computer.
      * @param computerId computer's id to remove
      */
-    public static void deleteComputer(String computerId) {
+    public void deleteComputer(String computerId) {
         Arrays.asList(computerId.split(",")).stream().forEach(id -> computerService.deleteComputer(Long.valueOf(id)));
     }
 

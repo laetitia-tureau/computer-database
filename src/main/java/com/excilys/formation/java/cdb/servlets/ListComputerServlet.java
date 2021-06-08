@@ -4,25 +4,34 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.excilys.formation.java.cdb.controllers.ComputerController;
 import com.excilys.formation.java.cdb.dtos.ComputerDTO;
 import com.excilys.formation.java.cdb.services.Pagination;
 import com.excilys.formation.java.cdb.services.SearchCriteria;
 
-@WebServlet(name = "ListComputerServlet", urlPatterns = { "/computer/list" })
+@Controller
+@RequestMapping("/computer/list")
 public class ListComputerServlet extends HttpServlet {
+
+    @Autowired
+    private ComputerController computerController;
+
     private static final long serialVersionUID = 1L;
     private static Logger log = Logger.getLogger(ListComputerServlet.class);
 
     @Override
+    @GetMapping
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String indexCurrentPage = request.getParameter("currentPage");
@@ -36,8 +45,8 @@ public class ListComputerServlet extends HttpServlet {
 
         SearchCriteria criteria = new SearchCriteria(order, sort, search);
 
-        Pagination page = ComputerController.getPage(indexCurrentPage, itemsPerPage, search);
-        List<ComputerDTO> computerList = ComputerController.getComputersPerPage(page, criteria);
+        Pagination page = computerController.getPage(indexCurrentPage, itemsPerPage, search);
+        List<ComputerDTO> computerList = computerController.getComputersPerPage(page, criteria);
         List<Integer> maxTotalOfPages = ComputerController.getMaxItemsPerPage(page);
 
         request.setAttribute("computerList", computerList);
@@ -52,7 +61,7 @@ public class ListComputerServlet extends HttpServlet {
         if (url.length() > 1) {
             request.setAttribute("url", url + "&");
         }
-        this.getServletContext().getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
     }
 
 }
