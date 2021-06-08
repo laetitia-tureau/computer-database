@@ -12,7 +12,7 @@
 <link href="${pageContext.request.contextPath}/css/font-awesome.css" rel="stylesheet" media="screen">
 <link href="${pageContext.request.contextPath}/css/main.css" rel="stylesheet" media="screen">
 </head>
-<body>
+<body> 
     <header class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <a class="navbar-brand" href="${pageContext.request.contextPath}/computer/list"> Application - Computer Database </a>
@@ -22,13 +22,13 @@
     <section id="main">
         <div class="container">
             <h1 id="homeTitle">
-             <c:out value="${pagination.totalItems}" /> Computers found
+             ${pagination.totalItems} Computers found
             </h1>
             <div id="actions" class="form-horizontal">
                 <div class="pull-left">
-                    <form id="searchForm" action="#" method="GET" class="form-inline">
+                    <form id="searchForm" action="${pageContext.request.contextPath}/computer/list" method="GET" class="form-inline">
 
-                        <input type="search" id="searchbox" name="search" class="form-control" placeholder="Search name" />
+                        <input type="search" id="searchbox" name="search" value="${criteria.itemName}" class="form-control" placeholder="Search name" />
                         <input type="submit" id="searchsubmit" value="Filter by name"
                         class="btn btn-primary" />
                     </form>
@@ -40,7 +40,7 @@
             </div>
         </div>
 
-        <form id="deleteForm" action="#" method="POST">
+        <form id="deleteForm" action="${pageContext.request.contextPath}/computer/delete" method="POST">
             <input type="hidden" name="selection" value="">
         </form>
 
@@ -60,18 +60,19 @@
                             </span>
                         </th>
                         <th>
-                            Computer name
+                            <a href="${pageContext.request.contextPath}/computer/list${not empty criteria.itemName ? '?search='.concat(criteria.itemName).concat('&') : '?'}sort=computer.name&order=${not empty criteria.order && criteria.order == 'ASC' ? 'DESC' : 'ASC'}">Computer name <i class="fa fa-fw fa-sort"></i></a>
                         </th>
                         <th>
-                            Introduced date
+                            <a href="${pageContext.request.contextPath}/computer/list${not empty criteria.itemName ? '?search='.concat(criteria.itemName).concat('&') : '?'}sort=computer.introduced&order=${not empty criteria.order && criteria.order == 'ASC' ? 'DESC' : 'ASC'}">Introduced date <i class="fa fa-fw fa-sort"></i></a>
                         </th>
                         <!-- Table header for Discontinued Date -->
                         <th>
-                            Discontinued date
+                            <a href="${pageContext.request.contextPath}/computer/list${not empty criteria.itemName ? '?search='.concat(criteria.itemName).concat('&') : '?'}sort=computer.discontinued&order=${not empty criteria.order && criteria.order == 'ASC' ? 'DESC' : 'ASC'}">Discontinued date <i class="fa fa-fw fa-sort"></i></a>
                         </th>
                         <!-- Table header for Company -->
                         <th>
-                            Company
+                            <a href="${pageContext.request.contextPath}/computer/list${not empty criteria.itemName ? '?search='.concat(criteria.itemName).concat('&') : '?'}sort=company.name&order=${not empty criteria.order && criteria.order == 'ASC' ? 'DESC' : 'ASC'}">Company name <i class="fa fa-fw fa-sort"></i></a>
+                            
                         </th>
 
                     </tr>
@@ -81,10 +82,10 @@
                     <c:forEach var="computer" items="${computerList}">
                     <tr>
                         <td class="editMode">
-                            <input type="checkbox" name="cb" class="cb" value="0">
+                            <input type="checkbox" name="cb" class="cb" value="${computer.id}">
                         </td>
                         <td>
-                            <a href="editComputer.html" onclick="">${computer.name }</a>
+                            <a href="${pageContext.request.contextPath}/computer/edit?id=${computer.id}" onclick="">${computer.name }</a>
                         </td>
                         <td>${computer.introduced}</td>
                         <td>${computer.discontinued}</td>
@@ -102,27 +103,27 @@
             <ul class="pagination">
                 <c:set var="firstPage" value="${1}"/>
                 <c:set var="lastPage" value="${5}"/>
-                <c:if test="${pagination.page > 1}">
-                <c:set var="firstPage" value="${pagination.page - 2}"/>
-                <c:set var="lastPage" value="${pagination.page + 2}"/>
-                <li class="${pagination.page == pageNumber ? 'active' : '' }" >
-                    <a href="?page=${pagination.page - 1}&perPage=${pagination.limit}" aria-label="Previous">
+                <c:if test="${pagination.currentPage > 1}">
+                <c:set var="firstPage" value="${pagination.currentPage - 2}"/>
+                <c:set var="lastPage" value="${pagination.currentPage + 2}"/>
+                <li class="${pagination.currentPage == indexPage ? 'active' : '' }" >
+                    <a href="${not empty url ? url : '?'}currentPage=${pagination.currentPage - 1}&itemsPerPage=${pagination.itemsPerPage}" aria-label="Previous">
                       <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
                 </c:if>
                 
-                <c:forEach var="pageNumber" begin="${firstPage}" end="${lastPage}">
-	                <c:if test="${pageNumber > 0 && pageNumber <= pagination.totalPage}">
-	                   <li class="${pagination.page == pageNumber ? 'active' : '' }">
-	                       <a href="?page=${pageNumber}&perPage=${pagination.limit}"><c:out value = "${pageNumber}"/></a>
+                <c:forEach var="indexPage" begin="${firstPage}" end="${lastPage}">
+	                <c:if test="${indexPage > 0 && indexPage <= pagination.totalOfPages}">
+	                   <li class="${pagination.currentPage == indexPage ? 'active' : '' }">
+	                       <a href="${not empty url ? url : '?'}currentPage=${indexPage}&itemsPerPage=${pagination.itemsPerPage}">${indexPage}</a>
 	                   </li>
 	                </c:if>
 			    </c:forEach>
-                <c:if test="${pagination.page < pagination.totalPage}">
-                <li class="${pagination.page == pageNumber ? 'active' : '' }">
+                <c:if test="${pagination.currentPage < pagination.totalOfPages}">
+                <li class="${pagination.currentPage == indexPage ? 'active' : '' }">
                 
-                    <a href="?page=${pagination.page + 1}&perPage=${pagination.limit}" aria-label="Next">
+                    <a href="${not empty url ? url : '?'}currentPage=${pagination.currentPage + 1}&itemsPerPage=${pagination.itemsPerPage}" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
@@ -130,9 +131,9 @@
             </ul>
        
 	        <div class="btn-group btn-group-sm pull-right" role="group" >
-	            <a href="?page=${pagination.page > maxTotalPage[0] ? maxTotalPage[0] : pagination.page}&perPage=10" class="btn btn-default ${pagination.limit == 10 ? 'active' : '' }">10</a>
-	            <a href="?page=${pagination.page > maxTotalPage[1] ? maxTotalPage[1] : pagination.page}&perPage=50" class="btn btn-default ${pagination.limit == 50 ? 'active' : '' }">50</a>
-	            <a href="?page=${pagination.page > maxTotalPage[2] ? maxTotalPage[2] : pagination.page}&perPage=100" class="btn btn-default ${pagination.limit == 100 ? 'active' : '' }">100</a>
+	            <a href="${not empty url ? url : '?'}currentPage=${pagination.currentPage > maxTotalOfPages[0] ? maxTotalOfPages[0] : pagination.currentPage}&itemsPerPage=10" class="btn btn-default ${pagination.itemsPerPage == 10 ? 'active' : '' }">10</a>
+	            <a href="${not empty url ? url : '?'}currentPage=${pagination.currentPage > maxTotalOfPages[1] ? maxTotalOfPages[1] : pagination.currentPage}&itemsPerPage=50" class="btn btn-default ${pagination.itemsPerPage == 50 ? 'active' : '' }">50</a>
+	            <a href="${not empty url ? url : '?'}currentPage=${pagination.currentPage > maxTotalOfPages[2] ? maxTotalOfPages[2] : pagination.currentPage}&itemsPerPage=100" class="btn btn-default ${pagination.itemsPerPage == 100 ? 'active' : '' }">100</a>
 	        </div>
         </div>
 

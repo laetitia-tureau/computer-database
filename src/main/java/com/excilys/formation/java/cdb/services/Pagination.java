@@ -6,8 +6,8 @@ package com.excilys.formation.java.cdb.services;
  */
 public class Pagination {
 
-    private int limit;
-    private int page;
+    private int itemsPerPage;
+    private int currentPage;
     private int totalItems;
 
     // show 25 item per page by default
@@ -19,8 +19,8 @@ public class Pagination {
      * @param total numbers of items to paginate
      */
     public Pagination(int total) {
-        this.limit = DEFAULT_LIMIT;
-        this.page = DEFAULT_PAGE;
+        this.itemsPerPage = DEFAULT_LIMIT;
+        this.currentPage = DEFAULT_PAGE;
         this.totalItems = total;
     }
 
@@ -31,25 +31,25 @@ public class Pagination {
      * @param total numbers of items to paginate
      */
     public Pagination(int limit, int page, int total) {
-        this.limit = limit;
-        this.page = page;
+        this.itemsPerPage = limit;
+        this.currentPage = page;
         this.totalItems = total;
     }
 
-    public int getLimit() {
-        return limit;
+    public int getItemsPerPage() {
+        return itemsPerPage;
     }
 
-    public void setLimit(int limit) {
-        this.limit = limit;
+    public void setItemsPerPage(int limit) {
+        this.itemsPerPage = limit;
     }
 
-    public int getPage() {
-        return page;
+    public int getCurrentPage() {
+        return currentPage;
     }
 
-    public void setPage(int page) {
-        this.page = page;
+    public void setCurrentPage(int page) {
+        this.currentPage = page;
     }
 
     public int getTotalItems() {
@@ -60,26 +60,45 @@ public class Pagination {
         this.totalItems = totalItem;
     }
 
-    public int getTotalPage() {
-        return (int) Math.ceil(((double) this.totalItems / (double) this.limit));
+    public int getTotalOfPages() {
+        return (int) Math.ceil(((double) this.totalItems / (double) this.itemsPerPage));
     }
 
     /** cursor to the next page.*/
     public void next() {
-        if (this.page < this.getTotalPage()) {
-            this.page++;
+        if (this.currentPage < this.getTotalOfPages()) {
+            this.currentPage++;
         }
     }
 
     /** cursor to the previous page.*/
     public void prev() {
-        if (this.page > 1) {
-            this.page--;
+        if (this.currentPage > 1) {
+            this.currentPage--;
         }
     }
 
     @Override
     public String toString() {
-        return "Pagination [limit=" + limit + ", page=" + page + ", totalItem=" + totalItems + "]";
+        return "Pagination [itemsPerPage=" + itemsPerPage + ", currentPage=" + currentPage + ", totalItems="
+                + totalItems + "]";
+    }
+
+    public enum PageLimit {
+        MIN(10), MID(50), MAX(100);
+
+        public Integer limit;
+
+        /**
+         * Creates a PageLimlit enum with given items limit.
+         * @param max limit of items per page
+         */
+        PageLimit(Integer max) {
+            this.limit = max;
+        }
+
+        public Integer getLimit() {
+            return this.limit;
+        }
     }
 }

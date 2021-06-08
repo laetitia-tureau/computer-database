@@ -47,5 +47,15 @@ public class CompanyService {
     public Company findById(Long id) {
         Optional<Company> opt = companyInstance.findById(id);
         return opt.orElseThrow(MyPersistenceException::new);
+        // return opt.orElse(null);
+    }
+
+    /**
+     * Delete a company and its computers.
+     * @param id A Long containing the company's id
+     * @return the number of rows deleted
+     */
+    public int deleteCompany(Long id) {
+        return companyInstance.deleteCompany(id);
     }
 }
