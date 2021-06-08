@@ -2,6 +2,8 @@ package com.excilys.formation.java.cdb.validator;
 
 import java.time.LocalDate;
 
+import org.springframework.stereotype.Component;
+
 import com.excilys.formation.java.cdb.dtos.ComputerDTO;
 import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
 import com.excilys.formation.java.cdb.models.Computer;
@@ -11,7 +13,7 @@ import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
  * Validator for computers.
  * @author Laetitia Tureau
  */
-
+@Component
 public class ComputerValidator {
 
     private static final String FORBIDDEN_DATE = "discontinued date must be greater than introduced date";

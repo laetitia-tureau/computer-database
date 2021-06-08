@@ -27,6 +27,7 @@ public class ComputerController {
     @Autowired
     private ComputerMapper computerMapper;
 
+    @Autowired
     private ComputerValidator computerValidator;
 
     /**

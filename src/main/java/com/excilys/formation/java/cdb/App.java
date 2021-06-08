@@ -16,6 +16,12 @@ public class App {
 
     private static Logger log = Logger.getLogger(App.class);
 
+    /**
+     * Runs the application.
+     * @param args An array of strings
+     * @throws SQLException for crud operations
+     * @throws ParseException when parsing a date
+     */
     public static void main(String[] args) throws SQLException, ParseException {
         ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
         CompanyDAO companyDAO = context.getBean(CompanyDAO.class);

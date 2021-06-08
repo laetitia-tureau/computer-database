@@ -30,6 +30,7 @@ public class ComputerService {
     @Autowired
     private CompanyService companyService;
 
+    @Autowired
     private ComputerValidator computerValidator;
 
     /** Class logger. */

@@ -26,6 +26,11 @@ public class UserInterface {
     private static Computer computer;
     private static final Logger LOGGER = Logger.getLogger(UserInterface.class);
 
+    /**
+     * Creates cdb user interface.
+     * @param computerDAO computer's dao
+     * @param companyDAO company's dao
+     */
     public UserInterface(ComputerDAO computerDAO, CompanyDAO companyDAO) {
         computerService.setComputerInstance(computerDAO);
         computerService.setCompanyServiceInstance(companyService);

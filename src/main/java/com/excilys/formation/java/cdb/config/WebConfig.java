@@ -17,8 +17,14 @@ import com.zaxxer.hikari.HikariDataSource;
 @EnableWebMvc
 @ComponentScan({ "com.excilys.formation.java.cdb.services", "com.excilys.formation.java.cdb.controllers",
         "com.excilys.formation.java.cdb.persistence.daos", "com.excilys.formation.java.cdb.mappers",
-        "com.excilys.formation.java.cdb.persistence", "com.excilys.formation.java.cdb.servlets" })
+        "com.excilys.formation.java.cdb.persistence", "com.excilys.formation.java.cdb.servlets",
+        "com.excilys.formation.java.cdb.validator" })
 public class WebConfig implements WebMvcConfigurer {
+
+    /**
+     * Build a ViewResolver maps view names to actual views.
+     * @return a ViewResolver
+     */
     @Bean
     public ViewResolver viewResolver() {
         InternalResourceViewResolver bean = new InternalResourceViewResolver();
