@@ -9,11 +9,11 @@ import java.util.Scanner;
 import org.apache.log4j.Logger;
 
 import com.excilys.formation.java.cdb.mappers.DateMapper;
-import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.models.Computer;
+import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
+import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
 import com.excilys.formation.java.cdb.services.CompanyService;
 import com.excilys.formation.java.cdb.services.ComputerService;
-import com.excilys.formation.java.cdb.services.Page;
 
 /**
  * Represents Command-line interface.
@@ -24,8 +24,14 @@ public class UserInterface {
     private static ComputerService computerService = new ComputerService();
     private static CompanyService companyService = new CompanyService();
     private static Computer computer;
-    private static Company company;
     private static final Logger LOGGER = Logger.getLogger(UserInterface.class);
+
+    public UserInterface(ComputerDAO computerDAO, CompanyDAO companyDAO) {
+        computerService.setComputerInstance(computerDAO);
+        computerService.setCompanyServiceInstance(companyService);
+        computerService.setCompanyInstance(companyDAO);
+        companyService.setCompanyInstance(companyDAO);
+    }
 
     /**
      * Display a paginated list.
@@ -119,7 +125,7 @@ public class UserInterface {
         Long id = retrieveID(scanner, action, update);
         if (isCompany) {
             try {
-                company = companyService.findById(id);
+                companyService.findById(id);
             } catch (Exception e) {
                 LOGGER.warn("No company with id : " + id);
             }

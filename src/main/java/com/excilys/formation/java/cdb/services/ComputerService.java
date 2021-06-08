@@ -51,6 +51,15 @@ public class ComputerService {
      */
     public void setCompanyInstance(CompanyDAO companyInstance) {
         this.companyService.setCompanyInstance(companyInstance);
+
+    }
+
+    /**
+     * Initialize CompanyService instance.
+     * @param companyInstance the instance
+     */
+    public void setCompanyServiceInstance(CompanyService companyInstance) {
+        this.companyService = companyInstance;
     }
 
     /**
