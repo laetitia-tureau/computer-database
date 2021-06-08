@@ -46,7 +46,7 @@ public class ListComputerServlet extends HttpServlet {
         request.setAttribute("criteria", criteria);
         request.setAttribute("search", search);
         // request.setAttribute("order", order);
-        request.setAttribute("sort", sort);
+        // request.setAttribute("sort", sort);
 
         String url = ComputerController.setUrl(search, order, sort);
         if (url.length() > 1) {
