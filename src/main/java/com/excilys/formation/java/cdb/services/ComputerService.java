@@ -64,20 +64,12 @@ public class ComputerService {
     }
 
     /**
-     * Create a computer.
-     * @param computer the computer to create
-     * @return the computer saved in database
+     * Find all computers matching given criteria.
+     * @param criteria represents the search criteria
+     * @return a list of computers matching the criteria
      */
-    public Computer createComputer(Computer computer) {
-        computerValidator.validateComputerDate(computer);
-        if (computer.getManufacturer() != null) {
-            if (computer.getManufacturer().getId() != 0) {
-                companyService.findById(computer.getManufacturer().getId());
-            } else {
-                throw new MyPersistenceException("company does not exist in database");
-            }
-        }
-        return computerInstance.createComputer(computer);
+    public List<Computer> findByCriteria(SearchCriteria criteria) {
+        return computerInstance.findByCriteria(criteria);
     }
 
     /**
@@ -88,6 +80,26 @@ public class ComputerService {
     public Computer findById(Long id) {
         Optional<Computer> opt = computerInstance.findById(id);
         return opt.orElseThrow(MyPersistenceException::new);
+        // return opt.orElse(null);
+    }
+
+    /**
+     * Create a computer.
+     * @param computer the computer to create
+     * @return the computer saved in database
+     */
+    public Computer createComputer(Computer computer) {
+        computerValidator.validateComputerDate(computer);
+        if (computer.getManufacturer() != null) {
+            if (computer.getManufacturer().getId() != 0) {
+                companyService.findById(computer.getManufacturer().getId());
+                // if (company == null) throw new MyPersistenceException("company does not exist
+                // in database");
+            } else {
+                throw new MyPersistenceException("company does not exist in database");
+            }
+        }
+        return computerInstance.createComputer(computer);
     }
 
     /**

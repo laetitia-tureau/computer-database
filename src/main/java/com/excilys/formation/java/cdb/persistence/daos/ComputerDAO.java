@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.excilys.formation.java.cdb.mappers.ComputerMapper;
@@ -18,6 +19,7 @@ import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
 import com.excilys.formation.java.cdb.persistence.DBConnexion;
 import com.excilys.formation.java.cdb.services.ComputerService;
 import com.excilys.formation.java.cdb.services.Pagination;
+import com.excilys.formation.java.cdb.services.SearchCriteria;
 
 /** Represents a computer DAO.
  * @author Laetitia Tureau
@@ -93,7 +95,8 @@ public class ComputerDAO {
      */
     public List<Computer> getPaginatedComputers(Pagination page) {
         List<Computer> computers = new ArrayList<>();
-        String withLimit = " LIMIT " + page.getLimit() * (page.getPage() - 1) + "," + page.getLimit();
+        String withLimit = " LIMIT " + page.getItemsPerPage() * (page.getCurrentPage() - 1) + ","
+                + page.getItemsPerPage();
         try (Connection connexion = dbConnexion.getConnection();
                 Statement stmt = connexion.createStatement();
                 ResultSet resultSet = stmt.executeQuery(ALL_COMPUTERS + withLimit)) {
@@ -256,6 +259,40 @@ public class ComputerDAO {
             LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
         }
         return 0;
+    }
+
+    /**
+     * Find all computers matching given criteria.
+     * @param criteria represents the search criteria (search, order, sort, limit)
+     * @return a list of computers matching the criteria
+     */
+    public List<Computer> findByCriteria(SearchCriteria criteria) {
+        List<Computer> computers = new ArrayList<>();
+        String query = ALL_COMPUTERS;
+        if (StringUtils.isNotBlank(criteria.getItemName())) {
+            query += " WHERE computer.name LIKE ? OR company.name LIKE ? ";
+        }
+        if (StringUtils.isNotBlank(criteria.getOrder()) && StringUtils.isNotBlank(criteria.getSort())) {
+            query += " ORDER BY " + criteria.getSort() + " " + criteria.getOrder();
+        }
+        if (StringUtils.isNotBlank(criteria.getLimit())) {
+            query += " LIMIT " + criteria.getLimit();
+        }
+        try (Connection connection = dbConnexion.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+            if (StringUtils.isNotBlank(criteria.getItemName())) {
+                preparedStatement.setString(1, "%" + criteria.getItemName() + "%");
+                preparedStatement.setString(2, "%" + criteria.getItemName() + "%");
+            }
+            try (ResultSet result = preparedStatement.executeQuery()) {
+                while (result.next()) {
+                    computers.add(ComputerMapper.mapFromResultSet(result));
+                }
+            }
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+        return computers;
     }
 
 }

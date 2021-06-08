@@ -10,9 +10,9 @@ public class ComputerDTO {
     private String introduced;
     private String discontinued;
 
-    /** Represents the computer's company.
-     */
+    /** Represents the computer's company.*/
     private String manufacturer;
+    private String companyName;
 
     /** Creates a computer using a ComputerBuilder.
      * @param builder A ComputerBuilder
@@ -23,6 +23,7 @@ public class ComputerDTO {
         this.introduced = builder.introduced;
         this.discontinued = builder.discontinued;
         this.manufacturer = builder.manufacturer;
+        this.companyName = builder.companyName;
     }
 
     /** Gets the computer's id.
@@ -54,11 +55,19 @@ public class ComputerDTO {
     }
 
     /**
-     * Gets the computer's company..
+     * Gets the computer's company.
      * @return this.manufacturer
      */
     public String getManufacturer() {
         return this.manufacturer;
+    }
+
+    /**
+     * Gets the computer's company.
+     * @return this.manufacturer
+     */
+    public String getCompanyName() {
+        return this.companyName;
     }
 
     @Override
@@ -82,6 +91,7 @@ public class ComputerDTO {
         private String discontinued;
         /** Represents the computer's company.*/
         private String manufacturer;
+        private String companyName;
 
         /** Creates a ComputerBuilder.*/
         public ComputerBuilderDTO() {
@@ -143,6 +153,16 @@ public class ComputerDTO {
          */
         public ComputerBuilderDTO manufacturer(String manufacturerBuilder) {
             this.manufacturer = manufacturerBuilder;
+            return this;
+        }
+
+        /**
+         * Initialize attribute companyName of the ComputerBuilder.
+         * @param companyNameBuilder A Company
+         * @return this
+         */
+        public ComputerBuilderDTO companyName(String companyNameBuilder) {
+            this.companyName = companyNameBuilder;
             return this;
         }
 

@@ -31,6 +31,12 @@ public class CompanyDAO {
     /** Represents query to retrieve a specific company. */
     private static final String FIND_COMPANY = "SELECT * FROM company WHERE id = ?";
 
+    /** Represents query to delete a company. */
+    private static final String DELETE_COMPANY = "DELETE FROM company WHERE id = ?";
+
+    /** Represents query to delete a computer. */
+    private static final String DELETE_COMPUTER = "DELETE FROM computer WHERE company_id = ?";
+
     /** Class logger. */
     private static final Logger LOGGER = Logger.getLogger(CompanyService.class);
 
@@ -72,7 +78,8 @@ public class CompanyDAO {
      */
     public List<Company> getPaginatedCompanies(Pagination page) {
         List<Company> companies = new ArrayList<>();
-        String withLimit = " LIMIT " + page.getLimit() * (page.getPage() - 1) + "," + page.getLimit();
+        String withLimit = " LIMIT " + page.getItemsPerPage() * (page.getCurrentPage() - 1) + ","
+                + page.getItemsPerPage();
         try (Connection connexion = dbConnexion.getConnection();
                 Statement stmt = connexion.createStatement();
                 ResultSet resultSet = stmt.executeQuery(ALL_COMPANIES + withLimit)) {
@@ -102,6 +109,33 @@ public class CompanyDAO {
             LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
         }
         return Optional.empty();
+    }
+
+    /**
+     * Delete a company in the database.
+     * @throws SQLException for database access error, or closed Connection or PreparedStatement, or wrong match with setter
+     * @param id the company's id
+     * @return the number of rows deleted
+     */
+    public int deleteCompany(Long id) {
+        try (Connection connexion = dbConnexion.getConnection()) {
+            connexion.setAutoCommit(false);
+            try (PreparedStatement companyPs = connexion.prepareStatement(DELETE_COMPANY);
+                    PreparedStatement computerPs = connexion.prepareStatement(DELETE_COMPUTER)) {
+                computerPs.setLong(1, id);
+                companyPs.setLong(1, id);
+                computerPs.executeUpdate();
+                return companyPs.executeUpdate();
+            } catch (SQLException sqle) {
+                connexion.rollback();
+                LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+            } finally {
+                connexion.setAutoCommit(true);
+            }
+        } catch (SQLException sqle) {
+            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+        }
+        return 0;
     }
 
 }
