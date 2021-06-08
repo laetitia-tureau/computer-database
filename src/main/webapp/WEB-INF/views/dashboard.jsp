@@ -60,18 +60,18 @@
                             </span>
                         </th>
                         <th>
-                            <a href="${pageContext.request.contextPath}/computer/list${not empty search ? '?search='.concat(search).concat('&') : '?'}sort=computer.name&order=${not empty order && order == 'ASC' ? 'DESC' : 'ASC'}">Computer name <i class="fa fa-fw fa-sort"></i></a>
+                            <a href="${pageContext.request.contextPath}/computer/list${not empty search ? '?search='.concat(search).concat('&') : '?'}sort=computer.name&order=${not empty criteria.order && criteria.order == 'ASC' ? 'DESC' : 'ASC'}">Computer name <i class="fa fa-fw fa-sort"></i></a>
                         </th>
                         <th>
-                            <a href="${pageContext.request.contextPath}/computer/list${not empty search ? '?search='.concat(search).concat('&') : '?'}sort=computer.introduced&order=${not empty order && order == 'ASC' ? 'DESC' : 'ASC'}">Introduced date <i class="fa fa-fw fa-sort"></i></a>
+                            <a href="${pageContext.request.contextPath}/computer/list${not empty search ? '?search='.concat(search).concat('&') : '?'}sort=computer.introduced&order=${not empty criteria.order && criteria.order == 'ASC' ? 'DESC' : 'ASC'}">Introduced date <i class="fa fa-fw fa-sort"></i></a>
                         </th>
                         <!-- Table header for Discontinued Date -->
                         <th>
-                            <a href="${pageContext.request.contextPath}/computer/list${not empty search ? '?search='.concat(search).concat('&') : '?'}sort=computer.discontinued&order=${not empty order && order == 'ASC' ? 'DESC' : 'ASC'}">Discontinued date <i class="fa fa-fw fa-sort"></i></a>
+                            <a href="${pageContext.request.contextPath}/computer/list${not empty search ? '?search='.concat(search).concat('&') : '?'}sort=computer.discontinued&order=${not empty criteria.order && criteria.order == 'ASC' ? 'DESC' : 'ASC'}">Discontinued date <i class="fa fa-fw fa-sort"></i></a>
                         </th>
                         <!-- Table header for Company -->
                         <th>
-                            <a href="${pageContext.request.contextPath}/computer/list${not empty search ? '?search='.concat(search).concat('&') : '?'}sort=company.name&order=${not empty order && order == 'ASC' ? 'DESC' : 'ASC'}">Company name <i class="fa fa-fw fa-sort"></i></a>
+                            <a href="${pageContext.request.contextPath}/computer/list${not empty search ? '?search='.concat(search).concat('&') : '?'}sort=company.name&order=${not empty criteria.order && criteria.order == 'ASC' ? 'DESC' : 'ASC'}">Company name <i class="fa fa-fw fa-sort"></i></a>
                             
                         </th>
 

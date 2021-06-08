@@ -63,6 +63,11 @@ public class ComputerService {
         return computerInstance.getPaginatedComputers(page);
     }
 
+    /**
+     * Find all computers matching given criteria.
+     * @param criteria represents the search criteria
+     * @return a list of computers matching the criteria
+     */
     public List<Computer> findByCriteria(SearchCriteria criteria) {
         return computerInstance.findByCriteria(criteria);
     }

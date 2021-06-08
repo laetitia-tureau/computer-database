@@ -21,8 +21,8 @@ public class ComputerController {
 
     /**
      * Retrieve computers encapsulated in a dto.
-     * @param criteria
-     * @param
+     * @param criteria a search by criteria service
+     * @param page a pagination service
      * @return list of computers dto
      */
     public static List<ComputerDTO> getComputersPerPage(Pagination page, SearchCriteria criteria) {
@@ -39,9 +39,9 @@ public class ComputerController {
 
     /**
      * Retrieve a Pagination.
-     * @param
-     * @param
-     * @param
+     * @param indexCurrentPage number of current page
+     * @param itemsPerPage max number of items per page
+     * @param search search criteria
      * @return a pagination service
      */
     public static Pagination getPage(String indexCurrentPage, String itemsPerPage, String search) {
@@ -63,6 +63,11 @@ public class ComputerController {
         return page;
     }
 
+    /**
+     * Retrieve the limit of items per page.
+     * @param page a pagination service
+     * @return a list of all limits
+     */
     public static List<Integer> getMaxItemsPerPage(Pagination page) {
         int totalItem = page.getTotalItems();
         int pageLimitMin = new Pagination(Pagination.PageLimit.MIN.getLimit(), 0, totalItem).getTotalOfPages();
@@ -88,6 +93,11 @@ public class ComputerController {
         new ComputerService().createComputer(computer);
     }
 
+    /**
+     * Retrieve a computer with specific id.
+     * @param computerId computer's id to find
+     * @return An empty Optional if nothing found else a Optional containing a computer
+     */
     public static Optional<ComputerDTO> findComputer(String computerId) {
         if (computerId != null && StringUtils.isNumeric(computerId)) {
             Computer computer = computerService.findById(Long.parseLong(computerId));
@@ -96,6 +106,14 @@ public class ComputerController {
         return Optional.empty();
     }
 
+    /**
+     * Update a computer.
+     * @param computerId computer's id to edit
+     * @param computerName computer's name
+     * @param introduced computer's introduced date
+     * @param discontinued computer's discontinued date
+     * @param companyId computer's manufacturer
+     */
     public static void updateComputer(String computerId, String computerName, String introduced, String discontinued,
             String companyId) {
         Optional<ComputerDTO> opt = findComputer(computerId);
@@ -108,10 +126,21 @@ public class ComputerController {
 
     }
 
+    /**
+     * Delete a computer.
+     * @param computerId computer's id to remove
+     */
     public static void deleteComputer(String computerId) {
         Arrays.asList(computerId.split(",")).stream().forEach(id -> computerService.deleteComputer(Long.valueOf(id)));
     }
 
+    /**
+     * Build an url with given criteria.
+     * @param search the search criteria
+     * @param order the order criteria
+     * @param sort the sort criteria
+     * @return the resulting url
+     */
     public static String setUrl(String search, String order, String sort) {
         String url = "?";
         if (StringUtils.isNotBlank(search)) {

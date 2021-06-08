@@ -25,8 +25,8 @@ public class ListComputerServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String indexCurrentPage = request.getParameter("currentPage"); // pageNumber
-        String itemsPerPage = request.getParameter("itemsPerPage"); // perPage
+        String indexCurrentPage = request.getParameter("currentPage");
+        String itemsPerPage = request.getParameter("itemsPerPage");
         String search = request.getParameter("search");
         if (StringUtils.isNotBlank(search)) {
             search.trim();
@@ -43,9 +43,9 @@ public class ListComputerServlet extends HttpServlet {
         request.setAttribute("computerList", computerList);
         request.setAttribute("pagination", page);
         request.setAttribute("maxTotalOfPages", maxTotalOfPages);
-        // request.setAttribute("criteria", criteria);
+        request.setAttribute("criteria", criteria);
         request.setAttribute("search", search);
-        request.setAttribute("order", order);
+        // request.setAttribute("order", order);
         request.setAttribute("sort", sort);
 
         String url = ComputerController.setUrl(search, order, sort);

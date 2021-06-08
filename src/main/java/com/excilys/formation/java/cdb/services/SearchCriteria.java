@@ -9,11 +9,20 @@ public class SearchCriteria {
     private static final String DEFAULT_SORT = "computer.id";
     private static final String DEFAULT_ORDER = "asc";
 
+    /**
+     * Creates an object that contains search criteria.
+     */
     public SearchCriteria() {
         this.order = DEFAULT_ORDER;
         this.sort = DEFAULT_SORT;
     }
 
+    /**
+     * Creates an object that contains search criteria.
+     * @param reqOrder order criteria
+     * @param reqSort sort criteria
+     * @param reqName search criteria
+     */
     public SearchCriteria(String reqOrder, String reqSort, String reqName) {
         this.order = reqOrder;
         this.sort = reqSort;

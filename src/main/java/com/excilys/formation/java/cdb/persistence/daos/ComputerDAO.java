@@ -261,6 +261,11 @@ public class ComputerDAO {
         return 0;
     }
 
+    /**
+     * Find all computers matching given criteria.
+     * @param criteria represents the search criteria (search, order, sort, limit)
+     * @return a list of computers matching the criteria
+     */
     public List<Computer> findByCriteria(SearchCriteria criteria) {
         List<Computer> computers = new ArrayList<>();
         String query = ALL_COMPUTERS;

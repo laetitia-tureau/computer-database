@@ -80,7 +80,8 @@ public class Pagination {
 
     @Override
     public String toString() {
-        return "Pagination [limit=" + itemsPerPage + ", page=" + currentPage + ", totalItem=" + totalItems + "]";
+        return "Pagination [itemsPerPage=" + itemsPerPage + ", currentPage=" + currentPage + ", totalItems="
+                + totalItems + "]";
     }
 
     public enum PageLimit {
@@ -88,8 +89,12 @@ public class Pagination {
 
         public Integer limit;
 
-        private PageLimit(Integer limit) {
-            this.limit = limit;
+        /**
+         * Creates a PageLimlit enum with given items limit.
+         * @param max limit of items per page
+         */
+        PageLimit(Integer max) {
+            this.limit = max;
         }
 
         public Integer getLimit() {
