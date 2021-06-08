@@ -38,15 +38,15 @@ public class ListComputerServlet extends HttpServlet {
 
         Pagination page = ComputerController.getPage(indexCurrentPage, itemsPerPage, search);
         List<ComputerDTO> computerList = ComputerController.getComputersPerPage(page, criteria);
-        List<Integer> maxTotalOfPages = ComputerController.getMaxItemsPerPage(page); // OK
+        List<Integer> maxTotalOfPages = ComputerController.getMaxItemsPerPage(page);
 
         request.setAttribute("computerList", computerList);
         request.setAttribute("pagination", page);
         request.setAttribute("maxTotalOfPages", maxTotalOfPages);
         request.setAttribute("criteria", criteria);
-        request.setAttribute("search", search);
-        // request.setAttribute("order", order);
-        // request.setAttribute("sort", sort);
+        /*  request.setAttribute("search", search);
+            request.setAttribute("order", order);
+            request.setAttribute("sort", sort);  */
 
         String url = ComputerController.setUrl(search, order, sort);
         if (url.length() > 1) {
