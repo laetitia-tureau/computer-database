@@ -47,7 +47,7 @@
 					</div>
 					</c:if>
 					<c:if test="${not empty computer}" ><c:set var="url" value="edit?id=${computer.id }"/></c:if>
-					<c:if test="${empty computer}" ><c:set var="url" value="add"/></c:if>
+					<c:if test="${empty computer}" ><c:set var="url" value="edit"/></c:if>
                     <form action="${pageContext.request.contextPath}/computer/${url}" method="POST" id="addComputer">
                         <fieldset>
                             <input type="hidden" id="computerId" value="${computer.id}">

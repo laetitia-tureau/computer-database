@@ -1,4 +1,4 @@
-package com.excilys.formation.java.cdb.services;
+package com.excilys.formation.java.cdb.ui;
 
 import java.util.List;
 import java.util.Scanner;

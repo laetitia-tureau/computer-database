@@ -3,6 +3,9 @@ package com.excilys.formation.java.cdb.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
@@ -11,15 +14,17 @@ import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
  * Represents a company service.
  * @author Laetitia Tureau
  */
+@Service
 public class CompanyService {
 
     /**
      * A DAO instance used to encapsulate the logic for retrieving, saving and updating table company data into the database.
      */
-    private static CompanyDAO companyInstance = CompanyDAO.getInstance();
+    @Autowired
+    private CompanyDAO companyInstance;
 
     public void setCompanyInstance(CompanyDAO companyInstance) {
-        CompanyService.companyInstance = companyInstance;
+        this.companyInstance = companyInstance;
     }
 
     /**
