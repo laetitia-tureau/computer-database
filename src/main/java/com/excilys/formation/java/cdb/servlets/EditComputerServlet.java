@@ -1,7 +1,6 @@
 package com.excilys.formation.java.cdb.servlets;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.ServletException;
@@ -20,7 +19,6 @@ import com.excilys.formation.java.cdb.controllers.CompanyController;
 import com.excilys.formation.java.cdb.controllers.ComputerController;
 import com.excilys.formation.java.cdb.dtos.ComputerDTO;
 import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
-import com.excilys.formation.java.cdb.models.Company;
 
 @Controller
 @RequestMapping("/computer/edit")
@@ -39,8 +37,7 @@ public class EditComputerServlet extends HttpServlet {
     @GetMapping
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<Company> companyList = companyController.getCompanies();
-        request.setAttribute("companyList", companyList);
+        request.setAttribute("companyList", companyController.getCompanies());
         if (request.getParameter("id") != null) {
             String computerId = request.getParameter("id");
             Optional<ComputerDTO> computer = computerController.findComputer(computerId);

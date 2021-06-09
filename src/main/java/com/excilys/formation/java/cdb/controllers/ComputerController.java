@@ -133,7 +133,7 @@ public class ComputerController {
                 .discontinued(discontinued).manufacturer(companyId).build();
         computerValidator.validateComputerDTO(computerDTO);
         Computer computer = computerMapper.mapFromDTOtoModel(computerDTO);
-        new ComputerService().update(computer);
+        computerService.update(computer);
 
     }
 
