@@ -41,7 +41,8 @@ public class CompanyService {
      * @return a list of companies
      */
     public List<Company> getPaginatedCompanies(Pagination page) {
-        return companyInstance.getPaginatedCompanies(page);
+        // TODO impl
+        return companyInstance.getPaginatedCompanies(page.getCurrentPage());
     }
 
     /**

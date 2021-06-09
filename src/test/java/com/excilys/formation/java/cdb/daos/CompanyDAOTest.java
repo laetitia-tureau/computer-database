@@ -22,11 +22,8 @@ public class CompanyDAOTest {
 
     @BeforeAll
     public static void init() throws Exception {
-        companyInstance = CompanyDAO.getInstance();
-        // TODO : missing script to run
     }
 
-    // @Test
     public void testFindById() {
         Optional<Company> opt = companyInstance.findById(FIND_COMPANY_BY_ID);
         if (opt.isPresent()) {
@@ -39,7 +36,6 @@ public class CompanyDAOTest {
         Assertions.assertFalse(opt.isPresent());
     }
 
-    // @Test
     public void testGetCompanyList() {
         List<Company> companyList = companyInstance.getAllCompanies();
         if (!companyList.isEmpty()) {
