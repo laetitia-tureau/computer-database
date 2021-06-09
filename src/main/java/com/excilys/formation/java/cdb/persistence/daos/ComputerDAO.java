@@ -12,22 +12,29 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import com.excilys.formation.java.cdb.mappers.ComputerMapper;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
-import com.excilys.formation.java.cdb.persistence.DBConnexion;
 import com.excilys.formation.java.cdb.services.ComputerService;
 import com.excilys.formation.java.cdb.services.Pagination;
 import com.excilys.formation.java.cdb.services.SearchCriteria;
+import com.zaxxer.hikari.HikariDataSource;
 
 /** Represents a computer DAO.
  * @author Laetitia Tureau
  */
+@Repository
 public class ComputerDAO {
 
     /** The connexion to mySQL database. */
-    private DBConnexion dbConnexion;
+    @Autowired
+    private HikariDataSource dataSource;
+
+    @Autowired
+    private ComputerMapper computerMapper;
 
     /** Class logger. */
     private static final Logger LOGGER = Logger.getLogger(ComputerService.class);
@@ -59,7 +66,6 @@ public class ComputerDAO {
 
     /** Creates a DAO to computer operations into database. */
     private ComputerDAO() {
-        this.dbConnexion = DBConnexion.getInstance();
     }
 
     public static ComputerDAO getInstance() {
@@ -76,11 +82,11 @@ public class ComputerDAO {
      */
     public List<Computer> getAllComputers() {
         List<Computer> computers = new ArrayList<>();
-        try (Connection connexion = dbConnexion.getConnection();
+        try (Connection connexion = dataSource.getConnection();
                 Statement stmt = connexion.createStatement();
                 ResultSet resultSet = stmt.executeQuery(ALL_COMPUTERS)) {
             while (resultSet.next()) {
-                computers.add(ComputerMapper.mapFromResultSet(resultSet));
+                computers.add(computerMapper.mapFromResultSet(resultSet));
             }
         } catch (SQLException sqle) {
             LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
@@ -97,11 +103,11 @@ public class ComputerDAO {
         List<Computer> computers = new ArrayList<>();
         String withLimit = " LIMIT " + page.getItemsPerPage() * (page.getCurrentPage() - 1) + ","
                 + page.getItemsPerPage();
-        try (Connection connexion = dbConnexion.getConnection();
+        try (Connection connexion = dataSource.getConnection();
                 Statement stmt = connexion.createStatement();
                 ResultSet resultSet = stmt.executeQuery(ALL_COMPUTERS + withLimit)) {
             while (resultSet.next()) {
-                computers.add(ComputerMapper.mapFromResultSet(resultSet));
+                computers.add(computerMapper.mapFromResultSet(resultSet));
             }
         } catch (SQLException sqle) {
             LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
@@ -117,7 +123,7 @@ public class ComputerDAO {
      */
     public Computer createComputer(Computer computer) {
         ComputerBuilder builder = new Computer.ComputerBuilder().name(computer.getName());
-        try (Connection connexion = dbConnexion.getConnection();
+        try (Connection connexion = dataSource.getConnection();
                 PreparedStatement stmt = connexion.prepareStatement(INSERT_COMPUTER)) {
             int i = 1;
             stmt.setString(i++, computer.getName());
@@ -154,12 +160,12 @@ public class ComputerDAO {
      * @return An empty Optional if nothing found else a Optional containing a computer
      */
     public Optional<Computer> findById(Long id) {
-        try (Connection connexion = dbConnexion.getConnection();
+        try (Connection connexion = dataSource.getConnection();
                 PreparedStatement stmt = connexion.prepareStatement(FIND_COMPUTER)) {
             stmt.setLong(1, id);
             ResultSet resultSet = stmt.executeQuery();
             if (resultSet.next()) {
-                return Optional.of(ComputerMapper.mapFromResultSet(resultSet));
+                return Optional.of(computerMapper.mapFromResultSet(resultSet));
             }
         } catch (SQLException sqle) {
             LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
@@ -174,7 +180,7 @@ public class ComputerDAO {
      * @return the number of rows deleted
      */
     public int deleteComputer(Long id) {
-        try (Connection connexion = dbConnexion.getConnection();
+        try (Connection connexion = dataSource.getConnection();
                 PreparedStatement stmt = connexion.prepareStatement(DELETE_COMPUTER)) {
             stmt.setLong(1, id);
             return stmt.executeUpdate();
@@ -192,7 +198,7 @@ public class ComputerDAO {
      * @return the number of rows updated
      */
     public int updateName(String name, Long id) {
-        try (Connection connexion = dbConnexion.getConnection();
+        try (Connection connexion = dataSource.getConnection();
                 PreparedStatement stmt = connexion.prepareStatement(UPDATE_NAME)) {
             stmt.setString(1, name);
             stmt.setLong(2, id);
@@ -212,7 +218,7 @@ public class ComputerDAO {
      * @return the number of rows updated
      */
     public int updateIntroduced(Timestamp date, Long id) {
-        try (Connection connexion = dbConnexion.getConnection();
+        try (Connection connexion = dataSource.getConnection();
                 PreparedStatement stmt = connexion.prepareStatement(UPDATE_INTRODUCED)) {
             stmt.setTimestamp(1, date);
             stmt.setLong(2, id);
@@ -231,7 +237,7 @@ public class ComputerDAO {
      * @return the number of rows updated
      */
     public int updateDiscontinued(Timestamp date, Long id) {
-        try (Connection connexion = dbConnexion.getConnection();
+        try (Connection connexion = dataSource.getConnection();
                 PreparedStatement stmt = connexion.prepareStatement(UPDATE_DISCONTINUED)) {
             stmt.setTimestamp(1, date);
             stmt.setLong(2, id);
@@ -250,7 +256,7 @@ public class ComputerDAO {
      * @return the number of rows updated
      */
     public int updateManufacturer(Long companyID, Long id) {
-        try (Connection connexion = dbConnexion.getConnection();
+        try (Connection connexion = dataSource.getConnection();
                 PreparedStatement stmt = connexion.prepareStatement(UPDATE_MANUFACTURER)) {
             stmt.setLong(1, companyID);
             stmt.setLong(2, id);
@@ -278,7 +284,7 @@ public class ComputerDAO {
         if (StringUtils.isNotBlank(criteria.getLimit())) {
             query += " LIMIT " + criteria.getLimit();
         }
-        try (Connection connection = dbConnexion.getConnection();
+        try (Connection connection = dataSource.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(query);) {
             if (StringUtils.isNotBlank(criteria.getItemName())) {
                 preparedStatement.setString(1, "%" + criteria.getItemName() + "%");
@@ -286,7 +292,7 @@ public class ComputerDAO {
             }
             try (ResultSet result = preparedStatement.executeQuery()) {
                 while (result.next()) {
-                    computers.add(ComputerMapper.mapFromResultSet(result));
+                    computers.add(computerMapper.mapFromResultSet(result));
                 }
             }
         } catch (SQLException sqle) {
