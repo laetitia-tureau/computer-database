@@ -1,6 +1,5 @@
 package com.excilys.formation.java.cdb.services;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,8 +34,6 @@ public class ComputerService {
 
     /** Class logger. */
     private static final Logger LOGGER = Logger.getLogger(ComputerService.class);
-
-    private static Computer computerToUpdate;
 
     /**
      * Initialize ComputerDAO instance.
@@ -96,8 +93,7 @@ public class ComputerService {
      */
     public Computer findById(Long id) {
         Optional<Computer> opt = computerInstance.findById(id);
-        return opt.orElseThrow(MyPersistenceException::new);
-        // return opt.orElse(null);
+        return opt.orElse(null);
     }
 
     /**
@@ -134,62 +130,9 @@ public class ComputerService {
      * @return the updated computer
      */
     public Computer update(Computer computer) {
-        Long id = computer.getId();
-        computerToUpdate = findById(id);
-        if (computer.getName() != null) {
-            updateName(computer.getName(), id);
-        }
-        if (computer.getIntroduced() != null) {
-            updateIntroduced(Timestamp.valueOf(computer.getIntroduced().atStartOfDay()), id);
-        }
-        if (computer.getDiscontinued() != null) {
-            updateDiscontinued(Timestamp.valueOf(computer.getDiscontinued().atStartOfDay()), id);
-        }
-        if (computer.getManufacturer() != null) {
-            updateManufacturer(computer.getManufacturer().getId(), id);
-        }
+        // TODO validate computer
+        computerInstance.update(computer);
         return computer;
     }
 
-    /**
-     * Update a computer's name.
-     * @param name A String containing the computer's name
-     * @param id A Long containing the computer's id
-     * @return the number of rows updated
-     */
-    public int updateName(String name, Long id) {
-        return computerInstance.updateName(name, id);
-    }
-
-    /**
-     * Update a computer's introduced date.
-     * @param date A Timestamp as the computer's introduced date
-     * @param id A Long containing the computer's id
-     * @return a computer
-     */
-    public int updateIntroduced(Timestamp date, Long id) {
-        computerValidator.validateComputerDate(computerToUpdate);
-        return computerInstance.updateIntroduced(date, id);
-    }
-
-    /**
-     * Update a computer's discontinued date.
-     * @param date A Timestamp as the computer's discontinued date
-     * @param id A Long containing the computer's id
-     * @return a computer
-     */
-    public int updateDiscontinued(Timestamp date, Long id) {
-        computerValidator.validateComputerDate(computerToUpdate);
-        return computerInstance.updateDiscontinued(date, id);
-    }
-
-    /**
-     * Update a computer's manufacturer.
-     * @param companyID A Long containing the computer's manufacturer id
-     * @param id A Long containing the computer's id
-     * @return the number of rows updated
-     */
-    public int updateManufacturer(Long companyID, Long id) {
-        return computerInstance.updateManufacturer(companyID, id);
-    }
 }

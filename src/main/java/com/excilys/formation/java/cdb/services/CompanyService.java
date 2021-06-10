@@ -36,16 +36,6 @@ public class CompanyService {
     }
 
     /**
-     * Retrieve all the companies in the database.
-     * @param page current page
-     * @return a list of companies
-     */
-    public List<Company> getPaginatedCompanies(Pagination page) {
-        // TODO impl
-        return companyInstance.getPaginatedCompanies(page.getCurrentPage());
-    }
-
-    /**
      * Retrieve a company with a specific id.
      * @param id the company's id
      * @return a company or throw exception

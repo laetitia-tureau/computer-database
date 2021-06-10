@@ -25,9 +25,13 @@ public class CompanyController {
      * Retrieve all companies.
      * @return list of companies
      */
-    public List<CompanyDTO> getCompanies() {
+    public List<CompanyDTO> getCompaniesDTO() {
         List<Company> companies = companyService.getCompanies();
         return companies.stream().map(c -> companyMapper.mapFromModelToDTO(c)).collect(Collectors.toList());
+    }
+
+    public List<Company> getCompanies() {
+        return companyService.getCompanies();
     }
 
     /**
