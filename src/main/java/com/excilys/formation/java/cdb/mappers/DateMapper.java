@@ -15,7 +15,7 @@ public class DateMapper {
     /**
      * Convert a date into a Timestamp.
      * @throws ParseException when time format not valid.
-     * @param scanner A Scanner to retrieve the date
+     * @param line String to parse
      * @return the timestamp resulting
      */
     public static Timestamp nextTimestamp(String line) throws ParseException {

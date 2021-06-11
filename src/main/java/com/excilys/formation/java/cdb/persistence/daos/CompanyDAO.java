@@ -38,7 +38,11 @@ public class CompanyDAO {
         return builder.build();
     };
 
-    /** Creates a DAO to company operations into database. */
+    /**
+     * Creates a DAO to company operations into database.
+     * @param namedParamJdbcTemp jdbc template
+     * @param jdbcTemp jdbc template
+     */
     public CompanyDAO(NamedParameterJdbcTemplate namedParamJdbcTemp, JdbcTemplate jdbcTemp) {
         this.jdbcTemplate = jdbcTemp;
         this.namedParamJdbcTemplate = namedParamJdbcTemp;

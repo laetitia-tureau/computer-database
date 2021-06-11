@@ -53,7 +53,7 @@ public class CompanyServiceTest {
 
     @Test
     public void testFindCompanyByIdShouldThrowException() {
-        // TODO (use something else than exceptionRule as its deprecated)
+        // (use something else than exceptionRule as its deprecated)
         /* when(companyDao.findById(FAKE_COMPANY_ID)).thenReturn(Optional.ofNullable(null));
         exceptionRule.expect(CustomException.class);
         exceptionRule.expectMessage(FAKE_COMPANY_ID + CustomException.TEXT_ER_NOT_FOUND);

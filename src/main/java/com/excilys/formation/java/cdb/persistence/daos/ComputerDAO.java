@@ -1,9 +1,6 @@
 package com.excilys.formation.java.cdb.persistence.daos;
 
-import java.sql.Connection;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +8,6 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -19,27 +15,18 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.excilys.formation.java.cdb.mappers.ComputerMapper;
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
 import com.excilys.formation.java.cdb.services.ComputerService;
 import com.excilys.formation.java.cdb.services.Pagination;
 import com.excilys.formation.java.cdb.services.SearchCriteria;
-import com.zaxxer.hikari.HikariDataSource;
 
 /** Represents a computer DAO.
  * @author Laetitia Tureau
  */
 @Repository
 public class ComputerDAO {
-
-    /** The connexion to mySQL database. */
-    @Autowired
-    private HikariDataSource dataSource;
-
-    @Autowired
-    private ComputerMapper computerMapper;
 
     private JdbcTemplate jdbcTemplate;
     private NamedParameterJdbcTemplate namedParamJdbcTemplate;
@@ -60,9 +47,14 @@ public class ComputerDAO {
     /** Represents query to delete a computer. */
     private static final String DELETE_COMPUTER = "DELETE FROM computer WHERE id = :id";
 
+    /** Represents query to update a computer. */
     private static final String UPDATE_COMPUTER = "UPDATE computer SET name = :name, introduced = :intro, discontinued = :dist, company_id = :company_id WHERE id = :id ";
 
-    /** Creates a DAO to computer operations into database. */
+    /**
+     * Creates a DAO to computer operations into database.
+     * @param namedParamJdbcTemp jdbc template
+     * @param jdbcTemp jdbc template
+     */
     public ComputerDAO(NamedParameterJdbcTemplate namedParamJdbcTemp, JdbcTemplate jdbcTemp) {
         this.jdbcTemplate = jdbcTemp;
         this.namedParamJdbcTemplate = namedParamJdbcTemp;
@@ -130,6 +122,11 @@ public class ComputerDAO {
         return 0;
     }
 
+    /**
+     * Update a computer in the database.
+     * @param computer to update
+     * @return the number of rows edited
+     */
     public int update(Computer computer) {
         Long companyId = computer.getManufacturer() != null ? computer.getManufacturer().getId() : null;
         Date dateIntro = computer.getIntroduced() != null ? java.sql.Date.valueOf(computer.getIntroduced()) : null;
@@ -173,12 +170,12 @@ public class ComputerDAO {
      * @return the number of rows deleted
      */
     public int deleteComputer(Long id) {
-        try (Connection connexion = dataSource.getConnection();
-                PreparedStatement stmt = connexion.prepareStatement(DELETE_COMPUTER)) {
-            stmt.setLong(1, id);
-            return stmt.executeUpdate();
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", id);
+        try {
+            return this.namedParamJdbcTemplate.update(DELETE_COMPUTER, params);
+        } catch (DataAccessException ex) {
+            LOGGER.error(ex.getMessage());
         }
         return 0;
     }
@@ -200,20 +197,17 @@ public class ComputerDAO {
         if (StringUtils.isNotBlank(criteria.getLimit())) {
             query += " LIMIT " + criteria.getLimit();
         }
-        try (Connection connection = dataSource.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+        query += ";";
+        try {
             if (StringUtils.isNotBlank(criteria.getItemName())) {
-                preparedStatement.setString(1, "%" + criteria.getItemName() + "%");
-                preparedStatement.setString(2, "%" + criteria.getItemName() + "%");
+                return this.jdbcTemplate.query(query, rowMapper, criteria.getItemName(), criteria.getItemName());
+            } else {
+                return this.jdbcTemplate.query(query, rowMapper);
             }
-            try (ResultSet result = preparedStatement.executeQuery()) {
-                while (result.next()) {
-                    computers.add(computerMapper.mapFromResultSet(result));
-                }
-            }
-        } catch (SQLException sqle) {
-            sqle.printStackTrace();
+        } catch (DataAccessException ex) {
+            LOGGER.error(ex.getMessage());
         }
+        // TODO return null or empty list ?
         return computers;
     }
 }

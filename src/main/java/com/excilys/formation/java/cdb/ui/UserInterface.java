@@ -60,7 +60,6 @@ public class UserInterface {
      * Retrieve the id entered in the cli.
      * @param scanner A scanner to read the id
      * @param action A message to display the use of the id
-     * @param update If the action is an update then scanner will read next line
      * @return the entered id
      */
     private Long retrieveID(Scanner scanner, String action) {
@@ -117,13 +116,10 @@ public class UserInterface {
      * Find Company or Computer given an id and assign the object retrieved to the corresponding static optional object.
      * @param scanner A scanner to read the id
      * @param action A message to display the use of the id
-     * @param update if the action is an update or not
      * @param isCompany if the object is a company or not
      * @return the id entered
-     * @throws ParseException 
-     * @throws SQLException 
      */
-    private Long find(Scanner scanner, String action, boolean isCompany) throws ParseException {
+    private Long find(Scanner scanner, String action, boolean isCompany) {
         Long id = retrieveID(scanner, action);
         if (isCompany) {
             company = companyService.findById(id);
@@ -136,7 +132,7 @@ public class UserInterface {
     /**
      * Update a Computer.
      * @param scanner A scanner to read the id and the user's choice
-     * @throws SQLException for crud operations
+     * @param create if a create action is requested, update action otherwise
      * @throws ParseException when parsing a date
      */
     private void edit(Scanner scanner, boolean create) throws ParseException {
