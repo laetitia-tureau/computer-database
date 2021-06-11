@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 
@@ -42,8 +41,7 @@ public class CompanyService {
      */
     public Company findById(Long id) {
         Optional<Company> opt = companyInstance.findById(id);
-        return opt.orElseThrow(MyPersistenceException::new);
-        // return opt.orElse(null);
+        return opt.orElse(null);
     }
 
     /**

@@ -48,7 +48,7 @@ public class ComputerDAO {
     private static final Logger LOGGER = Logger.getLogger(ComputerService.class);
 
     /** Represents query to create a computer. */
-    private static final String INSERT_COMPUTER = "INSERT INTO computer (name, introduced, discontinued, company_id) VALUES (?,?,?,?)";
+    private static final String INSERT_COMPUTER = "INSERT INTO computer (name, introduced, discontinued, company_id) VALUES (:name, :intro, :dist, :company_id)";
 
     /** Represents query to retrieve all computers. */
     private static final String ALL_COMPUTERS = "SELECT computer.id, computer.name, computer.introduced, computer.discontinued, computer.company_id, "
@@ -111,50 +111,36 @@ public class ComputerDAO {
      * @param computer object to create
      * @return the computer saved in database
      */
-    public Computer createComputer(Computer computer) {
-        ComputerBuilder builder = new Computer.ComputerBuilder().name(computer.getName());
-        try (Connection connexion = dataSource.getConnection();
-                PreparedStatement stmt = connexion.prepareStatement(INSERT_COMPUTER)) {
-            int i = 1;
-            stmt.setString(i++, computer.getName());
-            if (computer.getIntroduced() != null) {
-                stmt.setDate(i++, java.sql.Date.valueOf(computer.getIntroduced()));
-                builder.introduced(computer.getIntroduced());
-            } else {
-                stmt.setNull(i++, 0);
-            }
-            if (computer.getDiscontinued() != null) {
-                stmt.setDate(i++, java.sql.Date.valueOf(computer.getDiscontinued()));
-                builder.introduced(computer.getDiscontinued());
-            } else {
-                stmt.setNull(i++, 0);
-            }
-            if (computer.getManufacturer() != null) {
-                if (computer.getManufacturer().getId() != null) {
-                    stmt.setLong(i++, computer.getManufacturer().getId());
-                    builder.manufacturer(computer.getManufacturer());
-                }
-            } else {
-                stmt.setNull(i++, 0);
-            }
-            stmt.executeUpdate();
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+    public int createComputer(Computer computer) {
+        Long companyId = computer.getManufacturer() != null ? computer.getManufacturer().getId() : null;
+        Date dateIntro = computer.getIntroduced() != null ? java.sql.Date.valueOf(computer.getIntroduced()) : null;
+        Date dateDist = computer.getDiscontinued() != null ? java.sql.Date.valueOf(computer.getDiscontinued()) : null;
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("name", computer.getName());
+        params.addValue("intro", dateIntro);
+        params.addValue("dist", dateDist);
+        params.addValue("company_id", companyId);
+
+        try {
+            return this.namedParamJdbcTemplate.update(INSERT_COMPUTER, params);
+        } catch (DataAccessException ex) {
+            LOGGER.error(ex.getMessage());
         }
-        return computer;
+        return 0;
     }
 
     public int update(Computer computer) {
-        Optional<Long> optCompanyId = Optional.ofNullable(computer.getManufacturer().getId());
-        Optional<Date> optIntro = Optional.ofNullable(java.sql.Date.valueOf(computer.getIntroduced()));
-        Optional<Date> optDist = Optional.ofNullable(java.sql.Date.valueOf(computer.getDiscontinued()));
+        Long companyId = computer.getManufacturer() != null ? computer.getManufacturer().getId() : null;
+        Date dateIntro = computer.getIntroduced() != null ? java.sql.Date.valueOf(computer.getIntroduced()) : null;
+        Date dateDist = computer.getDiscontinued() != null ? java.sql.Date.valueOf(computer.getDiscontinued()) : null;
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", computer.getId());
         params.addValue("name", computer.getName());
-        params.addValue("intro", optIntro.orElse(null));
-        params.addValue("dist", optDist.orElse(null));
-        params.addValue("company_id", optCompanyId.orElse(null));
+        params.addValue("intro", dateIntro);
+        params.addValue("dist", dateDist);
+        params.addValue("company_id", companyId);
 
         try {
             return this.namedParamJdbcTemplate.update(UPDATE_COMPUTER, params);

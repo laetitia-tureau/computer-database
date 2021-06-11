@@ -101,8 +101,8 @@ public class ComputerService {
      * @param computer the computer to create
      * @return the computer saved in database
      */
-    public Computer createComputer(Computer computer) {
-        computerValidator.validateComputerDate(computer);
+    public int createComputer(Computer computer) {
+        // TODO computerValidator.validateComputerDate(computer);
         if (computer.getManufacturer() != null) {
             if (computer.getManufacturer().getId() != 0) {
                 companyService.findById(computer.getManufacturer().getId());

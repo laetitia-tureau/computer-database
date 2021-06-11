@@ -5,13 +5,11 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
 import com.excilys.formation.java.cdb.mappers.DateMapper;
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.models.Computer;
@@ -88,10 +86,10 @@ public class UserInterface {
      * @param scanner A scanner to read the date
      * @return the entered date as a Timestamp
      */
-    private Optional<Timestamp> retrieveTimestamp(Scanner scanner) throws ParseException {
+    private Timestamp retrieveTimestamp(Scanner scanner) throws ParseException {
         System.out.println("Enter date with format yyyy-MM-dd :");
         String date = scanner.nextLine();
-        return Optional.ofNullable(DateMapper.nextTimestamp(date));
+        return DateMapper.nextTimestamp(date);
     }
 
     /**
@@ -122,17 +120,15 @@ public class UserInterface {
      * @param update if the action is an update or not
      * @param isCompany if the object is a company or not
      * @return the id entered
+     * @throws ParseException 
+     * @throws SQLException 
      */
-    private Long find(Scanner scanner, String action, boolean isCompany) throws MyPersistenceException {
+    private Long find(Scanner scanner, String action, boolean isCompany) throws ParseException {
         Long id = retrieveID(scanner, action);
         if (isCompany) {
             company = companyService.findById(id);
         } else {
-            try {
-                computer = computerService.findById(id);
-            } catch (MyPersistenceException e) {
-                LOGGER.warn("No computer with id : " + id);
-            }
+            computer = computerService.findById(id);
         }
         return id;
     }
@@ -143,32 +139,38 @@ public class UserInterface {
      * @throws SQLException for crud operations
      * @throws ParseException when parsing a date
      */
-    private void update(Scanner scanner) throws SQLException, ParseException {
-        Long id = find(scanner, "computer to update", false);
+    private void edit(Scanner scanner, boolean create) throws ParseException {
+        Long id;
+        ComputerBuilder builder = new Computer.ComputerBuilder();
+        if (!create) {
+            id = find(scanner, "computer to update", false);
+            while (computer == null) {
+                // TODO cas d'arret entrer un chiffre
+                LOGGER.warn("No computer with id: " + id);
+                id = find(scanner, "computer to update", false);
+            }
+            builder.id(id);
+        }
 
         String name = retrieveName(scanner, "");
         if (StringUtils.isBlank(name)) {
             name = computer.getName();
         }
 
-        Timestamp timeIntro = retrieveTimestamp(scanner).orElse(null);
-        Timestamp timeDist = retrieveTimestamp(scanner).orElse(null);
-        // TODO computer.getIntroduced() == null || computer.getDiscontinued()
-        LocalDate dateIntro = timeIntro == null ? computer.getIntroduced() : timeIntro.toLocalDateTime().toLocalDate();
-        LocalDate dateDist = timeDist == null ? computer.getDiscontinued() : timeDist.toLocalDateTime().toLocalDate();
+        Timestamp timeIntro = retrieveTimestamp(scanner);
+        Timestamp timeDist = retrieveTimestamp(scanner);
+        LocalDate dateIntro = timeIntro == null ? null : timeIntro.toLocalDateTime().toLocalDate();
+        LocalDate dateDist = timeDist == null ? null : timeDist.toLocalDateTime().toLocalDate();
 
-        Long companyId;
-        Company comp;
-        try {
-            companyId = find(scanner, "related company", true);
-            comp = new Company.CompanyBuilder(companyId, company.getName()).build();
-        } catch (MyPersistenceException mpe) {
-            comp = computer.getManufacturer();
+        find(scanner, "related company", true);
+
+        builder.name(name).introduced(dateIntro).discontinued(dateDist).manufacturer(company);
+        if (!create) {
+            computerService.update(builder.build());
+        } else {
+            computerService.createComputer(builder.build());
         }
 
-        ComputerBuilder builder = new Computer.ComputerBuilder(id, name).introduced(dateIntro).discontinued(dateDist)
-                .manufacturer(comp);
-        computerService.update(builder.build());
     }
 
     /**
@@ -191,9 +193,7 @@ public class UserInterface {
                 System.out.println(computer);
                 break;
             case CREATE_COMPUTER:
-                String computerName = retrieveName(scanner, "of computer to create");
-                Computer computerToSave = new Computer.ComputerBuilder().name(computerName).build();
-                computerService.createComputer(computerToSave);
+                edit(scanner, true);
                 break;
             case DELETE_COMPUTER:
                 computerService.deleteComputer(retrieveID(scanner, "computer to delete"));
@@ -203,7 +203,7 @@ public class UserInterface {
                 break;
             case UPDATE_COMPUTER:
                 do {
-                    update(scanner);
+                    edit(scanner, false);
                 } while (decide(scanner) != 0);
                 break;
             default:
