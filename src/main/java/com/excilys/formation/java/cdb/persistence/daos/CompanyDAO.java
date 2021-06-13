@@ -1,19 +1,17 @@
 package com.excilys.formation.java.cdb.persistence.daos;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.excilys.formation.java.cdb.mappers.CompanyRowMapper;
 import com.excilys.formation.java.cdb.models.Company;
-import com.excilys.formation.java.cdb.models.Company.CompanyBuilder;
 import com.excilys.formation.java.cdb.services.CompanyService;
 
 /** Represents a company DAO.
@@ -24,6 +22,7 @@ public class CompanyDAO {
 
     private JdbcTemplate jdbcTemplate;
     private NamedParameterJdbcTemplate namedParamJdbcTemplate;
+    private CompanyRowMapper rowMapper;
 
     private static final String ALL_COMPANIES = "SELECT id, name FROM company";
     private static final String FIND_COMPANY = "SELECT * FROM company WHERE id=:id";
@@ -31,28 +30,23 @@ public class CompanyDAO {
     private static final String DELETE_COMPUTER = "DELETE FROM computer WHERE company_id=:id";
     private static final Logger LOGGER = Logger.getLogger(CompanyService.class);
 
-    RowMapper<Company> rowMapper = (rs, rowNum) -> {
-        CompanyBuilder builder = new Company.CompanyBuilder();
-        builder.id(rs.getLong("company.id"));
-        builder.name(rs.getString("company.name"));
-        return builder.build();
-    };
-
     /**
      * Creates a DAO to company operations into database.
      * @param namedParamJdbcTemp jdbc template
      * @param jdbcTemp jdbc template
      */
-    public CompanyDAO(NamedParameterJdbcTemplate namedParamJdbcTemp, JdbcTemplate jdbcTemp) {
+    public CompanyDAO(NamedParameterJdbcTemplate namedParamJdbcTemp, JdbcTemplate jdbcTemp,
+            CompanyRowMapper cmpRowMapper) {
         this.jdbcTemplate = jdbcTemp;
         this.namedParamJdbcTemplate = namedParamJdbcTemp;
+        this.rowMapper = cmpRowMapper;
     }
 
     /**
      * Retrieve all the companies in the database.
      * @return a list of companies
      */
-    public List<Company> getAllCompanies() {
+    public List<Company> findAll() {
         return this.jdbcTemplate.query(ALL_COMPANIES, rowMapper);
     }
 
@@ -74,11 +68,10 @@ public class CompanyDAO {
 
     /**
      * Delete a company in the database.
-     * @throws SQLException for database access error, or closed Connection or PreparedStatement, or wrong match with setter
      * @param id the company's id
      * @return the number of rows deleted
      */
-    public int deleteCompany(Long id) {
+    public int deleteById(Long id) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id);
         try {

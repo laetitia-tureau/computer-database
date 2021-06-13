@@ -53,21 +53,15 @@ public class CompanyServiceTest {
 
     @Test
     public void testFindCompanyByIdShouldThrowException() {
-        // (use something else than exceptionRule as its deprecated)
-        /* when(companyDao.findById(FAKE_COMPANY_ID)).thenReturn(Optional.ofNullable(null));
-        exceptionRule.expect(CustomException.class);
-        exceptionRule.expectMessage(FAKE_COMPANY_ID + CustomException.TEXT_ER_NOT_FOUND);
-        companyService.findById(FAKE_COMPANY_ID);
-        verify(companyDao).findById(FAKE_COMPANY_ID);*/
     }
 
     @Test
     public void testGetListCompaniesShouldReturnNotEmptyCompanyList() {
         List<Company> companies = new ArrayList<>(Arrays.asList(trueCompany, trueCompany));
-        when(companyDao.getAllCompanies()).thenReturn(companies);
+        when(companyDao.findAll()).thenReturn(companies);
         List<Company> companyList = companyService.getCompanies();
         assertFalse(companyList.isEmpty());
-        verify(companyDao).getAllCompanies();
+        verify(companyDao).findAll();
     }
 
 }

@@ -39,7 +39,7 @@ public class UserInterface {
     public UserInterface(ComputerDAO computerDAO, CompanyDAO companyDAO) {
         computerService.setComputerInstance(computerDAO);
         computerService.setCompanyServiceInstance(companyService);
-        computerService.setCompanyInstance(companyDAO);
+        computerService.setCompanyDAOInstance(companyDAO);
         companyService.setCompanyInstance(companyDAO);
     }
 

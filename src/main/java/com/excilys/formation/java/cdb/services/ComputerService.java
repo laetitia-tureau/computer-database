@@ -3,7 +3,6 @@ package com.excilys.formation.java.cdb.services;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +10,6 @@ import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
-import com.excilys.formation.java.cdb.validator.ComputerValidator;
 
 /**
  * Represents a computer service.
@@ -29,12 +27,6 @@ public class ComputerService {
     @Autowired
     private CompanyService companyService;
 
-    @Autowired
-    private ComputerValidator computerValidator;
-
-    /** Class logger. */
-    private static final Logger LOGGER = Logger.getLogger(ComputerService.class);
-
     /**
      * Initialize ComputerDAO instance.
      * @param computerInstance the instance
@@ -47,7 +39,7 @@ public class ComputerService {
      * Initialize CompanyDAO instance.
      * @param companyInstance the instance
      */
-    public void setCompanyInstance(CompanyDAO companyInstance) {
+    public void setCompanyDAOInstance(CompanyDAO companyInstance) {
         this.companyService.setCompanyInstance(companyInstance);
 
     }
@@ -65,7 +57,7 @@ public class ComputerService {
      * @return a list of computers
      */
     public List<Computer> getComputers() {
-        return computerInstance.getAllComputers();
+        return computerInstance.findAll();
     }
 
     /**
@@ -102,7 +94,6 @@ public class ComputerService {
      * @return the computer saved in database
      */
     public int createComputer(Computer computer) {
-        // TODO computerValidator.validateComputerDate(computer);
         if (computer.getManufacturer() != null) {
             if (computer.getManufacturer().getId() != 0) {
                 companyService.findById(computer.getManufacturer().getId());
@@ -112,7 +103,7 @@ public class ComputerService {
                 throw new MyPersistenceException("company does not exist in database");
             }
         }
-        return computerInstance.createComputer(computer);
+        return computerInstance.create(computer);
     }
 
     /**
@@ -121,7 +112,7 @@ public class ComputerService {
      * @return the number of rows deleted
      */
     public int deleteComputer(Long id) {
-        return computerInstance.deleteComputer(id);
+        return computerInstance.deleteById(id);
     }
 
     /**
@@ -130,7 +121,6 @@ public class ComputerService {
      * @return the updated computer
      */
     public Computer update(Computer computer) {
-        // TODO validate computer
         computerInstance.update(computer);
         return computer;
     }

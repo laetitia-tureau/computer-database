@@ -31,7 +31,7 @@ public class CompanyService {
      * @return a list of companies
      */
     public List<Company> getCompanies() {
-        return companyInstance.getAllCompanies();
+        return companyInstance.findAll();
     }
 
     /**
@@ -50,6 +50,6 @@ public class CompanyService {
      * @return the number of rows deleted
      */
     public int deleteCompany(Long id) {
-        return companyInstance.deleteCompany(id);
+        return companyInstance.deleteById(id);
     }
 }

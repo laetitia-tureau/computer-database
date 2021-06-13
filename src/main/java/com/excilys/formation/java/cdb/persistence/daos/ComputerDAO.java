@@ -10,14 +10,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.excilys.formation.java.cdb.models.Company;
+import com.excilys.formation.java.cdb.mappers.ComputerRowMapper;
 import com.excilys.formation.java.cdb.models.Computer;
-import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
 import com.excilys.formation.java.cdb.services.ComputerService;
 import com.excilys.formation.java.cdb.services.Pagination;
 import com.excilys.formation.java.cdb.services.SearchCriteria;
@@ -30,6 +28,7 @@ public class ComputerDAO {
 
     private JdbcTemplate jdbcTemplate;
     private NamedParameterJdbcTemplate namedParamJdbcTemplate;
+    private ComputerRowMapper rowMapper;
 
     /** Class logger. */
     private static final Logger LOGGER = Logger.getLogger(ComputerService.class);
@@ -55,34 +54,18 @@ public class ComputerDAO {
      * @param namedParamJdbcTemp jdbc template
      * @param jdbcTemp jdbc template
      */
-    public ComputerDAO(NamedParameterJdbcTemplate namedParamJdbcTemp, JdbcTemplate jdbcTemp) {
+    public ComputerDAO(NamedParameterJdbcTemplate namedParamJdbcTemp, JdbcTemplate jdbcTemp,
+            ComputerRowMapper cptRowMapper) {
         this.jdbcTemplate = jdbcTemp;
         this.namedParamJdbcTemplate = namedParamJdbcTemp;
+        this.rowMapper = cptRowMapper;
     }
-
-    RowMapper<Computer> rowMapper = (rs, rowNum) -> {
-        ComputerBuilder builder = new Computer.ComputerBuilder();
-        builder.id(rs.getLong("computer.id"));
-        builder.name(rs.getString("computer.name"));
-        if (rs.getDate("computer.introduced") != null) {
-            builder.introduced(rs.getDate("computer.introduced").toLocalDate());
-        }
-        if (rs.getDate("computer.discontinued") != null) {
-            builder.discontinued(rs.getDate("computer.discontinued").toLocalDate());
-        }
-        if (rs.getInt("computer.company_id") != 0) {
-            Company company = new Company.CompanyBuilder().id(rs.getLong("computer.company_id"))
-                    .name(rs.getString("company.name")).build();
-            builder.manufacturer(company);
-        }
-        return builder.build();
-    };
 
     /**
      * Retrieve all the computers in the database.
      * @return a list of computers
      */
-    public List<Computer> getAllComputers() {
+    public List<Computer> findAll() {
         return this.jdbcTemplate.query(ALL_COMPUTERS, rowMapper);
     }
 
@@ -103,7 +86,7 @@ public class ComputerDAO {
      * @param computer object to create
      * @return the computer saved in database
      */
-    public int createComputer(Computer computer) {
+    public int create(Computer computer) {
         Long companyId = computer.getManufacturer() != null ? computer.getManufacturer().getId() : null;
         Date dateIntro = computer.getIntroduced() != null ? java.sql.Date.valueOf(computer.getIntroduced()) : null;
         Date dateDist = computer.getDiscontinued() != null ? java.sql.Date.valueOf(computer.getDiscontinued()) : null;
@@ -169,7 +152,7 @@ public class ComputerDAO {
      * @param id the computer's id
      * @return the number of rows deleted
      */
-    public int deleteComputer(Long id) {
+    public int deleteById(Long id) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id);
         try {
@@ -207,7 +190,6 @@ public class ComputerDAO {
         } catch (DataAccessException ex) {
             LOGGER.error(ex.getMessage());
         }
-        // TODO return null or empty list ?
         return computers;
     }
 }
