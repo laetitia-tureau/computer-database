@@ -1,10 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+    <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
-<title>Computer Database</title>
+<title><fmt:message key="txt.title"/></title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- Bootstrap -->
 <link href="${pageContext.request.contextPath}/css/bootstrap.min.css" rel="stylesheet" media="screen">
@@ -14,7 +15,7 @@
 <body> 
     <header class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/computer/list"> Application - Computer Database </a>
+            <a class="navbar-brand" href="${pageContext.request.contextPath}/computer/list"> <fmt:message key="txt.home"/> </a>
         </div>
     </header>
 
@@ -28,10 +29,10 @@
 					    <div class="label label-default pull-right">
 	                        id: ${computer.id}
 	                    </div>
-	                    <h1>Edit Computer</h1>
+	                    <h1><fmt:message key="txt.editComputer"/></h1>
 					  </c:when>
 					  <c:otherwise>
-					    <h1>Add Computer</h1>
+					    <h1><fmt:message key="txt.addComputer"/></h1>
 					  </c:otherwise>
                     </c:choose>
                     <c:if test="${not empty success}">
@@ -52,22 +53,22 @@
                         <fieldset>
                             <input type="hidden" id="computerId" value="${computer.id}">
                             <div class="form-group">
-                                <label class="control-label" for="computerName">Computer name</label>
+                                <label class="control-label" for="computerName"><fmt:message key="label.computerName"/></label>
                                 <input type="text" class="form-control" id="computerName" name="computerName" placeholder="Computer name" value="${not empty computer ? computer.name : ''}">
-                                <span class="help-block hidden">Computer name must not be empty</span>
+                                <span class="help-block hidden"><fmt:message key="error.name.required"/></span>
                             </div>
                             <div class="form-group">
-                                <label class="control-label" for="introduced">Introduced date</label>
+                                <label class="control-label" for="introduced"><fmt:message key="label.introduced"/></label>
                                 <input type="date" class="form-control" id="introduced" name="introduced" placeholder="Introduced date" value="${not empty computer.introduced ? computer.introduced : ''}">
-                                <span class="help-block hidden">Introduced date must not be empty when discontinued date exist !</span>
+                                <span class="help-block hidden"><fmt:message key="error.introduced.invalid"/></span>
                             </div>
                             <div class="form-group">
-                                <label class="control-label" for="discontinued">Discontinued date</label>
+                                <label class="control-label" for="discontinued"><fmt:message key="label.discontinued"/></label>
                                 <input type="date" class="form-control" id="discontinued" name="discontinued" placeholder="Discontinued date" value="${not empty computer.discontinued ? computer.discontinued : ''}">
-                                <span class="help-block hidden">Discontinued date must be greater than introduced date !</span>
+                                <span class="help-block hidden"><fmt:message key="error.discontinued.invalid"/></span>
                             </div>
                             <div class="form-group">
-                                <label for="companyId">Company</label>
+                                <label for="companyId"><fmt:message key="label.company"/></label>
                                 <select class="form-control" id="companyId" name="companyId">
 	                                <c:choose>
 				                      <c:when test="${not empty computer && not empty computer.manufacturer}">
@@ -84,9 +85,14 @@
                             </div>                  
                         </fieldset>
                         <div class="actions pull-right">
-                            <input type="submit" value="${not empty computer ? 'Edit' : 'Add'}" class="btn btn-primary disabled" id="submitBtn">
-                            or
-                            <a href="${pageContext.request.contextPath}/computer/list" class="btn btn-default">Cancel</a>
+                        	<c:if test="${empty computer.id}">
+                            	<input type="submit" value="<fmt:message key="txt.add"/>" class="btn btn-primary disabled" id="submitBtn">
+                            </c:if>
+                            <c:if test="${not empty computer.id}">
+                            	<input type="submit" value="<fmt:message key="txt.edit"/>" class="btn btn-primary disabled" id="submitBtn">
+                            </c:if>
+                            <fmt:message key="txt.or"/>
+                            <a href="${pageContext.request.contextPath}/computer/list" class="btn btn-default"><fmt:message key="txt.cancel"/></a>
                         </div>
                     </form>
                 </div>

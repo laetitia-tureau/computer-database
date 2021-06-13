@@ -1,41 +1,43 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+    <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
-<title>Computer Database</title>
+<title><fmt:message key="txt.title"/></title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="utf-8">
 <!-- Bootstrap -->
 <link href="${pageContext.request.contextPath}/css/bootstrap.min.css" rel="stylesheet" media="screen">
 <link href="${pageContext.request.contextPath}/css/font-awesome.css" rel="stylesheet" media="screen">
 <link href="${pageContext.request.contextPath}/css/main.css" rel="stylesheet" media="screen">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" rel="stylesheet"/>
 </head>
 <body> 
     <header class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/computer/list"> Application - Computer Database </a>
+            <a class="navbar-brand" href="${pageContext.request.contextPath}/computer/list"> <fmt:message key="txt.home"/> </a>
         </div>
     </header>
 
     <section id="main">
         <div class="container">
             <h1 id="homeTitle">
-             ${pagination.totalItems} Computers found
+             ${pagination.totalItems} <fmt:message key="txt.computersFound"/>
             </h1>
             <div id="actions" class="form-horizontal">
                 <div class="pull-left">
                     <form id="searchForm" action="${pageContext.request.contextPath}/computer/list" method="GET" class="form-inline">
 
-                        <input type="search" id="searchbox" name="search" value="${criteria.itemName}" class="form-control" placeholder="Search name" />
-                        <input type="submit" id="searchsubmit" value="Filter by name"
+                        <input type="search" id="searchbox" name="search" value="${criteria.itemName}" class="form-control" placeholder="<fmt:message key="txt.searchName"/>" />
+                        <input type="submit" id="searchsubmit" value="<fmt:message key="txt.filterName"/>"
                         class="btn btn-primary" />
                     </form>
                 </div>
                 <div class="pull-right">
-                    <a class="btn btn-success" id="addComputer" href="${pageContext.request.contextPath}/computer/edit">Add Computer</a> 
-                    <a class="btn btn-default" id="editComputer" href="#" onclick="$.fn.toggleEditMode();">Edit</a>
+                    <a class="btn btn-success" id="addComputer" href="${pageContext.request.contextPath}/computer/edit"><fmt:message key="txt.addComputer"/></a> 
+                    <a class="btn btn-default" id="editComputer" href="#" onclick="$.fn.toggleEditMode();"><fmt:message key="txt.editComputer"/></a>
                 </div>
             </div>
         </div>
@@ -100,6 +102,10 @@
 
     <footer class="navbar-fixed-bottom">
         <div class="container text-center">
+            <div class="btn-group btn-group-sm pull-left" role="group">
+                <a class="dropdown-item" href="${pageContext.request.contextPath}/computer/list?lang=en"><span class="flag-icon flag-icon-gb"></a> 
+                <a class="dropdown-item" href="${pageContext.request.contextPath}/computer/list?lang=fr"><span class="flag-icon flag-icon-fr"></a>
+            </div>
             <ul class="pagination">
                 <c:set var="firstPage" value="${1}"/>
                 <c:set var="lastPage" value="${5}"/>
@@ -107,7 +113,7 @@
                 <c:set var="firstPage" value="${pagination.currentPage - 2}"/>
                 <c:set var="lastPage" value="${pagination.currentPage + 2}"/>
                 <li class="${pagination.currentPage == indexPage ? 'active' : '' }" >
-                    <a href="${not empty url ? url : '?'}currentPage=${pagination.currentPage - 1}&itemsPerPage=${pagination.itemsPerPage}" aria-label="Previous">
+                    <a href="${not empty url ? url : '?'}currentPage=${pagination.currentPage - 1}&itemsPerPage=${pagination.itemsPerPage}" aria-label="<fmt:message key="txt.previous"/>">
                       <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
@@ -123,7 +129,7 @@
                 <c:if test="${pagination.currentPage < pagination.totalOfPages}">
                 <li class="${pagination.currentPage == indexPage ? 'active' : '' }">
                 
-                    <a href="${not empty url ? url : '?'}currentPage=${pagination.currentPage + 1}&itemsPerPage=${pagination.itemsPerPage}" aria-label="Next">
+                    <a href="${not empty url ? url : '?'}currentPage=${pagination.currentPage + 1}&itemsPerPage=${pagination.itemsPerPage}" aria-label="<fmt:message key="txt.next"/>">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
