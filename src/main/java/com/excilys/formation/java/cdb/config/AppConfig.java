@@ -10,7 +10,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-@ComponentScan({ "com.excilys.formation.java.cdb.services", "com.excilys.formation.java.cdb.controllers",
+@ComponentScan({ "com.excilys.formation.java.cdb.services",
         "com.excilys.formation.java.cdb.persistence.daos", "com.excilys.formation.java.cdb.mappers",
         "com.excilys.formation.java.cdb.servlets", "com.excilys.formation.java.cdb.validator" })
 public class AppConfig {

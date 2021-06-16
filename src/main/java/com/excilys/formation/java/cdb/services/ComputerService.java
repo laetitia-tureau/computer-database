@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
@@ -93,16 +92,7 @@ public class ComputerService {
      * @param computer the computer to create
      * @return the computer saved in database
      */
-    public int createComputer(Computer computer) {
-        if (computer.getManufacturer() != null) {
-            if (computer.getManufacturer().getId() != 0) {
-                companyService.findById(computer.getManufacturer().getId());
-                // if (company == null) throw new MyPersistenceException("company does not exist
-                // in database");
-            } else {
-                throw new MyPersistenceException("company does not exist in database");
-            }
-        }
+    public Computer createComputer(Computer computer) {
         return computerInstance.create(computer);
     }
 
@@ -121,8 +111,7 @@ public class ComputerService {
      * @return the updated computer
      */
     public Computer update(Computer computer) {
-        computerInstance.update(computer);
-        return computer;
+         return computerInstance.update(computer);
     }
 
 }

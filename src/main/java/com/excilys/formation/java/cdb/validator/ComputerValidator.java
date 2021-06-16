@@ -45,8 +45,8 @@ public class ComputerValidator {
      * @param discontinued the computerDTO's discontinued date
      */
     private void validateDate(String introduced, String discontinued) {
-        LocalDate introducedDate = null;
-        LocalDate discontinuedDate = null;
+        LocalDate introducedDate;
+        LocalDate discontinuedDate;
         ComputerBuilder builder = new Computer.ComputerBuilder();
         if (introduced != null && !introduced.isEmpty()) {
             introducedDate = LocalDate.parse(introduced);

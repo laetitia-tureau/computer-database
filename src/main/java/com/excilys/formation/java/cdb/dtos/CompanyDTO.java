@@ -9,6 +9,9 @@ public class CompanyDTO {
     private String id;
     private String name;
 
+    /** Creates a CompanyDTO. */
+    public CompanyDTO() { }
+
     /**
      * Creates a company using a CompanyBuilderDTO.
      * @param builder A CompanyBuilderDTO

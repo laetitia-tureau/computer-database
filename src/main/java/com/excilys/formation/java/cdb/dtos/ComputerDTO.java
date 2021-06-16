@@ -14,6 +14,9 @@ public class ComputerDTO {
     private String manufacturer;
     private String companyName;
 
+    /** Creates a ComputerDTO. */
+    public ComputerDTO() { }
+
     /** Creates a computer using a ComputerBuilder.
      * @param builder A ComputerBuilder
      */

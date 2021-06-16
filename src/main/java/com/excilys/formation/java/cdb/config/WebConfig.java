@@ -26,7 +26,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan({ "com.excilys.formation.java.cdb.services", "com.excilys.formation.java.cdb.controllers",
+@ComponentScan(basePackages = { "com.excilys.formation.java.cdb.services",
         "com.excilys.formation.java.cdb.persistence.daos", "com.excilys.formation.java.cdb.mappers",
         "com.excilys.formation.java.cdb.persistence", "com.excilys.formation.java.cdb.servlets",
         "com.excilys.formation.java.cdb.validator" })

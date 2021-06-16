@@ -53,6 +53,7 @@ public class ComputerDAO {
      * Creates a DAO to computer operations into database.
      * @param namedParamJdbcTemp jdbc template
      * @param jdbcTemp jdbc template
+     * @param cptRowMapper mapper from ResultSet to Computer
      */
     public ComputerDAO(NamedParameterJdbcTemplate namedParamJdbcTemp, JdbcTemplate jdbcTemp,
             ComputerRowMapper cptRowMapper) {
@@ -82,35 +83,38 @@ public class ComputerDAO {
 
     /**
      * Insert a computer in the database.
-     * @throws SQLException for database access error, or closed Connection or PreparedStatement, or wrong match with setter
      * @param computer object to create
      * @return the computer saved in database
      */
-    public int create(Computer computer) {
-        Long companyId = computer.getManufacturer() != null ? computer.getManufacturer().getId() : null;
-        Date dateIntro = computer.getIntroduced() != null ? java.sql.Date.valueOf(computer.getIntroduced()) : null;
-        Date dateDist = computer.getDiscontinued() != null ? java.sql.Date.valueOf(computer.getDiscontinued()) : null;
-
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("name", computer.getName());
-        params.addValue("intro", dateIntro);
-        params.addValue("dist", dateDist);
-        params.addValue("company_id", companyId);
-
+    public Computer create(Computer computer) {
         try {
-            return this.namedParamJdbcTemplate.update(INSERT_COMPUTER, params);
+            this.namedParamJdbcTemplate.update(INSERT_COMPUTER, this.createSqlParamSource(computer));
         } catch (DataAccessException ex) {
             LOGGER.error(ex.getMessage());
         }
-        return 0;
+        return computer;
     }
 
     /**
      * Update a computer in the database.
      * @param computer to update
-     * @return the number of rows edited
+     * @return saved computer
      */
-    public int update(Computer computer) {
+    public Computer update(Computer computer) {
+        try {
+            this.namedParamJdbcTemplate.update(UPDATE_COMPUTER, this.createSqlParamSource(computer));
+        } catch (DataAccessException ex) {
+            LOGGER.error(ex.getMessage());
+        }
+        return computer;
+    }
+
+    /**
+     * Creates a MapSqlParameterSource with values as computer's attributes.
+     * @param computer to retrieve attributes
+     * @return MapSqlParameterSource with attributes
+     */
+    private MapSqlParameterSource createSqlParamSource(Computer computer) {
         Long companyId = computer.getManufacturer() != null ? computer.getManufacturer().getId() : null;
         Date dateIntro = computer.getIntroduced() != null ? java.sql.Date.valueOf(computer.getIntroduced()) : null;
         Date dateDist = computer.getDiscontinued() != null ? java.sql.Date.valueOf(computer.getDiscontinued()) : null;
@@ -122,12 +126,7 @@ public class ComputerDAO {
         params.addValue("dist", dateDist);
         params.addValue("company_id", companyId);
 
-        try {
-            return this.namedParamJdbcTemplate.update(UPDATE_COMPUTER, params);
-        } catch (DataAccessException ex) {
-            LOGGER.error(ex.getMessage());
-        }
-        return 0;
+        return params;
     }
 
     /**
@@ -183,7 +182,7 @@ public class ComputerDAO {
         query += ";";
         try {
             if (StringUtils.isNotBlank(criteria.getItemName())) {
-                return this.jdbcTemplate.query(query, rowMapper, criteria.getItemName(), criteria.getItemName());
+                return this.jdbcTemplate.query(query, rowMapper, "%" + criteria.getItemName() + "%", "%" + criteria.getItemName() + "%");
             } else {
                 return this.jdbcTemplate.query(query, rowMapper);
             }

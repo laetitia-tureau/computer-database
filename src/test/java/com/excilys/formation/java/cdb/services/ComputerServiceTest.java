@@ -1,6 +1,5 @@
 package com.excilys.formation.java.cdb.services;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -16,7 +15,6 @@ public class ComputerServiceTest {
 
     ComputerService computerService;
 
-    @BeforeAll
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         builderMock = new Computer.ComputerBuilder(1L, "Lenovo").introduced(null).discontinued(null);
@@ -35,7 +33,6 @@ public class ComputerServiceTest {
 
     @Test
     public void updateIntroducedDateWhenNoData() {
-        Computer computerMock = builderMock.build();
     }
 
     @Test

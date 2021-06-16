@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.excilys.formation.java.cdb.mappers.CompanyRowMapper;
 import com.excilys.formation.java.cdb.models.Company;
@@ -34,6 +35,7 @@ public class CompanyDAO {
      * Creates a DAO to company operations into database.
      * @param namedParamJdbcTemp jdbc template
      * @param jdbcTemp jdbc template
+     * @param cmpRowMapper mapper from ResultSet to Company
      */
     public CompanyDAO(NamedParameterJdbcTemplate namedParamJdbcTemp, JdbcTemplate jdbcTemp,
             CompanyRowMapper cmpRowMapper) {
@@ -71,6 +73,7 @@ public class CompanyDAO {
      * @param id the company's id
      * @return the number of rows deleted
      */
+    @Transactional
     public int deleteById(Long id) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id);
