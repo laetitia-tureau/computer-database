@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-    <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-    <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
-    <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -26,7 +26,7 @@
                 <div class="col-xs-8 col-xs-offset-2 box">
                    
                     <c:choose>
-					  <c:when test="${not empty computer.id}">
+					  <c:when test="${not empty computer.id }">
 					    <div class="label label-default pull-right">
 	                        id: ${computer.id}
 	                    </div>
@@ -50,7 +50,6 @@
 					</c:if>
                     <form:form action="${pageContext.request.contextPath}/computer/edit${not empty computer.id ? '?id='.concat(computer.id) : ''}" method="POST" id="addComputer" modelAttribute="computer">
                         <fieldset>
-
                             <div class="form-group">
                                 <form:label class="control-label" path="name" for="computerName"><fmt:message key="label.computerName"/></form:label>
                                 <form:input type="text" class="form-control" id="computerName" path="name" name="name" placeholder="Computer name" value="${not empty computer ? computer.name : ''}" />
@@ -84,12 +83,13 @@
                             </div>                  
                         </fieldset>
                         <div class="actions pull-right">
-                        	<c:if test="${empty computer.id}">
-                            	<input type="submit" value="<fmt:message key="txt.add"/>" class="btn btn-primary disabled" id="submitBtn">
+                            <c:if test="${ empty computer.id }">
+                                <input type="submit" value="<fmt:message key="txt.add"/>" class="btn btn-primary disabled" id="submitBtn">
                             </c:if>
-                            <c:if test="${not empty computer.id}">
-                            	<input type="submit" value="<fmt:message key="txt.edit"/>" class="btn btn-primary disabled" id="submitBtn">
+                            <c:if test="${ not empty computer.id }">
+                                <input type="submit" value="<fmt:message key="txt.edit"/>" class="btn btn-primary disabled" id="submitBtn">
                             </c:if>
+                            
                             <fmt:message key="txt.or"/>
                             <a href="${pageContext.request.contextPath}/computer/list" class="btn btn-default"><fmt:message key="txt.cancel"/></a>
                         </div>

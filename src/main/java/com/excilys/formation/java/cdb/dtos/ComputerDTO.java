@@ -73,6 +73,50 @@ public class ComputerDTO {
         return this.companyName;
     }
 
+    /** Set the computer's id.
+     * @param setId id
+     */
+    public void setId(String setId) {
+        this.id = setId;
+    }
+
+    /** Set the computer's name.
+     * @param setName name
+     */
+    public void setName(String setName) {
+        this.name = setName;
+    }
+
+    /** Set the computer's introduced date.
+     * @param setIntroduced introduced date
+     */
+    public void setIntroduced(String setIntroduced) {
+        this.introduced = setIntroduced;
+    }
+
+    /** Set the computer's discontinued date.
+     * @param setDiscontinued discontinued date
+     */
+    public void setDiscontinued(String setDiscontinued) {
+        this.discontinued = setDiscontinued;
+    }
+
+    /**
+     * Set the computer's company.
+     * @param setManufacturer company
+     */
+    public void setManufacturer(String setManufacturer) {
+        this.manufacturer = setManufacturer;
+    }
+
+    /**
+     * Set the computer's company.
+     * @param setCompanyName company's name
+     */
+    public void setCompanyName(String setCompanyName) {
+        this.companyName = setCompanyName;
+    }
+
     @Override
     public String toString() {
         String str = this.id + "\t|\t" + this.name + "\t|\t";

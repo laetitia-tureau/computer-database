@@ -30,11 +30,27 @@ public class CompanyDTO {
     }
 
     /**
+     * Set the company's id.
+     * @param setId id
+     */
+    public void setId(String setId) {
+        this.id = setId;
+    }
+
+    /**
      * Gets the company's name.
      * @return this.name
      */
     public String getName() {
         return this.name;
+    }
+
+    /**
+     * Set the company's name.
+     * @param setName name
+     */
+    public void setName(String setName) {
+        this.name = setName;
     }
 
     @Override

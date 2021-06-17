@@ -70,8 +70,6 @@ public class EditComputerServlet {
     @PostMapping("/computer/edit")
     protected RedirectView editComputer(@ModelAttribute("computer") ComputerDTO computerDTO,
                                         RedirectAttributes redirectAttributes) {
-        System.out.println("DEBUG");
-        System.out.println(redirectAttributes.getAttribute("computer"));
         try {
             String successMessage = " was successfully ";
             if (computerDTO.getId() != null) {
