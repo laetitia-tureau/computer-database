@@ -1,27 +1,24 @@
 package com.excilys.formation.java.cdb.persistence.daos;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.excilys.formation.java.cdb.mappers.ComputerMapper;
+import com.excilys.formation.java.cdb.mappers.ComputerRowMapper;
 import com.excilys.formation.java.cdb.models.Computer;
-import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
 import com.excilys.formation.java.cdb.services.ComputerService;
 import com.excilys.formation.java.cdb.services.Pagination;
 import com.excilys.formation.java.cdb.services.SearchCriteria;
-import com.zaxxer.hikari.HikariDataSource;
 
 /** Represents a computer DAO.
  * @author Laetitia Tureau
@@ -29,69 +26,48 @@ import com.zaxxer.hikari.HikariDataSource;
 @Repository
 public class ComputerDAO {
 
-    /** The connexion to mySQL database. */
-    @Autowired
-    private HikariDataSource dataSource;
-
-    @Autowired
-    private ComputerMapper computerMapper;
+    private JdbcTemplate jdbcTemplate;
+    private NamedParameterJdbcTemplate namedParamJdbcTemplate;
+    private ComputerRowMapper rowMapper;
 
     /** Class logger. */
     private static final Logger LOGGER = Logger.getLogger(ComputerService.class);
 
     /** Represents query to create a computer. */
-    private static final String INSERT_COMPUTER = "INSERT INTO computer (name, introduced, discontinued, company_id) VALUES (?,?,?,?)";
+    private static final String INSERT_COMPUTER = "INSERT INTO computer (name, introduced, discontinued, company_id) VALUES (:name, :intro, :dist, :company_id)";
 
     /** Represents query to retrieve all computers. */
-    private static final String ALL_COMPUTERS = "SELECT computer.id, computer.name, introduced, discontinued, company_id, "
-            + "company.name AS company_name FROM computer LEFT JOIN company ON company_id = company.id";
+    private static final String ALL_COMPUTERS = "SELECT computer.id, computer.name, computer.introduced, computer.discontinued, computer.company_id, "
+            + "company.name FROM computer LEFT JOIN company ON computer.company_id = company.id";
 
     /** Represents query to retrieve a specific computer. */
-    private static final String FIND_COMPUTER = ALL_COMPUTERS + " WHERE computer.id = ?";
+    private static final String FIND_COMPUTER = ALL_COMPUTERS + " WHERE computer.id = :id";
 
     /** Represents query to delete a computer. */
-    private static final String DELETE_COMPUTER = "DELETE FROM computer WHERE id = ?";
+    private static final String DELETE_COMPUTER = "DELETE FROM computer WHERE id = :id";
 
-    /** Represents query to update a computer's name. */
-    private static final String UPDATE_NAME = "UPDATE computer SET name = ? WHERE id = ?";
+    /** Represents query to update a computer. */
+    private static final String UPDATE_COMPUTER = "UPDATE computer SET name = :name, introduced = :intro, discontinued = :dist, company_id = :company_id WHERE id = :id ";
 
-    /** Represents query to update a computer's introduced date. */
-    private static final String UPDATE_INTRODUCED = "UPDATE computer SET introduced = ? WHERE id = ?";
-
-    /** Represents query to update a computer's discontinued date. */
-    private static final String UPDATE_DISCONTINUED = "UPDATE computer SET discontinued = ? WHERE id = ?";
-
-    /** Represents query to update a computer's manufacturer. */
-    private static final String UPDATE_MANUFACTURER = "UPDATE computer SET company_id = ? WHERE id = ?";
-
-    /** Creates a DAO to computer operations into database. */
-    private ComputerDAO() {
-    }
-
-    public static ComputerDAO getInstance() {
-        return SingletonHolder.INSTANCE;
-    }
-
-    private static class SingletonHolder {
-        private static final ComputerDAO INSTANCE = new ComputerDAO();
+    /**
+     * Creates a DAO to computer operations into database.
+     * @param namedParamJdbcTemp jdbc template
+     * @param jdbcTemp jdbc template
+     * @param cptRowMapper mapper from ResultSet to Computer
+     */
+    public ComputerDAO(NamedParameterJdbcTemplate namedParamJdbcTemp, JdbcTemplate jdbcTemp,
+            ComputerRowMapper cptRowMapper) {
+        this.jdbcTemplate = jdbcTemp;
+        this.namedParamJdbcTemplate = namedParamJdbcTemp;
+        this.rowMapper = cptRowMapper;
     }
 
     /**
      * Retrieve all the computers in the database.
      * @return a list of computers
      */
-    public List<Computer> getAllComputers() {
-        List<Computer> computers = new ArrayList<>();
-        try (Connection connexion = dataSource.getConnection();
-                Statement stmt = connexion.createStatement();
-                ResultSet resultSet = stmt.executeQuery(ALL_COMPUTERS)) {
-            while (resultSet.next()) {
-                computers.add(computerMapper.mapFromResultSet(resultSet));
-            }
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return computers;
+    public List<Computer> findAll() {
+        return this.jdbcTemplate.query(ALL_COMPUTERS, rowMapper);
     }
 
     /**
@@ -100,58 +76,57 @@ public class ComputerDAO {
      * @return a list of computers
      */
     public List<Computer> getPaginatedComputers(Pagination page) {
-        List<Computer> computers = new ArrayList<>();
         String withLimit = " LIMIT " + page.getItemsPerPage() * (page.getCurrentPage() - 1) + ","
                 + page.getItemsPerPage();
-        try (Connection connexion = dataSource.getConnection();
-                Statement stmt = connexion.createStatement();
-                ResultSet resultSet = stmt.executeQuery(ALL_COMPUTERS + withLimit)) {
-            while (resultSet.next()) {
-                computers.add(computerMapper.mapFromResultSet(resultSet));
-            }
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return computers;
+        return this.jdbcTemplate.query(ALL_COMPUTERS + withLimit, rowMapper);
     }
 
     /**
      * Insert a computer in the database.
-     * @throws SQLException for database access error, or closed Connection or PreparedStatement, or wrong match with setter
      * @param computer object to create
      * @return the computer saved in database
      */
-    public Computer createComputer(Computer computer) {
-        ComputerBuilder builder = new Computer.ComputerBuilder().name(computer.getName());
-        try (Connection connexion = dataSource.getConnection();
-                PreparedStatement stmt = connexion.prepareStatement(INSERT_COMPUTER)) {
-            int i = 1;
-            stmt.setString(i++, computer.getName());
-            if (computer.getIntroduced() != null) {
-                stmt.setDate(i++, java.sql.Date.valueOf(computer.getIntroduced()));
-                builder.introduced(computer.getIntroduced());
-            } else {
-                stmt.setNull(i++, 0);
-            }
-            if (computer.getDiscontinued() != null) {
-                stmt.setDate(i++, java.sql.Date.valueOf(computer.getDiscontinued()));
-                builder.introduced(computer.getDiscontinued());
-            } else {
-                stmt.setNull(i++, 0);
-            }
-            if (computer.getManufacturer() != null) {
-                if (computer.getManufacturer().getId() != null) {
-                    stmt.setLong(i++, computer.getManufacturer().getId());
-                    builder.manufacturer(computer.getManufacturer());
-                }
-            } else {
-                stmt.setNull(i++, 0);
-            }
-            stmt.executeUpdate();
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+    public Computer create(Computer computer) {
+        try {
+            this.namedParamJdbcTemplate.update(INSERT_COMPUTER, this.createSqlParamSource(computer));
+        } catch (DataAccessException ex) {
+            LOGGER.error(ex.getMessage());
         }
         return computer;
+    }
+
+    /**
+     * Update a computer in the database.
+     * @param computer to update
+     * @return saved computer
+     */
+    public Computer update(Computer computer) {
+        try {
+            this.namedParamJdbcTemplate.update(UPDATE_COMPUTER, this.createSqlParamSource(computer));
+        } catch (DataAccessException ex) {
+            LOGGER.error(ex.getMessage());
+        }
+        return computer;
+    }
+
+    /**
+     * Creates a MapSqlParameterSource with values as computer's attributes.
+     * @param computer to retrieve attributes
+     * @return MapSqlParameterSource with attributes
+     */
+    private MapSqlParameterSource createSqlParamSource(Computer computer) {
+        Long companyId = computer.getManufacturer() != null ? computer.getManufacturer().getId() : null;
+        Date dateIntro = computer.getIntroduced() != null ? java.sql.Date.valueOf(computer.getIntroduced()) : null;
+        Date dateDist = computer.getDiscontinued() != null ? java.sql.Date.valueOf(computer.getDiscontinued()) : null;
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", computer.getId());
+        params.addValue("name", computer.getName());
+        params.addValue("intro", dateIntro);
+        params.addValue("dist", dateDist);
+        params.addValue("company_id", companyId);
+
+        return params;
     }
 
     /**
@@ -160,17 +135,14 @@ public class ComputerDAO {
      * @return An empty Optional if nothing found else a Optional containing a computer
      */
     public Optional<Computer> findById(Long id) {
-        try (Connection connexion = dataSource.getConnection();
-                PreparedStatement stmt = connexion.prepareStatement(FIND_COMPUTER)) {
-            stmt.setLong(1, id);
-            ResultSet resultSet = stmt.executeQuery();
-            if (resultSet.next()) {
-                return Optional.of(computerMapper.mapFromResultSet(resultSet));
-            }
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", id);
+        try {
+            return Optional.ofNullable(this.namedParamJdbcTemplate.queryForObject(FIND_COMPUTER, params, rowMapper));
+        } catch (DataAccessException ex) {
+            LOGGER.error(ex.getMessage());
         }
-        return Optional.empty();
+        return Optional.ofNullable(null);
     }
 
     /**
@@ -179,90 +151,13 @@ public class ComputerDAO {
      * @param id the computer's id
      * @return the number of rows deleted
      */
-    public int deleteComputer(Long id) {
-        try (Connection connexion = dataSource.getConnection();
-                PreparedStatement stmt = connexion.prepareStatement(DELETE_COMPUTER)) {
-            stmt.setLong(1, id);
-            return stmt.executeUpdate();
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return 0;
-    }
-
-    /**
-     * Update a computer's name in the database.
-     * @throws SQLException for database access error, or closed Connection or PreparedStatement, or wrong match with setters
-     * @param name the computer's name
-     * @param id the computer's id
-     * @return the number of rows updated
-     */
-    public int updateName(String name, Long id) {
-        try (Connection connexion = dataSource.getConnection();
-                PreparedStatement stmt = connexion.prepareStatement(UPDATE_NAME)) {
-            stmt.setString(1, name);
-            stmt.setLong(2, id);
-            return stmt.executeUpdate();
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return 0;
-
-    }
-
-    /**
-     * Update a computer's introduced date in the database.
-     * @throws SQLException for database access error, or closed Connection or PreparedStatement, or wrong match with setters
-     * @param date the computer's introduced date
-     * @param id the computer's id
-     * @return the number of rows updated
-     */
-    public int updateIntroduced(Timestamp date, Long id) {
-        try (Connection connexion = dataSource.getConnection();
-                PreparedStatement stmt = connexion.prepareStatement(UPDATE_INTRODUCED)) {
-            stmt.setTimestamp(1, date);
-            stmt.setLong(2, id);
-            return stmt.executeUpdate();
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return 0;
-    }
-
-    /**
-     * Update a computer's discontinued date in the database.
-     * @throws SQLException for database access error, or closed Connection or PreparedStatement, or wrong match with setters
-     * @param date the computer's discontinued date
-     * @param id the computer's id
-     * @return the number of rows updated
-     */
-    public int updateDiscontinued(Timestamp date, Long id) {
-        try (Connection connexion = dataSource.getConnection();
-                PreparedStatement stmt = connexion.prepareStatement(UPDATE_DISCONTINUED)) {
-            stmt.setTimestamp(1, date);
-            stmt.setLong(2, id);
-            return stmt.executeUpdate();
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
-        }
-        return 0;
-    }
-
-    /**
-     * Update a computer's company_id in the database.
-     * @throws SQLException for database access error, or closed Connection or PreparedStatement, or wrong match with setter
-     * @param id the computer's id
-     * @param companyID the computer's manufacturer id
-     * @return the number of rows updated
-     */
-    public int updateManufacturer(Long companyID, Long id) {
-        try (Connection connexion = dataSource.getConnection();
-                PreparedStatement stmt = connexion.prepareStatement(UPDATE_MANUFACTURER)) {
-            stmt.setLong(1, companyID);
-            stmt.setLong(2, id);
-            return stmt.executeUpdate();
-        } catch (SQLException sqle) {
-            LOGGER.error("Erreur lors de l'exécution de la requête", sqle);
+    public int deleteById(Long id) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", id);
+        try {
+            return this.namedParamJdbcTemplate.update(DELETE_COMPUTER, params);
+        } catch (DataAccessException ex) {
+            LOGGER.error(ex.getMessage());
         }
         return 0;
     }
@@ -284,21 +179,16 @@ public class ComputerDAO {
         if (StringUtils.isNotBlank(criteria.getLimit())) {
             query += " LIMIT " + criteria.getLimit();
         }
-        try (Connection connection = dataSource.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(query);) {
+        query += ";";
+        try {
             if (StringUtils.isNotBlank(criteria.getItemName())) {
-                preparedStatement.setString(1, "%" + criteria.getItemName() + "%");
-                preparedStatement.setString(2, "%" + criteria.getItemName() + "%");
+                return this.jdbcTemplate.query(query, rowMapper, "%" + criteria.getItemName() + "%", "%" + criteria.getItemName() + "%");
+            } else {
+                return this.jdbcTemplate.query(query, rowMapper);
             }
-            try (ResultSet result = preparedStatement.executeQuery()) {
-                while (result.next()) {
-                    computers.add(computerMapper.mapFromResultSet(result));
-                }
-            }
-        } catch (SQLException sqle) {
-            sqle.printStackTrace();
+        } catch (DataAccessException ex) {
+            LOGGER.error(ex.getMessage());
         }
         return computers;
     }
-
 }

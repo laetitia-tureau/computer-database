@@ -14,6 +14,9 @@ public class ComputerDTO {
     private String manufacturer;
     private String companyName;
 
+    /** Creates a ComputerDTO. */
+    public ComputerDTO() { }
+
     /** Creates a computer using a ComputerBuilder.
      * @param builder A ComputerBuilder
      */
@@ -68,6 +71,50 @@ public class ComputerDTO {
      */
     public String getCompanyName() {
         return this.companyName;
+    }
+
+    /** Set the computer's id.
+     * @param setId id
+     */
+    public void setId(String setId) {
+        this.id = setId;
+    }
+
+    /** Set the computer's name.
+     * @param setName name
+     */
+    public void setName(String setName) {
+        this.name = setName;
+    }
+
+    /** Set the computer's introduced date.
+     * @param setIntroduced introduced date
+     */
+    public void setIntroduced(String setIntroduced) {
+        this.introduced = setIntroduced;
+    }
+
+    /** Set the computer's discontinued date.
+     * @param setDiscontinued discontinued date
+     */
+    public void setDiscontinued(String setDiscontinued) {
+        this.discontinued = setDiscontinued;
+    }
+
+    /**
+     * Set the computer's company.
+     * @param setManufacturer company
+     */
+    public void setManufacturer(String setManufacturer) {
+        this.manufacturer = setManufacturer;
+    }
+
+    /**
+     * Set the computer's company.
+     * @param setCompanyName company's name
+     */
+    public void setCompanyName(String setCompanyName) {
+        this.companyName = setCompanyName;
     }
 
     @Override

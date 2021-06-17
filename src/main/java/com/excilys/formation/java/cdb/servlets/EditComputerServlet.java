@@ -1,74 +1,126 @@
 package com.excilys.formation.java.cdb.servlets;
 
-import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.excilys.formation.java.cdb.dtos.CompanyDTO;
+import com.excilys.formation.java.cdb.mappers.CompanyMapper;
+import com.excilys.formation.java.cdb.mappers.ComputerMapper;
+import com.excilys.formation.java.cdb.models.Computer;
+import com.excilys.formation.java.cdb.services.CompanyService;
+import com.excilys.formation.java.cdb.services.ComputerService;
+import com.excilys.formation.java.cdb.validator.ComputerValidator;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.excilys.formation.java.cdb.controllers.CompanyController;
-import com.excilys.formation.java.cdb.controllers.ComputerController;
 import com.excilys.formation.java.cdb.dtos.ComputerDTO;
 import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
-@RequestMapping("/computer/edit")
-public class EditComputerServlet extends HttpServlet {
+public class EditComputerServlet {
 
-    @Autowired
-    private ComputerController computerController;
-
-    @Autowired
-    private CompanyController companyController;
+    private CompanyService companyService;
+    private ComputerService computerService;
+    private ComputerMapper computerMapper;
+    private CompanyMapper companyMapper;
+    private ComputerValidator computerValidator;
 
     private static final long serialVersionUID = 1L;
     private static Logger log = Logger.getLogger(EditComputerServlet.class);
 
-    @Override
-    @GetMapping
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        request.setAttribute("companyList", companyController.getCompanies());
-        if (request.getParameter("id") != null) {
-            String computerId = request.getParameter("id");
-            Optional<ComputerDTO> computer = computerController.findComputer(computerId);
-            request.setAttribute("computer", computer.get());
-        }
-        request.getRequestDispatcher("/WEB-INF/views/editComputer.jsp").forward(request, response);
+    /**
+     * Creates a servlet for adding and editing a computer.
+     * @param cmpService a company service
+     * @param cmptService a computer service
+     * @param cmptMapper a computer mapper
+     * @param cmpMapper a company mapper
+     * @param validator a computer validator
+     */
+    public EditComputerServlet(CompanyService cmpService, ComputerService cmptService,
+                                 ComputerMapper cmptMapper, CompanyMapper cmpMapper, ComputerValidator validator) {
+        this.companyService = cmpService;
+        this.computerService = cmptService;
+        this.computerMapper = cmptMapper;
+        this.companyMapper = cmpMapper;
+        this.computerValidator = validator;
     }
 
-    @Override
-    @PostMapping
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String computerName = request.getParameter("computerName");
-        String introduced = request.getParameter("introduced");
-        String discontinued = request.getParameter("discontinued");
-        String companyId = request.getParameter("companyId");
-        String computerId = request.getParameter("id");
+    @GetMapping("/computer/edit")
+    protected ModelAndView getView(@RequestParam(value = "id", required = false) String computerId) {
+        ComputerDTO computerDTO = new ComputerDTO.ComputerBuilderDTO().build();
+        if (computerId != null && StringUtils.isNumeric(computerId)) {
+            computerDTO = computerMapper.mapFromModelToDTO(computerService.findById(Long.parseLong(computerId)));
+        }
+        ModelAndView modelAndView = new ModelAndView("editComputer", "computer", computerDTO);
+        List<CompanyDTO> companyDTOList = companyService.getCompanies().stream()
+                .map(c -> companyMapper.mapFromModelToDTO(c)).collect(Collectors.toList());
+        modelAndView.addObject("companyList", companyDTOList);
+        return modelAndView;
+    }
 
+    @PostMapping("/computer/edit")
+    protected RedirectView editComputer(@ModelAttribute("computer") ComputerDTO computerDTO,
+                                        RedirectAttributes redirectAttributes) {
         try {
-            if (computerId != null) {
-                computerController.updateComputer(computerId, computerName, introduced, discontinued, companyId);
-                request.setAttribute("success", computerName + " was successfully updated !");
+            String successMessage = " was successfully ";
+            if (computerDTO.getId() != null) {
+                computerDTO = this.updateComputer(computerDTO);
+                successMessage += "updated !";
             } else {
-                computerController.createComputer(computerName, introduced, discontinued, companyId);
-                request.setAttribute("success", computerName + " was successfully added !");
+                computerDTO = this.createComputer(computerDTO);
+                successMessage += "added !";
             }
-            doGet(request, response);
+            redirectAttributes.addFlashAttribute("success", computerDTO.getName() + successMessage);
+            redirectAttributes.addAttribute("id", computerDTO.getId());
         } catch (MyPersistenceException ex) {
             log.error(ex.getMessage());
-            request.setAttribute("error", ex.getMessage());
-            doGet(request, response);
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
+        return new RedirectView("/computer/edit", true);
+    }
+
+    /**
+     * Create a computer.
+     * @param computerDTO to create a computer
+     * @throws MyPersistenceException if invalid computer
+     * @return a saved computerDTO
+     */
+    public ComputerDTO createComputer(ComputerDTO computerDTO) throws MyPersistenceException {
+        computerValidator.validateComputerDTO(computerDTO);
+        Computer computer = computerMapper.mapFromDTOtoModel(computerDTO);
+        return computerMapper.mapFromModelToDTO(computerService.createComputer(computer));
+    }
+
+    /**
+     * Retrieve a computer with specific id.
+     * @param computerId computer's id to find
+     * @return An empty Optional if nothing found else a Optional containing a computer
+     */
+    public Optional<ComputerDTO> findComputer(String computerId) {
+        if (computerId != null && StringUtils.isNumeric(computerId)) {
+            Computer computer = computerService.findById(Long.parseLong(computerId));
+            return Optional.of(computerMapper.mapFromModelToDTO(computer));
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Update a computer.
+     * @param computerDTO to edit a computer
+     * @return a saved computerDTO
+     */
+    public ComputerDTO updateComputer(ComputerDTO computerDTO) {
+        computerValidator.validateComputerDTO(computerDTO);
+        Computer computer = computerMapper.mapFromDTOtoModel(computerDTO);
+        return computerMapper.mapFromModelToDTO(computerService.update(computer));
     }
 }

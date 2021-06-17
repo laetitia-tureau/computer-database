@@ -1,18 +1,14 @@
 package com.excilys.formation.java.cdb.services;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
-import com.excilys.formation.java.cdb.validator.ComputerValidator;
 
 /**
  * Represents a computer service.
@@ -30,14 +26,6 @@ public class ComputerService {
     @Autowired
     private CompanyService companyService;
 
-    @Autowired
-    private ComputerValidator computerValidator;
-
-    /** Class logger. */
-    private static final Logger LOGGER = Logger.getLogger(ComputerService.class);
-
-    private static Computer computerToUpdate;
-
     /**
      * Initialize ComputerDAO instance.
      * @param computerInstance the instance
@@ -50,7 +38,7 @@ public class ComputerService {
      * Initialize CompanyDAO instance.
      * @param companyInstance the instance
      */
-    public void setCompanyInstance(CompanyDAO companyInstance) {
+    public void setCompanyDAOInstance(CompanyDAO companyInstance) {
         this.companyService.setCompanyInstance(companyInstance);
 
     }
@@ -68,7 +56,7 @@ public class ComputerService {
      * @return a list of computers
      */
     public List<Computer> getComputers() {
-        return computerInstance.getAllComputers();
+        return computerInstance.findAll();
     }
 
     /**
@@ -96,8 +84,7 @@ public class ComputerService {
      */
     public Computer findById(Long id) {
         Optional<Computer> opt = computerInstance.findById(id);
-        return opt.orElseThrow(MyPersistenceException::new);
-        // return opt.orElse(null);
+        return opt.orElse(null);
     }
 
     /**
@@ -106,17 +93,7 @@ public class ComputerService {
      * @return the computer saved in database
      */
     public Computer createComputer(Computer computer) {
-        computerValidator.validateComputerDate(computer);
-        if (computer.getManufacturer() != null) {
-            if (computer.getManufacturer().getId() != 0) {
-                companyService.findById(computer.getManufacturer().getId());
-                // if (company == null) throw new MyPersistenceException("company does not exist
-                // in database");
-            } else {
-                throw new MyPersistenceException("company does not exist in database");
-            }
-        }
-        return computerInstance.createComputer(computer);
+        return computerInstance.create(computer);
     }
 
     /**
@@ -125,7 +102,7 @@ public class ComputerService {
      * @return the number of rows deleted
      */
     public int deleteComputer(Long id) {
-        return computerInstance.deleteComputer(id);
+        return computerInstance.deleteById(id);
     }
 
     /**
@@ -134,62 +111,7 @@ public class ComputerService {
      * @return the updated computer
      */
     public Computer update(Computer computer) {
-        Long id = computer.getId();
-        computerToUpdate = findById(id);
-        if (computer.getName() != null) {
-            updateName(computer.getName(), id);
-        }
-        if (computer.getIntroduced() != null) {
-            updateIntroduced(Timestamp.valueOf(computer.getIntroduced().atStartOfDay()), id);
-        }
-        if (computer.getDiscontinued() != null) {
-            updateDiscontinued(Timestamp.valueOf(computer.getDiscontinued().atStartOfDay()), id);
-        }
-        if (computer.getManufacturer() != null) {
-            updateManufacturer(computer.getManufacturer().getId(), id);
-        }
-        return computer;
+         return computerInstance.update(computer);
     }
 
-    /**
-     * Update a computer's name.
-     * @param name A String containing the computer's name
-     * @param id A Long containing the computer's id
-     * @return the number of rows updated
-     */
-    public int updateName(String name, Long id) {
-        return computerInstance.updateName(name, id);
-    }
-
-    /**
-     * Update a computer's introduced date.
-     * @param date A Timestamp as the computer's introduced date
-     * @param id A Long containing the computer's id
-     * @return a computer
-     */
-    public int updateIntroduced(Timestamp date, Long id) {
-        computerValidator.validateComputerDate(computerToUpdate);
-        return computerInstance.updateIntroduced(date, id);
-    }
-
-    /**
-     * Update a computer's discontinued date.
-     * @param date A Timestamp as the computer's discontinued date
-     * @param id A Long containing the computer's id
-     * @return a computer
-     */
-    public int updateDiscontinued(Timestamp date, Long id) {
-        computerValidator.validateComputerDate(computerToUpdate);
-        return computerInstance.updateDiscontinued(date, id);
-    }
-
-    /**
-     * Update a computer's manufacturer.
-     * @param companyID A Long containing the computer's manufacturer id
-     * @param id A Long containing the computer's id
-     * @return the number of rows updated
-     */
-    public int updateManufacturer(Long companyID, Long id) {
-        return computerInstance.updateManufacturer(companyID, id);
-    }
 }

@@ -45,8 +45,8 @@ public class ComputerValidator {
      * @param discontinued the computerDTO's discontinued date
      */
     private void validateDate(String introduced, String discontinued) {
-        LocalDate introducedDate = null;
-        LocalDate discontinuedDate = null;
+        LocalDate introducedDate;
+        LocalDate discontinuedDate;
         ComputerBuilder builder = new Computer.ComputerBuilder();
         if (introduced != null && !introduced.isEmpty()) {
             introducedDate = LocalDate.parse(introduced);
@@ -64,7 +64,7 @@ public class ComputerValidator {
      * @throws MyPersistenceException if user enter a discontinued date when no introduced date or if introduced date > discontinued date
      * @param computer to validate
      */
-    public void validateComputerDate(Computer computer) throws MyPersistenceException {
+    private void validateComputerDate(Computer computer) throws MyPersistenceException {
         if (computer.getIntroduced() != null && computer.getDiscontinued() != null) {
             if (computer.getDiscontinued().compareTo(computer.getIntroduced()) < 0) {
                 throw new MyPersistenceException(FORBIDDEN_DATE);
