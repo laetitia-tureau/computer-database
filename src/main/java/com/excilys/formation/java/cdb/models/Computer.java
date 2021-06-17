@@ -30,7 +30,7 @@ public class Computer {
     /** Gets the computer's id.
      * @return this.id
      */
-    public long getId() {
+    public Long getId() {
         return this.id;
     }
 

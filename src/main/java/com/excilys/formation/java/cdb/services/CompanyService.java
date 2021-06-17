@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.excilys.formation.java.cdb.exceptions.MyPersistenceException;
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 
@@ -32,16 +31,7 @@ public class CompanyService {
      * @return a list of companies
      */
     public List<Company> getCompanies() {
-        return companyInstance.getAllCompanies();
-    }
-
-    /**
-     * Retrieve all the companies in the database.
-     * @param page current page
-     * @return a list of companies
-     */
-    public List<Company> getPaginatedCompanies(Pagination page) {
-        return companyInstance.getPaginatedCompanies(page);
+        return companyInstance.findAll();
     }
 
     /**
@@ -51,8 +41,7 @@ public class CompanyService {
      */
     public Company findById(Long id) {
         Optional<Company> opt = companyInstance.findById(id);
-        return opt.orElseThrow(MyPersistenceException::new);
-        // return opt.orElse(null);
+        return opt.orElse(null);
     }
 
     /**
@@ -61,6 +50,6 @@ public class CompanyService {
      * @return the number of rows deleted
      */
     public int deleteCompany(Long id) {
-        return companyInstance.deleteCompany(id);
+        return companyInstance.deleteById(id);
     }
 }

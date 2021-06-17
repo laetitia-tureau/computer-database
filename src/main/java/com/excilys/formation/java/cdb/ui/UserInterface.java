@@ -3,13 +3,17 @@ package com.excilys.formation.java.cdb.ui;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.excilys.formation.java.cdb.mappers.DateMapper;
+import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.models.Computer;
+import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
 import com.excilys.formation.java.cdb.services.CompanyService;
@@ -24,6 +28,7 @@ public class UserInterface {
     private static ComputerService computerService = new ComputerService();
     private static CompanyService companyService = new CompanyService();
     private static Computer computer;
+    private static Company company;
     private static final Logger LOGGER = Logger.getLogger(UserInterface.class);
 
     /**
@@ -34,7 +39,7 @@ public class UserInterface {
     public UserInterface(ComputerDAO computerDAO, CompanyDAO companyDAO) {
         computerService.setComputerInstance(computerDAO);
         computerService.setCompanyServiceInstance(companyService);
-        computerService.setCompanyInstance(companyDAO);
+        computerService.setCompanyDAOInstance(companyDAO);
         companyService.setCompanyInstance(companyDAO);
     }
 
@@ -55,14 +60,10 @@ public class UserInterface {
      * Retrieve the id entered in the cli.
      * @param scanner A scanner to read the id
      * @param action A message to display the use of the id
-     * @param update If the action is an update then scanner will read next line
      * @return the entered id
      */
-    private Long retrieveID(Scanner scanner, String action, boolean update) {
+    private Long retrieveID(Scanner scanner, String action) {
         System.out.println("Enter id of " + action);
-        if (update) {
-            scanner.nextLine();
-        }
         return scanner.nextLong();
     }
 
@@ -86,8 +87,8 @@ public class UserInterface {
      */
     private Timestamp retrieveTimestamp(Scanner scanner) throws ParseException {
         System.out.println("Enter date with format yyyy-MM-dd :");
-        scanner.nextLine();
-        return DateMapper.nextTimestamp(scanner);
+        String date = scanner.nextLine();
+        return DateMapper.nextTimestamp(date);
     }
 
     /**
@@ -101,45 +102,29 @@ public class UserInterface {
     }
 
     /**
-     * Print general menu or menu to update attributes and select an option.
+     * Print general menu and select an option.
      * @param scanner A scanner to read the choice
-     * @param update if user choice's is to update an attribute or other
      * @return the user choice as a MenuChoice
      */
-    private MenuChoice choiceFromMenu(Scanner scanner, boolean update) {
-        if (update) {
-            menuUpdate();
-            int selector = scanner.nextInt();
-            return MenuChoice.fromEntryUpdate(selector);
-        } else {
-            menu();
-            int selector = scanner.nextInt();
-            return MenuChoice.fromEntry(selector);
-        }
+    private MenuChoice choiceFromMenu(Scanner scanner) {
+        menu();
+        int selector = scanner.nextInt();
+        return MenuChoice.fromEntry(selector);
     }
 
     /**
      * Find Company or Computer given an id and assign the object retrieved to the corresponding static optional object.
      * @param scanner A scanner to read the id
      * @param action A message to display the use of the id
-     * @param update if the action is an update or not
      * @param isCompany if the object is a company or not
      * @return the id entered
      */
-    private Long find(Scanner scanner, String action, boolean update, boolean isCompany) {
-        Long id = retrieveID(scanner, action, update);
+    private Long find(Scanner scanner, String action, boolean isCompany) {
+        Long id = retrieveID(scanner, action);
         if (isCompany) {
-            try {
-                companyService.findById(id);
-            } catch (Exception e) {
-                LOGGER.warn("No company with id : " + id);
-            }
+            company = companyService.findById(id);
         } else {
-            try {
-                computer = computerService.findById(id);
-            } catch (Exception e) {
-                LOGGER.warn("No computer with id : " + id);
-            }
+            computer = computerService.findById(id);
         }
         return id;
     }
@@ -147,28 +132,41 @@ public class UserInterface {
     /**
      * Update a Computer.
      * @param scanner A scanner to read the id and the user's choice
-     * @throws SQLException for crud operations
+     * @param create if a create action is requested, update action otherwise
      * @throws ParseException when parsing a date
      */
-    private void update(Scanner scanner) throws SQLException, ParseException {
-        Long updateID = find(scanner, "computer to update", true, false);
-        switch (choiceFromMenu(scanner, true)) {
-        case COMPUTER_NAME:
-            computerService.updateName(retrieveName(scanner, ""), updateID);
-            break;
-        case INTRODUCED_DATE:
-            computerService.updateIntroduced(retrieveTimestamp(scanner), updateID);
-            break;
-        case DISCONTINUED_DATE:
-            computerService.updateDiscontinued(retrieveTimestamp(scanner), updateID);
-            break;
-        case MANUFACTURER:
-            Long companyID = find(scanner, "company to update", true, true);
-            computerService.updateManufacturer(companyID, updateID);
-            break;
-        default:
-            break;
+    private void edit(Scanner scanner, boolean create) throws ParseException {
+        Long id;
+        ComputerBuilder builder = new Computer.ComputerBuilder();
+        if (!create) {
+            id = find(scanner, "computer to update", false);
+            while (computer == null) {
+                // TODO cas d'arret entrer un chiffre
+                LOGGER.warn("No computer with id: " + id);
+                id = find(scanner, "computer to update", false);
+            }
+            builder.id(id);
         }
+
+        String name = retrieveName(scanner, "");
+        if (StringUtils.isBlank(name)) {
+            name = computer.getName();
+        }
+
+        Timestamp timeIntro = retrieveTimestamp(scanner);
+        Timestamp timeDist = retrieveTimestamp(scanner);
+        LocalDate dateIntro = timeIntro == null ? null : timeIntro.toLocalDateTime().toLocalDate();
+        LocalDate dateDist = timeDist == null ? null : timeDist.toLocalDateTime().toLocalDate();
+
+        find(scanner, "related company", true);
+
+        builder.name(name).introduced(dateIntro).discontinued(dateDist).manufacturer(company);
+        if (!create) {
+            computerService.update(builder.build());
+        } else {
+            computerService.createComputer(builder.build());
+        }
+
     }
 
     /**
@@ -179,7 +177,7 @@ public class UserInterface {
     public void start() throws SQLException, ParseException {
         Scanner scanner = new Scanner(System.in);
         do {
-            switch (choiceFromMenu(scanner, false)) {
+            switch (choiceFromMenu(scanner)) {
             case COMPUTER_LIST:
                 printList(scanner, computerService.getComputers());
                 break;
@@ -187,23 +185,21 @@ public class UserInterface {
                 printList(scanner, companyService.getCompanies());
                 break;
             case COMPUTER_DETAIL:
-                find(scanner, "computer to show", true, false);
+                find(scanner, "computer to show", false);
                 System.out.println(computer);
                 break;
             case CREATE_COMPUTER:
-                String computerName = retrieveName(scanner, "of computer to create");
-                Computer computerToSave = new Computer.ComputerBuilder().name(computerName).build();
-                computerService.createComputer(computerToSave);
+                edit(scanner, true);
                 break;
             case DELETE_COMPUTER:
-                computerService.deleteComputer(retrieveID(scanner, "computer to delete", false));
+                computerService.deleteComputer(retrieveID(scanner, "computer to delete"));
                 break;
             case DELETE_COMPANY:
-                companyService.deleteCompany(retrieveID(scanner, "company to delete", false));
+                companyService.deleteCompany(retrieveID(scanner, "company to delete"));
                 break;
             case UPDATE_COMPUTER:
                 do {
-                    update(scanner);
+                    edit(scanner, false);
                 } while (decide(scanner) != 0);
                 break;
             default:
@@ -226,16 +222,4 @@ public class UserInterface {
         System.out.println(MenuChoice.DELETE_COMPANY);
         System.out.println(MenuChoice.QUIT);
     }
-
-    /** Print menu for updating a computer's attribute. */
-    private static void menuUpdate() {
-        System.out.println(" -> What do you want to update ? ");
-        System.out.println("Select operation:");
-        System.out.println(MenuChoice.COMPUTER_NAME);
-        System.out.println(MenuChoice.INTRODUCED_DATE);
-        System.out.println(MenuChoice.DISCONTINUED_DATE);
-        System.out.println(MenuChoice.MANUFACTURER);
-        System.out.println(MenuChoice.QUIT);
-    }
-
 }
