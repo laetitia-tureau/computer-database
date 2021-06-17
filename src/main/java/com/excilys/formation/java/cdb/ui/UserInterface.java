@@ -37,10 +37,6 @@ public class UserInterface {
      * @param companyDAO company's dao
      */
     public UserInterface(ComputerDAO computerDAO, CompanyDAO companyDAO) {
-        computerService.setComputerInstance(computerDAO);
-        computerService.setCompanyServiceInstance(companyService);
-        computerService.setCompanyDAOInstance(companyDAO);
-        companyService.setCompanyInstance(companyDAO);
     }
 
     /**
@@ -161,11 +157,7 @@ public class UserInterface {
         find(scanner, "related company", true);
 
         builder.name(name).introduced(dateIntro).discontinued(dateDist).manufacturer(company);
-        if (!create) {
-            computerService.update(builder.build());
-        } else {
-            computerService.createComputer(builder.build());
-        }
+        computerService.save(builder.build());
 
     }
 

@@ -2,11 +2,21 @@ package com.excilys.formation.java.cdb.models;
 
 import java.time.LocalDate;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /** Represents a computer.
  * @author Laetitia Tureau
  */
+@Entity
+@Table(name = "computer")
 public class Computer {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private LocalDate introduced;

@@ -73,12 +73,11 @@ public class EditComputerServlet {
         try {
             String successMessage = " was successfully ";
             if (computerDTO.getId() != null) {
-                computerDTO = this.updateComputer(computerDTO);
                 successMessage += "updated !";
             } else {
-                computerDTO = this.createComputer(computerDTO);
                 successMessage += "added !";
             }
+            computerDTO = this.saveComputer(computerDTO);
             redirectAttributes.addFlashAttribute("success", computerDTO.getName() + successMessage);
             redirectAttributes.addAttribute("id", computerDTO.getId());
         } catch (MyPersistenceException ex) {
@@ -86,18 +85,6 @@ public class EditComputerServlet {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
         return new RedirectView("/computer/edit", true);
-    }
-
-    /**
-     * Create a computer.
-     * @param computerDTO to create a computer
-     * @throws MyPersistenceException if invalid computer
-     * @return a saved computerDTO
-     */
-    public ComputerDTO createComputer(ComputerDTO computerDTO) throws MyPersistenceException {
-        computerValidator.validateComputerDTO(computerDTO);
-        Computer computer = computerMapper.mapFromDTOtoModel(computerDTO);
-        return computerMapper.mapFromModelToDTO(computerService.createComputer(computer));
     }
 
     /**
@@ -114,13 +101,13 @@ public class EditComputerServlet {
     }
 
     /**
-     * Update a computer.
+     * Edit a computer.
      * @param computerDTO to edit a computer
      * @return a saved computerDTO
      */
-    public ComputerDTO updateComputer(ComputerDTO computerDTO) {
+    public ComputerDTO saveComputer(ComputerDTO computerDTO) {
         computerValidator.validateComputerDTO(computerDTO);
         Computer computer = computerMapper.mapFromDTOtoModel(computerDTO);
-        return computerMapper.mapFromModelToDTO(computerService.update(computer));
+        return computerMapper.mapFromModelToDTO(computerService.save(computer));
     }
 }
