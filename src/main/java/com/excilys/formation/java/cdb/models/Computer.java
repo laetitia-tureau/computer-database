@@ -6,6 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /** Represents a computer.
@@ -22,8 +24,8 @@ public class Computer {
     private LocalDate introduced;
     private LocalDate discontinued;
 
-    /** Represents the computer's company.
-     */
+    @ManyToOne
+    @JoinColumn(name = "company_id")
     private Company manufacturer;
 
     /** Creates a computer using a ComputerBuilder.
@@ -35,6 +37,10 @@ public class Computer {
         this.introduced = builder.introduced;
         this.discontinued = builder.discontinued;
         this.manufacturer = builder.manufacturer;
+    }
+    
+    public Computer() {
+        
     }
 
     /** Gets the computer's id.

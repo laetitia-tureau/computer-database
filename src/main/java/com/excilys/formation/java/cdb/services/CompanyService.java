@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
+import com.excilys.formation.java.cdb.persistence.daos.CompanyRepository;
 
 /**
  * Represents a company service.
@@ -16,22 +17,14 @@ import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 @Service
 public class CompanyService {
 
-    /**
-     * A DAO instance used to encapsulate the logic for retrieving, saving and updating table company data into the database.
-     */
-    @Autowired
-    private CompanyDAO companyInstance;
-
-    public void setCompanyInstance(CompanyDAO companyInstance) {
-        this.companyInstance = companyInstance;
-    }
+    private CompanyRepository companyRepository;
 
     /**
      * Retrieve all the companies in the database.
      * @return a list of companies
      */
     public List<Company> getCompanies() {
-        return companyInstance.findAll();
+        return this.companyRepository.findAll();
     }
 
     /**
@@ -40,16 +33,14 @@ public class CompanyService {
      * @return a company or throw exception
      */
     public Company findById(Long id) {
-        Optional<Company> opt = companyInstance.findById(id);
-        return opt.orElse(null);
+        return this.companyRepository.getById(id);
     }
 
     /**
      * Delete a company and its computers.
      * @param id A Long containing the company's id
-     * @return the number of rows deleted
      */
-    public int deleteCompany(Long id) {
-        return companyInstance.deleteById(id);
+    public void deleteCompany(Long id) {
+        //TODO
     }
 }

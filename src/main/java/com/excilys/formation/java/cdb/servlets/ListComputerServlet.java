@@ -14,6 +14,7 @@ import com.excilys.formation.java.cdb.services.Pagination;
 import com.excilys.formation.java.cdb.services.SearchCriteria;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +29,7 @@ public class ListComputerServlet {
 
     private ComputerService computerService;
     private ComputerMapper computerMapper;
-    private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = Logger.getLogger(ListComputerServlet.class);
 
     /** Creates a servlet to list and search computers.
      * @param cmptService a computer service
@@ -78,7 +79,7 @@ public class ListComputerServlet {
                 String.valueOf(page.getItemsPerPage()), criteria.getItemName());
         criteria.setLimit(
                 pagination.getItemsPerPage() * (pagination.getCurrentPage() - 1) + "," + pagination.getItemsPerPage());
-        List<Computer> computerList = computerService.findByCriteria(criteria);
+        List<Computer> computerList = computerService.getComputers();
 
         return computerList.stream().map(c -> {
             return computerMapper.mapFromModelToDTO(c);

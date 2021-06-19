@@ -25,6 +25,10 @@ public class Company {
         this.id = builder.id;
         this.name = builder.name;
     }
+    
+    public Company() {
+        
+    }
 
     /**
      * Gets the company's id.

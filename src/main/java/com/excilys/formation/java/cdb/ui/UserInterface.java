@@ -15,7 +15,9 @@ import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
+import com.excilys.formation.java.cdb.persistence.daos.CompanyRepository;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
+import com.excilys.formation.java.cdb.persistence.daos.ComputerRepository;
 import com.excilys.formation.java.cdb.services.CompanyService;
 import com.excilys.formation.java.cdb.services.ComputerService;
 
@@ -25,7 +27,7 @@ import com.excilys.formation.java.cdb.services.ComputerService;
  */
 public class UserInterface {
 
-    private static ComputerService computerService = new ComputerService();
+    private static ComputerService computerService;
     private static CompanyService companyService = new CompanyService();
     private static Computer computer;
     private static Company company;
@@ -33,10 +35,11 @@ public class UserInterface {
 
     /**
      * Creates cdb user interface.
-     * @param computerDAO computer's dao
-     * @param companyDAO company's dao
+     * @param computerRepo computer's dao
+     * @param companyRepo company's dao
      */
-    public UserInterface(ComputerDAO computerDAO, CompanyDAO companyDAO) {
+    public UserInterface(ComputerRepository computerRepo, CompanyRepository companyRepo) {
+        computerService = new ComputerService(computerRepo);
     }
 
     /**
@@ -214,4 +217,5 @@ public class UserInterface {
         System.out.println(MenuChoice.DELETE_COMPANY);
         System.out.println(MenuChoice.QUIT);
     }
+   
 }

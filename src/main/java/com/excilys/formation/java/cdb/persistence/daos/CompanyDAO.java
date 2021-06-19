@@ -18,7 +18,6 @@ import com.excilys.formation.java.cdb.services.CompanyService;
 /** Represents a company DAO.
  * @author Laetitia Tureau
  */
-@Repository
 public class CompanyDAO {
 
     private JdbcTemplate jdbcTemplate;
