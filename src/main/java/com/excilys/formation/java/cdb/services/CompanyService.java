@@ -18,7 +18,11 @@ public class CompanyService {
 
     @Autowired
     private CompanyRepository companyRepository;
-    
+
+    /**
+     * Creates a company service.
+     * @param companyDAO jpa repository
+     */
     public CompanyService(CompanyRepository companyDAO) {
         super();
         this.companyRepository = companyDAO;

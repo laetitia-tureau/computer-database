@@ -34,7 +34,6 @@ public class EditComputerServlet {
     private CompanyMapper companyMapper;
     private ComputerValidator computerValidator;
 
-    private static final long serialVersionUID = 1L;
     private static Logger log = Logger.getLogger(EditComputerServlet.class);
 
     /**
@@ -58,12 +57,12 @@ public class EditComputerServlet {
     protected ModelAndView getView(@RequestParam(value = "id", required = false) String computerId) {
         ComputerDTO computerDTO = new ComputerDTO.ComputerBuilderDTO().build();
         if (computerId != null && StringUtils.isNumeric(computerId)) {
-            //TODO could not initialize proxy computer no session
-            computerDTO = computerMapper.mapFromModelToDTO(computerService.findById(Long.parseLong(computerId)));
+            Optional<Computer> opt = this.computerService.findById(Long.parseLong(computerId));
+            computerDTO = this.computerMapper.mapFromOptionalToDTO(opt);
         }
         ModelAndView modelAndView = new ModelAndView("editComputer", "computer", computerDTO);
-        List<CompanyDTO> companyDTOList = companyService.getCompanies().stream()
-                .map(c -> companyMapper.mapFromModelToDTO(c)).collect(Collectors.toList());
+        List<CompanyDTO> companyDTOList = this.companyService.getCompanies().stream()
+                .map(c -> this.companyMapper.mapFromModelToDTO(c)).collect(Collectors.toList());
         modelAndView.addObject("companyList", companyDTOList);
         return modelAndView;
     }
@@ -85,20 +84,7 @@ public class EditComputerServlet {
             log.error(ex.getMessage());
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
-        return new RedirectView("/computer/list", true);
-    }
-
-    /**
-     * Retrieve a computer with specific id.
-     * @param computerId computer's id to find
-     * @return An empty Optional if nothing found else a Optional containing a computer
-     */
-    public Optional<ComputerDTO> findComputer(String computerId) {
-        if (computerId != null && StringUtils.isNumeric(computerId)) {
-            Computer computer = computerService.findById(Long.parseLong(computerId));
-            return Optional.of(computerMapper.mapFromModelToDTO(computer));
-        }
-        return Optional.empty();
+        return new RedirectView("/computer/edit", true);
     }
 
     /**
@@ -107,8 +93,8 @@ public class EditComputerServlet {
      * @return a saved computerDTO
      */
     public ComputerDTO saveComputer(ComputerDTO computerDTO) {
-        computerValidator.validateComputerDTO(computerDTO);
-        Computer computer = computerMapper.mapFromDTOtoModel(computerDTO);
-        return computerMapper.mapFromModelToDTO(computerService.save(computer));
+        this.computerValidator.validateComputerDTO(computerDTO);
+        Computer computer = this.computerMapper.mapFromDTOtoModel(computerDTO);
+        return this.computerMapper.mapFromModelToDTO(this.computerService.save(computer));
     }
 }

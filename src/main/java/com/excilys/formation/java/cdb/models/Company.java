@@ -25,9 +25,9 @@ public class Company {
         this.id = builder.id;
         this.name = builder.name;
     }
-    
+
+    /** Creates a company. */
     public Company() {
-        
     }
 
     /**

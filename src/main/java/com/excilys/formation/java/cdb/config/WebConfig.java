@@ -102,32 +102,32 @@ public class WebConfig implements WebMvcConfigurer {
         messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
     }
-    
+
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(this.getDataSource());
         em.setPackagesToScan(new String[] {"com.excilys.formation.java.cdb.models"});
-        
+
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         em.setJpaProperties(this.additionalProperties());
-        
+
         return em;
     }
-    
+
     protected Properties additionalProperties() {
         Properties props = new Properties();
-        props.setProperty("hibernate.dialect","org.hibernate.dialect.MySQL5Dialect");
-        
+        props.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
+
         return props;
     }
-      
+
     @Bean
     public JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory);
-          
+
         return transactionManager;
-    }  
+    }
 }

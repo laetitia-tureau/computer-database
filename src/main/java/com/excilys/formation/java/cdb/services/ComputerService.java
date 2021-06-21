@@ -1,6 +1,7 @@
 package com.excilys.formation.java.cdb.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,17 @@ public class ComputerService {
 
     @Autowired
     private ComputerRepository computerRepository;
-    
+
     @Autowired
     private ComputerDAO computerDAO;
-    
+
     private static final Logger LOGGER = Logger.getLogger(ListComputerServlet.class);
-    
+
+    /**
+     * Creates a computer service.
+     * @param computerRepository jpa repository
+     * @param computerInstance jdbc dao
+     */
     public ComputerService(ComputerRepository computerRepository, ComputerDAO computerInstance) {
         super();
         this.computerRepository = computerRepository;
@@ -54,8 +60,8 @@ public class ComputerService {
      * @param id the computer's id
      * @return a computer or throw exception
      */
-    public Computer findById(Long id) {
-        return this.computerRepository.getById(id);
+    public Optional<Computer> findById(Long id) {
+        return this.computerRepository.findById(id);
     }
 
     /**
@@ -74,5 +80,4 @@ public class ComputerService {
     public Computer save(Computer computer) {
          return this.computerRepository.save(computer);
     }
-
 }

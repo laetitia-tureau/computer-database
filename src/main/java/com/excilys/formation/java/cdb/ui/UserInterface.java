@@ -34,8 +34,9 @@ public class UserInterface {
 
     /**
      * Creates cdb user interface.
-     * @param computerRepo computer's dao
+     * @param computerRepo computer's jpa repo
      * @param companyRepo company's dao
+     * @param computerDAO computer's jdbc dao
      */
     public UserInterface(ComputerRepository computerRepo, CompanyRepository companyRepo, ComputerDAO computerDAO) {
         computerService = new ComputerService(computerRepo, computerDAO);
@@ -123,7 +124,7 @@ public class UserInterface {
         if (isCompany) {
             company = companyService.findById(id);
         } else {
-            computer = computerService.findById(id);
+            computer = computerService.findById(id).get();
         }
         return id;
     }
@@ -217,5 +218,4 @@ public class UserInterface {
         System.out.println(MenuChoice.DELETE_COMPANY);
         System.out.println(MenuChoice.QUIT);
     }
-   
 }

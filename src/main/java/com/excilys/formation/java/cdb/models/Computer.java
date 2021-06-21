@@ -39,9 +39,9 @@ public class Computer {
         this.discontinued = builder.discontinued;
         this.manufacturer = builder.manufacturer;
     }
-    
+
+    /** Creates a computer. */
     public Computer() {
-        
     }
 
     /** Gets the computer's id.
