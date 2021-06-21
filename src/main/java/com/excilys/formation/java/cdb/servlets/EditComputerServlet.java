@@ -58,6 +58,7 @@ public class EditComputerServlet {
     protected ModelAndView getView(@RequestParam(value = "id", required = false) String computerId) {
         ComputerDTO computerDTO = new ComputerDTO.ComputerBuilderDTO().build();
         if (computerId != null && StringUtils.isNumeric(computerId)) {
+            //TODO could not initialize proxy computer no session
             computerDTO = computerMapper.mapFromModelToDTO(computerService.findById(Long.parseLong(computerId)));
         }
         ModelAndView modelAndView = new ModelAndView("editComputer", "computer", computerDTO);
@@ -84,7 +85,7 @@ public class EditComputerServlet {
             log.error(ex.getMessage());
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
-        return new RedirectView("/computer/edit", true);
+        return new RedirectView("/computer/list", true);
     }
 
     /**

@@ -84,18 +84,20 @@ public class ComputerMapper {
      */
     public ComputerDTO mapFromModelToDTO(Computer computer) {
         String id = String.valueOf(computer.getId());
-        ComputerBuilderDTO builder = new ComputerDTO.ComputerBuilderDTO(id, computer.getName());
+        String dis = null;
+        String intro = null; 
+        String companyId = null;
 
         if (computer.getDiscontinued() != null) {
-            builder.discontinued(String.valueOf(computer.getDiscontinued()));
+            dis = String.valueOf(computer.getDiscontinued());
         }
         if (computer.getIntroduced() != null) {
-            builder.introduced(String.valueOf(computer.getIntroduced()));
+            intro = String.valueOf(computer.getIntroduced());
         }
         if (computer.getManufacturer() != null) {
-            builder.manufacturer(String.valueOf(computer.getManufacturer().getId()));
+            companyId = String.valueOf(computer.getManufacturer().getId());
         }
-        return new ComputerDTO(builder);
+        return new ComputerDTO.ComputerBuilderDTO(id, computer.getName()).discontinued(dis).introduced(intro).manufacturer(companyId).build();
     }
 
 }
