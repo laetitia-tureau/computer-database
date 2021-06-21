@@ -7,7 +7,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.excilys.formation.java.cdb.config.AppConfig;
-import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyRepository;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerRepository;
@@ -25,7 +24,8 @@ public class App {
         ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
         ComputerRepository computerRepo = context.getBean(ComputerRepository.class);
         CompanyRepository companyRepo = context.getBean(CompanyRepository.class);
-        UserInterface cli = new UserInterface(computerRepo, companyRepo);
+        ComputerDAO computerDAO = context.getBean(ComputerDAO.class);
+        UserInterface cli = new UserInterface(computerRepo, companyRepo, computerDAO);
         cli.start();
     }
 

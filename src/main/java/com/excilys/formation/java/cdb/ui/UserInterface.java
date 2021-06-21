@@ -14,7 +14,6 @@ import com.excilys.formation.java.cdb.mappers.DateMapper;
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
-import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyRepository;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerRepository;
@@ -28,7 +27,7 @@ import com.excilys.formation.java.cdb.services.ComputerService;
 public class UserInterface {
 
     private static ComputerService computerService;
-    private static CompanyService companyService = new CompanyService();
+    private static CompanyService companyService;
     private static Computer computer;
     private static Company company;
     private static final Logger LOGGER = Logger.getLogger(UserInterface.class);
@@ -38,8 +37,9 @@ public class UserInterface {
      * @param computerRepo computer's dao
      * @param companyRepo company's dao
      */
-    public UserInterface(ComputerRepository computerRepo, CompanyRepository companyRepo) {
-        computerService = new ComputerService(computerRepo);
+    public UserInterface(ComputerRepository computerRepo, CompanyRepository companyRepo, ComputerDAO computerDAO) {
+        computerService = new ComputerService(computerRepo, computerDAO);
+        companyService = new CompanyService(companyRepo);
     }
 
     /**

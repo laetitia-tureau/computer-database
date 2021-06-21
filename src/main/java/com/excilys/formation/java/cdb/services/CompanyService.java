@@ -1,13 +1,12 @@
 package com.excilys.formation.java.cdb.services;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.excilys.formation.java.cdb.models.Company;
-import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 import com.excilys.formation.java.cdb.persistence.daos.CompanyRepository;
 
 /**
@@ -17,7 +16,13 @@ import com.excilys.formation.java.cdb.persistence.daos.CompanyRepository;
 @Service
 public class CompanyService {
 
+    @Autowired
     private CompanyRepository companyRepository;
+    
+    public CompanyService(CompanyRepository companyDAO) {
+        super();
+        this.companyRepository = companyDAO;
+    }
 
     /**
      * Retrieve all the companies in the database.
@@ -40,7 +45,8 @@ public class CompanyService {
      * Delete a company and its computers.
      * @param id A Long containing the company's id
      */
+    @Transactional
     public void deleteCompany(Long id) {
-        //TODO
+        this.companyRepository.deleteById(id);
     }
 }

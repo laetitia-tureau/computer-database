@@ -79,7 +79,7 @@ public class ListComputerServlet {
                 String.valueOf(page.getItemsPerPage()), criteria.getItemName());
         criteria.setLimit(
                 pagination.getItemsPerPage() * (pagination.getCurrentPage() - 1) + "," + pagination.getItemsPerPage());
-        List<Computer> computerList = computerService.getComputers();
+        List<Computer> computerList = computerService.findByCriteria(criteria);
 
         return computerList.stream().map(c -> {
             return computerMapper.mapFromModelToDTO(c);

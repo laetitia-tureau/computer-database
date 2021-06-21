@@ -1,16 +1,12 @@
 package com.excilys.formation.java.cdb.services;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.excilys.formation.java.cdb.models.Computer;
-import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerRepository;
 import com.excilys.formation.java.cdb.servlets.ListComputerServlet;
@@ -24,11 +20,16 @@ public class ComputerService {
 
     @Autowired
     private ComputerRepository computerRepository;
+    
+    @Autowired
+    private ComputerDAO computerDAO;
+    
     private static final Logger LOGGER = Logger.getLogger(ListComputerServlet.class);
     
-    public ComputerService(ComputerRepository computerRepository) {
+    public ComputerService(ComputerRepository computerRepository, ComputerDAO computerInstance) {
         super();
         this.computerRepository = computerRepository;
+        this.computerDAO = computerInstance;
     }
 
     /**
@@ -45,15 +46,7 @@ public class ComputerService {
      * @return a list of computers matching the criteria
      */
     public List<Computer> findByCriteria(SearchCriteria criteria) {
-       List<Computer> computers = new ArrayList<>();
-       Sort sort;
-       //name
-       computers = this.computerRepository.findByNameContainingIgnoreCase(criteria.getItemName());
-       //order
-       sort = Sort.by(criteria.getOrder(), criteria.getSort());
-       //sort
-       //limit
-       return computers;
+       return this.computerDAO.findByCriteria(criteria);
     }
 
     /**

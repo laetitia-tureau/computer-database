@@ -23,6 +23,7 @@ import com.excilys.formation.java.cdb.services.SearchCriteria;
 /** Represents a computer DAO.
  * @author Laetitia Tureau
  */
+@Repository
 public class ComputerDAO {
 
     private JdbcTemplate jdbcTemplate;
