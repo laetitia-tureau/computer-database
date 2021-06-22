@@ -1,10 +1,20 @@
 package com.excilys.formation.java.cdb.config;
 
+import java.util.Properties;
+
+import javax.persistence.EntityManagerFactory;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.JpaVendorAdapter;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -13,6 +23,8 @@ import com.zaxxer.hikari.HikariDataSource;
 @ComponentScan({ "com.excilys.formation.java.cdb.services",
         "com.excilys.formation.java.cdb.persistence.daos", "com.excilys.formation.java.cdb.mappers",
         "com.excilys.formation.java.cdb.servlets", "com.excilys.formation.java.cdb.validator" })
+@EnableJpaRepositories(basePackages = {"com.excilys.formation.java.cdb.persistence.daos"})
+@EnableTransactionManagement
 public class AppConfig {
     @Bean
     public HikariDataSource getDataSource() {
@@ -27,5 +39,33 @@ public class AppConfig {
     @Bean
     public NamedParameterJdbcTemplate getNamedParameterJdbcTemplate(HikariDataSource dataSource) {
         return new NamedParameterJdbcTemplate(dataSource);
+    }
+
+    @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+        LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
+        em.setDataSource(this.getDataSource());
+        em.setPackagesToScan(new String[] {"com.excilys.formation.java.cdb.models"});
+
+        JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+        em.setJpaVendorAdapter(vendorAdapter);
+        em.setJpaProperties(this.additionalProperties());
+
+        return em;
+    }
+
+    protected Properties additionalProperties() {
+        Properties props = new Properties();
+        props.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
+
+        return props;
+    }
+
+    @Bean
+    public JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(entityManagerFactory);
+
+        return transactionManager;
     }
 }

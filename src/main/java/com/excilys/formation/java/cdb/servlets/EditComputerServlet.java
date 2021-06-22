@@ -34,7 +34,6 @@ public class EditComputerServlet {
     private CompanyMapper companyMapper;
     private ComputerValidator computerValidator;
 
-    private static final long serialVersionUID = 1L;
     private static Logger log = Logger.getLogger(EditComputerServlet.class);
 
     /**
@@ -58,11 +57,12 @@ public class EditComputerServlet {
     protected ModelAndView getView(@RequestParam(value = "id", required = false) String computerId) {
         ComputerDTO computerDTO = new ComputerDTO.ComputerBuilderDTO().build();
         if (computerId != null && StringUtils.isNumeric(computerId)) {
-            computerDTO = computerMapper.mapFromModelToDTO(computerService.findById(Long.parseLong(computerId)));
+            Optional<Computer> opt = this.computerService.findById(Long.parseLong(computerId));
+            computerDTO = this.computerMapper.mapFromOptionalToDTO(opt);
         }
         ModelAndView modelAndView = new ModelAndView("editComputer", "computer", computerDTO);
-        List<CompanyDTO> companyDTOList = companyService.getCompanies().stream()
-                .map(c -> companyMapper.mapFromModelToDTO(c)).collect(Collectors.toList());
+        List<CompanyDTO> companyDTOList = this.companyService.getCompanies().stream()
+                .map(c -> this.companyMapper.mapFromModelToDTO(c)).collect(Collectors.toList());
         modelAndView.addObject("companyList", companyDTOList);
         return modelAndView;
     }
@@ -73,12 +73,11 @@ public class EditComputerServlet {
         try {
             String successMessage = " was successfully ";
             if (computerDTO.getId() != null) {
-                computerDTO = this.updateComputer(computerDTO);
                 successMessage += "updated !";
             } else {
-                computerDTO = this.createComputer(computerDTO);
                 successMessage += "added !";
             }
+            computerDTO = this.saveComputer(computerDTO);
             redirectAttributes.addFlashAttribute("success", computerDTO.getName() + successMessage);
             redirectAttributes.addAttribute("id", computerDTO.getId());
         } catch (MyPersistenceException ex) {
@@ -89,38 +88,13 @@ public class EditComputerServlet {
     }
 
     /**
-     * Create a computer.
-     * @param computerDTO to create a computer
-     * @throws MyPersistenceException if invalid computer
-     * @return a saved computerDTO
-     */
-    public ComputerDTO createComputer(ComputerDTO computerDTO) throws MyPersistenceException {
-        computerValidator.validateComputerDTO(computerDTO);
-        Computer computer = computerMapper.mapFromDTOtoModel(computerDTO);
-        return computerMapper.mapFromModelToDTO(computerService.createComputer(computer));
-    }
-
-    /**
-     * Retrieve a computer with specific id.
-     * @param computerId computer's id to find
-     * @return An empty Optional if nothing found else a Optional containing a computer
-     */
-    public Optional<ComputerDTO> findComputer(String computerId) {
-        if (computerId != null && StringUtils.isNumeric(computerId)) {
-            Computer computer = computerService.findById(Long.parseLong(computerId));
-            return Optional.of(computerMapper.mapFromModelToDTO(computer));
-        }
-        return Optional.empty();
-    }
-
-    /**
-     * Update a computer.
+     * Edit a computer.
      * @param computerDTO to edit a computer
      * @return a saved computerDTO
      */
-    public ComputerDTO updateComputer(ComputerDTO computerDTO) {
-        computerValidator.validateComputerDTO(computerDTO);
-        Computer computer = computerMapper.mapFromDTOtoModel(computerDTO);
-        return computerMapper.mapFromModelToDTO(computerService.update(computer));
+    public ComputerDTO saveComputer(ComputerDTO computerDTO) {
+        this.computerValidator.validateComputerDTO(computerDTO);
+        Computer computer = this.computerMapper.mapFromDTOtoModel(computerDTO);
+        return this.computerMapper.mapFromModelToDTO(this.computerService.save(computer));
     }
 }

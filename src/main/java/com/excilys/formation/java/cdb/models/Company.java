@@ -1,10 +1,20 @@
 package com.excilys.formation.java.cdb.models;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /** Represents a company.
  * @author Laetitia Tureau
  */
+@Entity
+@Table(name = "company")
 public class Company {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
 
@@ -14,6 +24,10 @@ public class Company {
     public Company(CompanyBuilder builder) {
         this.id = builder.id;
         this.name = builder.name;
+    }
+
+    /** Creates a company. */
+    public Company() {
     }
 
     /**

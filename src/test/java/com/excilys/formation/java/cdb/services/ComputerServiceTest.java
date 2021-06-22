@@ -17,8 +17,6 @@ public class ComputerServiceTest {
 
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        builderMock = new Computer.ComputerBuilder(1L, "Lenovo").introduced(null).discontinued(null);
-        computerService = new ComputerService();
     }
 
     @Test

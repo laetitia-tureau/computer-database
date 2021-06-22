@@ -14,6 +14,7 @@ import com.excilys.formation.java.cdb.services.Pagination;
 import com.excilys.formation.java.cdb.services.SearchCriteria;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +29,7 @@ public class ListComputerServlet {
 
     private ComputerService computerService;
     private ComputerMapper computerMapper;
-    private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = Logger.getLogger(ListComputerServlet.class);
 
     /** Creates a servlet to list and search computers.
      * @param cmptService a computer service
@@ -63,7 +64,6 @@ public class ListComputerServlet {
         if (url.length() > 1) {
             attributeList.put("url", url + "&");
         }
-        //request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
         return new ModelAndView("dashboard").addAllObjects(attributeList);
     }
 
@@ -78,10 +78,10 @@ public class ListComputerServlet {
                 String.valueOf(page.getItemsPerPage()), criteria.getItemName());
         criteria.setLimit(
                 pagination.getItemsPerPage() * (pagination.getCurrentPage() - 1) + "," + pagination.getItemsPerPage());
-        List<Computer> computerList = computerService.findByCriteria(criteria);
+        List<Computer> computerList = this.computerService.findByCriteria(criteria);
 
         return computerList.stream().map(c -> {
-            return computerMapper.mapFromModelToDTO(c);
+            return this.computerMapper.mapFromModelToDTO(c);
         }).collect(Collectors.toList());
     }
 
@@ -95,11 +95,11 @@ public class ListComputerServlet {
     public Pagination getPage(String indexCurrentPage, String itemsPerPage, String search) {
         Pagination page = new Pagination(0);
         if (StringUtils.isBlank(search)) {
-            page.setTotalItems(computerService.getComputers().size());
+            page.setTotalItems(this.computerService.getComputers().size());
         } else {
             SearchCriteria criteria = new SearchCriteria();
             criteria.setItemName(search);
-            page.setTotalItems(computerService.findByCriteria(criteria).size());
+            page.setTotalItems(this.computerService.findByCriteria(criteria).size());
         }
 
         if (indexCurrentPage != null && StringUtils.isNumeric(indexCurrentPage)) {
@@ -155,7 +155,7 @@ public class ListComputerServlet {
     protected RedirectView deleteComputer(@RequestParam(value = "selection") String selection,
                                           HttpServletResponse response) {
         if (!StringUtils.isBlank(selection)) {
-            Arrays.asList(selection.split(",")).stream().forEach(id -> computerService.deleteComputer(Long.parseLong(id)));
+            Arrays.asList(selection.split(",")).stream().forEach(id -> this.computerService.deleteComputer(Long.parseLong(id)));
         }
         return new RedirectView("/computer/list", true);
     }

@@ -14,8 +14,9 @@ import com.excilys.formation.java.cdb.mappers.DateMapper;
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
-import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
+import com.excilys.formation.java.cdb.persistence.daos.CompanyRepository;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
+import com.excilys.formation.java.cdb.persistence.daos.ComputerRepository;
 import com.excilys.formation.java.cdb.services.CompanyService;
 import com.excilys.formation.java.cdb.services.ComputerService;
 
@@ -25,22 +26,21 @@ import com.excilys.formation.java.cdb.services.ComputerService;
  */
 public class UserInterface {
 
-    private static ComputerService computerService = new ComputerService();
-    private static CompanyService companyService = new CompanyService();
+    private static ComputerService computerService;
+    private static CompanyService companyService;
     private static Computer computer;
     private static Company company;
     private static final Logger LOGGER = Logger.getLogger(UserInterface.class);
 
     /**
      * Creates cdb user interface.
-     * @param computerDAO computer's dao
-     * @param companyDAO company's dao
+     * @param computerRepo computer's jpa repo
+     * @param companyRepo company's dao
+     * @param computerDAO computer's jdbc dao
      */
-    public UserInterface(ComputerDAO computerDAO, CompanyDAO companyDAO) {
-        computerService.setComputerInstance(computerDAO);
-        computerService.setCompanyServiceInstance(companyService);
-        computerService.setCompanyDAOInstance(companyDAO);
-        companyService.setCompanyInstance(companyDAO);
+    public UserInterface(ComputerRepository computerRepo, CompanyRepository companyRepo, ComputerDAO computerDAO) {
+        computerService = new ComputerService(computerRepo, computerDAO);
+        companyService = new CompanyService(companyRepo);
     }
 
     /**
@@ -124,7 +124,7 @@ public class UserInterface {
         if (isCompany) {
             company = companyService.findById(id);
         } else {
-            computer = computerService.findById(id);
+            computer = computerService.findById(id).get();
         }
         return id;
     }
@@ -161,11 +161,7 @@ public class UserInterface {
         find(scanner, "related company", true);
 
         builder.name(name).introduced(dateIntro).discontinued(dateDist).manufacturer(company);
-        if (!create) {
-            computerService.update(builder.build());
-        } else {
-            computerService.createComputer(builder.build());
-        }
+        computerService.save(builder.build());
 
     }
 

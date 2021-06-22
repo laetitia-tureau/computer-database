@@ -2,18 +2,31 @@ package com.excilys.formation.java.cdb.models;
 
 import java.time.LocalDate;
 
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 /** Represents a computer.
  * @author Laetitia Tureau
  */
+@Entity
+@Table(name = "computer")
 public class Computer {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private LocalDate introduced;
     private LocalDate discontinued;
 
-    /** Represents the computer's company.
-     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "company_id")
     private Company manufacturer;
 
     /** Creates a computer using a ComputerBuilder.
@@ -25,6 +38,10 @@ public class Computer {
         this.introduced = builder.introduced;
         this.discontinued = builder.discontinued;
         this.manufacturer = builder.manufacturer;
+    }
+
+    /** Creates a computer. */
+    public Computer() {
     }
 
     /** Gets the computer's id.

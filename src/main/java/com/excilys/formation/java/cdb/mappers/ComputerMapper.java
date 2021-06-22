@@ -3,6 +3,7 @@ package com.excilys.formation.java.cdb.mappers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
@@ -42,7 +43,6 @@ public class ComputerMapper {
             builder.discontinued(discontinued);
         }
         if (result.getLong(5) != 0) {
-            // manufacturer = new Company(result.getLong(5), result.getString(6));
             manufacturer = new CompanyBuilder(result.getLong(5), result.getString(6)).build();
             builder.manufacturer(manufacturer);
         }
@@ -96,6 +96,15 @@ public class ComputerMapper {
             builder.manufacturer(String.valueOf(computer.getManufacturer().getId()));
         }
         return new ComputerDTO(builder);
+    }
+
+    /**
+     * Convert an Optional of Computer into a ComputerDTO.
+     * @param opt Optional to convert
+     * @return the computerDTO resulting
+     */
+    public ComputerDTO mapFromOptionalToDTO(Optional<Computer> opt) {
+        return this.mapFromModelToDTO(opt.get());
     }
 
 }

@@ -7,8 +7,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.excilys.formation.java.cdb.config.AppConfig;
-import com.excilys.formation.java.cdb.persistence.daos.CompanyDAO;
+import com.excilys.formation.java.cdb.persistence.daos.CompanyRepository;
 import com.excilys.formation.java.cdb.persistence.daos.ComputerDAO;
+import com.excilys.formation.java.cdb.persistence.daos.ComputerRepository;
 import com.excilys.formation.java.cdb.ui.UserInterface;
 
 public class App {
@@ -21,9 +22,10 @@ public class App {
      */
     public static void main(String[] args) throws SQLException, ParseException {
         ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
-        CompanyDAO companyDAO = context.getBean(CompanyDAO.class);
+        ComputerRepository computerRepo = context.getBean(ComputerRepository.class);
+        CompanyRepository companyRepo = context.getBean(CompanyRepository.class);
         ComputerDAO computerDAO = context.getBean(ComputerDAO.class);
-        UserInterface cli = new UserInterface(computerDAO, companyDAO);
+        UserInterface cli = new UserInterface(computerRepo, companyRepo, computerDAO);
         cli.start();
     }
 
