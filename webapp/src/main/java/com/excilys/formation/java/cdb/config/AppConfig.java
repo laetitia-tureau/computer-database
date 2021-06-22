@@ -21,9 +21,8 @@ import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @ComponentScan({ "com.excilys.formation.java.cdb.services",
-        "com.excilys.formation.java.cdb.persistence.daos", "com.excilys.formation.java.cdb.mappers",
-        "com.excilys.formation.java.cdb.servlets", "com.excilys.formation.java.cdb.validator" })
-@EnableJpaRepositories(basePackages = {"com.excilys.formation.java.cdb.persistence.daos"})
+        "com.excilys.formation.java.cdb.daos", "com.excilys.formation.java.cdb.mappers", "com.excilys.formation.java.cdb.validators" })
+@EnableJpaRepositories(basePackages = {"com.excilys.formation.java.cdb.daos"})
 @EnableTransactionManagement
 public class AppConfig {
     @Bean
