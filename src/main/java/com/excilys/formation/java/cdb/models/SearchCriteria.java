@@ -1,4 +1,4 @@
-package com.excilys.formation.java.cdb.services;
+package com.excilys.formation.java.cdb.models;
 
 public class SearchCriteria {
     private String order;

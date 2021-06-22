@@ -1,4 +1,4 @@
-package com.excilys.formation.java.cdb.services;
+package com.excilys.formation.java.cdb.models;
 
 /**
  * Service to paginate.

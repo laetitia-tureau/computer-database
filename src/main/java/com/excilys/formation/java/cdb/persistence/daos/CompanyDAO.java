@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.excilys.formation.java.cdb.mappers.CompanyRowMapper;
 import com.excilys.formation.java.cdb.models.Company;
-import com.excilys.formation.java.cdb.services.CompanyService;
 
 /** Represents a company DAO.
  * @author Laetitia Tureau
@@ -29,7 +28,7 @@ public class CompanyDAO {
     private static final String FIND_COMPANY = "SELECT * FROM company WHERE id=:id";
     private static final String DELETE_COMPANY = "DELETE FROM company WHERE id=:id";
     private static final String DELETE_COMPUTER = "DELETE FROM computer WHERE company_id=:id";
-    private static final Logger LOGGER = Logger.getLogger(CompanyService.class);
+    private static final Logger LOGGER = Logger.getLogger(CompanyDAO.class);
 
     /**
      * Creates a DAO to company operations into database.

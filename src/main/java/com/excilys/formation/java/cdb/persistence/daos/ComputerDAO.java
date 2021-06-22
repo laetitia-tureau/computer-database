@@ -16,9 +16,8 @@ import org.springframework.stereotype.Repository;
 
 import com.excilys.formation.java.cdb.mappers.ComputerRowMapper;
 import com.excilys.formation.java.cdb.models.Computer;
-import com.excilys.formation.java.cdb.services.ComputerService;
-import com.excilys.formation.java.cdb.services.Pagination;
-import com.excilys.formation.java.cdb.services.SearchCriteria;
+import com.excilys.formation.java.cdb.models.Pagination;
+import com.excilys.formation.java.cdb.models.SearchCriteria;
 
 /** Represents a computer DAO.
  * @author Laetitia Tureau
@@ -31,7 +30,7 @@ public class ComputerDAO {
     private ComputerRowMapper rowMapper;
 
     /** Class logger. */
-    private static final Logger LOGGER = Logger.getLogger(ComputerService.class);
+    private static final Logger LOGGER = Logger.getLogger(ComputerDAO.class);
 
     /** Represents query to create a computer. */
     private static final String INSERT_COMPUTER = "INSERT INTO computer (name, introduced, discontinued, company_id) VALUES (:name, :intro, :dist, :company_id)";

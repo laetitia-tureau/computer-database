@@ -10,8 +10,8 @@ import com.excilys.formation.java.cdb.dtos.ComputerDTO;
 import com.excilys.formation.java.cdb.mappers.ComputerMapper;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.services.ComputerService;
-import com.excilys.formation.java.cdb.services.Pagination;
-import com.excilys.formation.java.cdb.services.SearchCriteria;
+import com.excilys.formation.java.cdb.models.Pagination;
+import com.excilys.formation.java.cdb.models.SearchCriteria;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
