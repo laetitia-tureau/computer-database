@@ -4,10 +4,13 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.excilys.formation.java.cdb</groupId>
-  <artifactId>console</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <parent>
+        <artifactId>computerDatabaseWebApplication</artifactId>
+        <groupId>com.excilys.formation.java.cdb</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
 
+  <artifactId>console</artifactId>
   <name>console</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
@@ -27,11 +30,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>services</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>webapp</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

@@ -1,4 +1,4 @@
-package com.excilys.formation.java.cdb.config;
+package com.excilys.formation.java.cdb;
 
 import java.util.Properties;
 

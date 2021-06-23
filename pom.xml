@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <groupId>com.excilys.formation.java.cdb</groupId>
   <artifactId>computerDatabaseWebApplication</artifactId>
   <packaging>pom</packaging>
@@ -11,21 +11,19 @@
         <module>console</module>
         <module>binding</module>
         <module>webapp</module>
-        <module>service</module>
         <module>persistence</module>
-        <module>service</module>
         <module>services</module>
     </modules>
 
     <name>computerDatabaseWebApplication Maven Webapp</name>
   <url>http://maven.apache.org</url>
-  
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -112,7 +110,7 @@
 	  <version>5.5.2.Final</version>
 	</dependency>
   </dependencies>
-  
+
   <build>
     <finalName>computerDatabaseWebApplication</finalName>
         <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
@@ -159,7 +157,7 @@
       </plugins>
     </pluginManagement>
   </build>
-  
+
   <reporting>
     <plugins>
         <plugin>

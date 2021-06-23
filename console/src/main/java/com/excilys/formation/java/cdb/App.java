@@ -6,7 +6,6 @@ import java.text.ParseException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import com.excilys.formation.java.cdb.config.AppConfig;
 import com.excilys.formation.java.cdb.daos.CompanyDAO;
 import com.excilys.formation.java.cdb.daos.CompanyRepository;
 import com.excilys.formation.java.cdb.daos.ComputerDAO;
