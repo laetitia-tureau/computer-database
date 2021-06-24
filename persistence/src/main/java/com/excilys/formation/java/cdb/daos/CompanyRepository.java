@@ -7,5 +7,4 @@ import com.excilys.formation.java.cdb.models.Company;
 
 @Repository
 public interface CompanyRepository extends JpaRepository<Company, Long> {
-
 }

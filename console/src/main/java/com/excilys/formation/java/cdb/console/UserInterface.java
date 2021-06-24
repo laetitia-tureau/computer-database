@@ -14,7 +14,6 @@ import com.excilys.formation.java.cdb.mappers.DateMapper;
 import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
-import com.excilys.formation.java.cdb.daos.CompanyDAO;
 import com.excilys.formation.java.cdb.daos.CompanyRepository;
 import com.excilys.formation.java.cdb.daos.ComputerDAO;
 import com.excilys.formation.java.cdb.daos.ComputerRepository;
@@ -38,11 +37,10 @@ public class UserInterface {
      * @param computerRepo computer's jpa repo
      * @param companyRepo company's dao
      * @param computerDAO computer's jdbc dao
-     * @param companyDAO company's jdbc dao
      */
-    public UserInterface(ComputerRepository computerRepo, CompanyRepository companyRepo, ComputerDAO computerDAO, CompanyDAO companyDAO) {
+    public UserInterface(ComputerRepository computerRepo, CompanyRepository companyRepo, ComputerDAO computerDAO) {
         computerService = new ComputerService(computerRepo, computerDAO);
-        companyService = new CompanyService(companyRepo, companyDAO);
+        companyService = new CompanyService(companyRepo, computerRepo);
     }
 
     /**

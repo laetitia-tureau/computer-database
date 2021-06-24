@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.excilys.formation.java.cdb.models.Company;
-import com.excilys.formation.java.cdb.daos.CompanyDAO;
 import com.excilys.formation.java.cdb.daos.CompanyRepository;
+import com.excilys.formation.java.cdb.daos.ComputerRepository;
 
 /**
  * Represents a company service.
@@ -21,17 +21,17 @@ public class CompanyService {
     private CompanyRepository companyRepository;
 
     @Autowired
-    private CompanyDAO companyDAO;
+    private ComputerRepository computerRepository;
 
     /**
      * Creates a company service.
-     * @param companyRepo jpa repository
-     * @param companyDAO jdbc dao
+     * @param companyRepo company jpa repository
+     * @param computerRepo computer jpa repository
      */
-    public CompanyService(CompanyRepository companyRepo, CompanyDAO companyDAO) {
+    public CompanyService(CompanyRepository companyRepo, ComputerRepository computerRepo) {
         super();
         this.companyRepository = companyRepo;
-        this.companyDAO = companyDAO;
+        this.computerRepository = computerRepo;
     }
 
     /**
@@ -57,7 +57,7 @@ public class CompanyService {
      */
     @Transactional
     public void deleteCompany(Long id) {
-        //this.companyRepository.deleteById(id);
-        this.companyDAO.deleteById(id);
+        this.computerRepository.deleteByManufacturer(this.companyRepository.getById(id));
+        this.companyRepository.deleteById(id);
     }
 }
