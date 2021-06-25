@@ -15,7 +15,6 @@ import com.excilys.formation.java.cdb.models.Company;
 import com.excilys.formation.java.cdb.models.Computer;
 import com.excilys.formation.java.cdb.models.Computer.ComputerBuilder;
 import com.excilys.formation.java.cdb.daos.CompanyRepository;
-import com.excilys.formation.java.cdb.daos.ComputerDAO;
 import com.excilys.formation.java.cdb.daos.ComputerRepository;
 import com.excilys.formation.java.cdb.services.CompanyService;
 import com.excilys.formation.java.cdb.services.ComputerService;
@@ -36,10 +35,9 @@ public class UserInterface {
      * Creates cdb user interface.
      * @param computerRepo computer's jpa repo
      * @param companyRepo company's dao
-     * @param computerDAO computer's jdbc dao
      */
-    public UserInterface(ComputerRepository computerRepo, CompanyRepository companyRepo, ComputerDAO computerDAO) {
-        computerService = new ComputerService(computerRepo, computerDAO);
+    public UserInterface(ComputerRepository computerRepo, CompanyRepository companyRepo) {
+        computerService = new ComputerService(computerRepo);
         companyService = new CompanyService(companyRepo, computerRepo);
     }
 

@@ -172,7 +172,7 @@ public class ComputerDAO {
         if (StringUtils.isNotBlank(criteria.getItemName())) {
             query += " WHERE computer.name LIKE ? OR company.name LIKE ? ";
         }
-        if (StringUtils.isNotBlank(criteria.getOrder()) && StringUtils.isNotBlank(criteria.getSort())) {
+        if (criteria.getOrder() != null && criteria.getSort() != null) {
             query += " ORDER BY " + criteria.getSort() + " " + criteria.getOrder();
         }
         if (StringUtils.isNotBlank(criteria.getLimit())) {

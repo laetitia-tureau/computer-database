@@ -15,6 +15,7 @@ import com.excilys.formation.java.cdb.models.SearchCriteria;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,7 +50,9 @@ public class ListComputerServlet {
         if (StringUtils.isNotBlank(search)) {
             search.trim();
         }
-        SearchCriteria criteria = new SearchCriteria(order, sort, search);
+        SearchCriteria.SortColumn col = StringUtils.isBlank(sort) ? SearchCriteria.SortColumn.ID : SearchCriteria.SortColumn.of(sort);
+        Sort.Direction dir = StringUtils.isBlank(order) ? Sort.DEFAULT_DIRECTION : Sort.Direction.valueOf(order);
+        SearchCriteria criteria = new SearchCriteria(dir, col, search);
         Pagination page = this.getPage(indexCurrentPage, itemsPerPage, search);
         List<ComputerDTO> computerList = this.getComputersPerPage(page, criteria);
         List<Integer> maxTotalOfPages = this.getMaxItemsPerPage(page);
@@ -78,7 +81,7 @@ public class ListComputerServlet {
                 String.valueOf(page.getItemsPerPage()), criteria.getItemName());
         criteria.setLimit(
                 pagination.getItemsPerPage() * (pagination.getCurrentPage() - 1) + "," + pagination.getItemsPerPage());
-        List<Computer> computerList = this.computerService.findByCriteria(criteria);
+        List<Computer> computerList = this.computerService.findByCriteria(criteria, page);
 
         return computerList.stream().map(c -> {
             return this.computerMapper.mapFromModelToDTO(c);
@@ -97,9 +100,7 @@ public class ListComputerServlet {
         if (StringUtils.isBlank(search)) {
             page.setTotalItems(this.computerService.getComputers().size());
         } else {
-            SearchCriteria criteria = new SearchCriteria();
-            criteria.setItemName(search);
-            page.setTotalItems(this.computerService.findByCriteria(criteria).size());
+            page.setTotalItems(this.computerService.filterAndCount(search));
         }
 
         if (indexCurrentPage != null && StringUtils.isNumeric(indexCurrentPage)) {

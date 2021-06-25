@@ -1,14 +1,21 @@
 package com.excilys.formation.java.cdb.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import com.excilys.formation.java.cdb.models.SearchCriteria;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.excilys.formation.java.cdb.models.Computer;
-import com.excilys.formation.java.cdb.daos.ComputerDAO;
+import com.excilys.formation.java.cdb.models.Pagination;
 import com.excilys.formation.java.cdb.daos.ComputerRepository;
 
 /**
@@ -21,18 +28,15 @@ public class ComputerService {
     @Autowired
     private ComputerRepository computerRepository;
 
-    @Autowired
-    private ComputerDAO computerDAO;
+    private static final Logger LOGGER = Logger.getLogger(ComputerService.class);
 
     /**
      * Creates a computer service.
      * @param computerRepository jpa repository
-     * @param computerInstance jdbc dao
      */
-    public ComputerService(ComputerRepository computerRepository, ComputerDAO computerInstance) {
+    public ComputerService(ComputerRepository computerRepository) {
         super();
         this.computerRepository = computerRepository;
-        this.computerDAO = computerInstance;
     }
 
     /**
@@ -41,15 +45,6 @@ public class ComputerService {
      */
     public List<Computer> getComputers() {
         return this.computerRepository.findAll();
-    }
-
-    /**
-     * Find all computers matching given criteria.
-     * @param criteria represents the search criteria
-     * @return a list of computers matching the criteria
-     */
-    public List<Computer> findByCriteria(SearchCriteria criteria) {
-       return this.computerDAO.findByCriteria(criteria);
     }
 
     /**
@@ -76,5 +71,34 @@ public class ComputerService {
      */
     public Computer save(Computer computer) {
          return this.computerRepository.save(computer);
+    }
+
+    /**
+     * Counts all computers by name matching the filter.
+     * @param filter to compare with
+     * @return numbers of computers
+     */
+    public int filterAndCount(String filter) {
+        return this.computerRepository.countByNameContaining(filter);
+    }
+
+    /**
+     * Find all computers matching given criteria.
+     * @param criteria represents the search criteria
+     * @param page represents pagination
+     * @return a list of computers matching the criteria
+     */
+    public List<Computer> findByCriteria(SearchCriteria criteria, Pagination page) {
+        List<Computer> computers = new ArrayList<>();
+        boolean byName = StringUtils.isBlank(criteria.getItemName()) ? false : true;
+        Pageable pageable = PageRequest.of(page.getCurrentPage() - 1, page.getItemsPerPage(), criteria.getOrder(), criteria.getSort().getRequest());
+        Page<Computer> p;
+        if (!byName) {
+            p = this.computerRepository.findAll(pageable);
+        } else {
+            p = this.computerRepository.findAllByNameContaining(criteria.getItemName(), pageable);
+        }
+        p.forEach(c -> computers.add(c));
+        return computers;
     }
 }

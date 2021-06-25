@@ -1,20 +1,70 @@
 package com.excilys.formation.java.cdb.models;
 
+import org.springframework.data.domain.Sort;
+
 public class SearchCriteria {
-    private String order;
-    private String sort;
+    private Sort.Direction order;
+    private SortColumn sort;
     private String limit;
     private String itemName;
 
-    private static final String DEFAULT_SORT = "computer.id";
-    private static final String DEFAULT_ORDER = "asc";
+    public enum SortColumn {
+        ID("id"), NAME("name"), INTRO("introduced"), DIST("discontinued"), COMPANY("manufacturer");
+
+        private String sqlRequest;
+
+        /**
+         * Creates a SortColumn enum.
+         * @param value sqlResquest
+         */
+        SortColumn(String value) {
+            this.sqlRequest = value;
+        }
+
+        /**
+         * Retrieve sqlRequest field.
+         * @return sqlRequest
+         */
+        public String getRequest() {
+            return this.sqlRequest;
+        }
+
+        /**
+         * Creates a SortColumn with given query.
+         * @param value requested
+         * @return a matching SortColumn or SortColumn.ID as default
+         */
+        public static SortColumn of(String value) {
+            SortColumn sort;
+            switch (value) {
+            case "computer.id":
+                sort = SortColumn.ID;
+                break;
+            case "computer.name":
+                sort = SortColumn.NAME;
+                break;
+            case "computer.introduced":
+                sort = SortColumn.INTRO;
+                break;
+            case "computer.discontinued":
+                sort = SortColumn.DIST;
+                break;
+            case "company.name":
+                sort = SortColumn.COMPANY;
+                break;
+            default:
+                sort = SortColumn.ID;
+            }
+            return sort;
+        }
+    }
 
     /**
      * Creates an object that contains search criteria.
      */
     public SearchCriteria() {
-        this.order = DEFAULT_ORDER;
-        this.sort = DEFAULT_SORT;
+        this.order = Sort.DEFAULT_DIRECTION;
+        this.sort = SortColumn.ID;
     }
 
     /**
@@ -23,25 +73,25 @@ public class SearchCriteria {
      * @param reqSort sort criteria
      * @param reqName search criteria
      */
-    public SearchCriteria(String reqOrder, String reqSort, String reqName) {
+    public SearchCriteria(Sort.Direction reqOrder, SortColumn reqSort, String reqName) {
         this.order = reqOrder;
         this.sort = reqSort;
         this.itemName = reqName;
     }
 
-    public String getOrder() {
+    public Sort.Direction getOrder() {
         return order;
     }
 
-    public void setOrder(String reqOrder) {
+    public void setOrder(Sort.Direction reqOrder) {
         this.order = reqOrder;
     }
 
-    public String getSort() {
+    public SortColumn getSort() {
         return sort;
     }
 
-    public void setSort(String reqSort) {
+    public void setSort(SortColumn reqSort) {
         this.sort = reqSort;
     }
 
