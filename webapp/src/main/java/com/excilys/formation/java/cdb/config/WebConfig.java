@@ -5,6 +5,7 @@ import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -30,6 +31,13 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -40,7 +48,8 @@ import com.zaxxer.hikari.HikariDataSource;
         "com.excilys.formation.java.cdb.validators" })
 @EnableJpaRepositories(basePackages = {"com.excilys.formation.java.cdb.daos"})
 @EnableTransactionManagement
-public class WebConfig implements WebMvcConfigurer {
+@EnableWebSecurity
+public class WebConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
     /**
      * Build a ViewResolver maps view names to actual views.
@@ -128,5 +137,27 @@ public class WebConfig implements WebMvcConfigurer {
         transactionManager.setEntityManagerFactory(entityManagerFactory);
 
         return transactionManager;
+    }
+
+    @Override
+    @Autowired
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication().withUser("user1@gmail.com").password(passwordEncoder().encode("user1Pass"))
+                .roles("USER").and().withUser("user2@gmail.com").password(passwordEncoder().encode("user2Pass"))
+                .roles("USER").and().withUser("admin@gmail.com").password(passwordEncoder().encode("adminPass"))
+                .roles("ADMIN");
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests().antMatchers("/computer/edit", "/computer/delete").hasRole("ADMIN")
+                .antMatchers("/computer/list").authenticated().antMatchers("/login").permitAll().and().formLogin()
+                .defaultSuccessUrl("/computer/list", false).and().logout();
+        ;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
