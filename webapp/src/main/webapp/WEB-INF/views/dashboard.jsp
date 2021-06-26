@@ -17,7 +17,16 @@
 <body> 
     <header class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/computer/list"> <fmt:message key="txt.home"/> </a>
+            <!-- a class="navbar-brand" href="${pageContext.request.contextPath}/computer/list"> <fmt:message key="txt.home"/> </a -->
+            <div class="navbar-header">
+            	<a class="navbar-brand" href="${pageContext.request.contextPath}/computer/list"> <fmt:message key="txt.home"/> </a>
+            </div>
+            <div class="collapse navbar-collapse">
+            	<ul class="nav navbar-nav navbar-right">
+            		<li class="active"><a href="#">Welcome [[${username}]]</a></li>
+            		<li class="active"><a href="${pageContext.request.contextPath}/logout"><fmt:message key="txt.logout" /></a></li>
+            	</ul>
+            </div>
         </div>
     </header>
 

@@ -1,5 +1,6 @@
 package com.excilys.formation.java.cdb.controllers;
 
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +47,7 @@ public class ListComputerServlet {
                                         @RequestParam(value = "itemsPerPage", required = false) String itemsPerPage,
                                         @RequestParam(value = "search", required = false) String search,
                                         @RequestParam(value = "order", required = false) String order,
-                                        @RequestParam(value = "sort", required = false) String sort) {
+                                        @RequestParam(value = "sort", required = false) String sort, Principal principal) {
         if (StringUtils.isNotBlank(search)) {
             search.trim();
         }
@@ -62,6 +63,7 @@ public class ListComputerServlet {
         attributeList.put("pagination", page);
         attributeList.put("maxTotalOfPages", maxTotalOfPages);
         attributeList.put("criteria", criteria);
+        attributeList.put("username", principal.getName());
 
         String url = this.setUrl(search, order, sort);
         if (url.length() > 1) {

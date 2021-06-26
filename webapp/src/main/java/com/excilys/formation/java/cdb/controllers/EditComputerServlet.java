@@ -1,6 +1,9 @@
 package com.excilys.formation.java.cdb.controllers;
 
+import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -54,7 +57,7 @@ public class EditComputerServlet {
     }
 
     @GetMapping("/computer/edit")
-    protected ModelAndView getView(@RequestParam(value = "id", required = false) String computerId) {
+    protected ModelAndView getView(@RequestParam(value = "id", required = false) String computerId, Principal principal) {
         ComputerDTO computerDTO = new ComputerDTO.ComputerBuilderDTO().build();
         if (computerId != null && StringUtils.isNumeric(computerId)) {
             Optional<Computer> opt = this.computerService.findById(Long.parseLong(computerId));
@@ -63,8 +66,10 @@ public class EditComputerServlet {
         ModelAndView modelAndView = new ModelAndView("editComputer", "computer", computerDTO);
         List<CompanyDTO> companyDTOList = this.companyService.getCompanies().stream()
                 .map(c -> this.companyMapper.mapFromModelToDTO(c)).collect(Collectors.toList());
-        modelAndView.addObject("companyList", companyDTOList);
-        return modelAndView;
+        Map<String, Object> attributeList = new HashMap<>();
+        attributeList.put("companyList", companyDTOList);
+        attributeList.put("username", principal.getName());
+        return modelAndView.addAllObjects(attributeList);
     }
 
     @PostMapping("/computer/edit")

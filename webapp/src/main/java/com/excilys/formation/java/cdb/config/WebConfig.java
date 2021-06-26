@@ -30,14 +30,16 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
-
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
+import com.excilys.formation.java.cdb.services.CustomUserDetailsService;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -142,14 +144,12 @@ public class WebConfig extends WebSecurityConfigurerAdapter implements WebMvcCon
     @Override
     @Autowired
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser("user1@gmail.com").password(passwordEncoder().encode("user1Pass"))
-                .roles("USER").and().withUser("user2@gmail.com").password(passwordEncoder().encode("user2Pass"))
-                .roles("USER").and().withUser("admin@gmail.com").password(passwordEncoder().encode("adminPass"))
-                .roles("ADMIN");
+        auth.authenticationProvider(authenticationProvider());
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        //TODO use mvcMatchers instead of antMatchers
         http.authorizeRequests().antMatchers("/computer/edit", "/computer/delete").hasRole("ADMIN")
                 .antMatchers("/computer/list").authenticated().antMatchers("/login").permitAll().and().formLogin()
                 .defaultSuccessUrl("/computer/list", false).and().logout();
@@ -159,5 +159,19 @@ public class WebConfig extends WebSecurityConfigurerAdapter implements WebMvcCon
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+    
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+    
+    @Override
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new CustomUserDetailsService();
     }
 }
